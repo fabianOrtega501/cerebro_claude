@@ -58,6 +58,7 @@ procedimiento vive una vez en `~/.claude/skills/` y lo especifico en un perfil b
 | Skill | Perfil | Como se invoca |
 |---|---|---|
 | `update-manual` | `<proy>/manual/` | Deduce el proyecto del repo actual |
+| `start-development` | — (usa `projects.json`) | Automatica al empezar un desarrollo |
 | `fullstack-ticket` | `<proy>/stack/` | `/fullstack-ticket <proyecto>`, o deduce del repo actual |
 
 Agregar un proyecto a cualquiera de las dos es escribir su perfil. **El motor no se toca**; si

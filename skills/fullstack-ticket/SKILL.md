@@ -50,6 +50,11 @@ sesión**. Decirlo y parar; seguir a ciegas genera trabajo que hay que rehacer.
 
 Si el proyecto no tiene stack definido, el script dice cómo crearlo desde la plantilla.
 
+**Si algún repo está en una rama protegida —o si es un desarrollo nuevo y todavía no hay rama—,
+ejecutar la skill `start-development` antes de seguir.** Ese checklist pone las ramas al día,
+pregunta lo necesario y crea la rama de trabajo en los dos repos. Volver aquí con la rama ya
+creada; su paso 3 recoge el enunciado del ticket, que es justo lo que necesita la fase 1.
+
 **Después, leer el `NOTES.md` del stack.** Ahí está lo específico del proyecto: cómo encuadrar,
 dónde buscar, qué se olvida siempre en cada lado, y cómo cerrar. Sin eso, los pasos que siguen son
 genéricos y producen código que ignora las convenciones del proyecto.
