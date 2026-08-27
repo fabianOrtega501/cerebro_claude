@@ -19,6 +19,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
+import { projectOf } from "../../../brain/lib/projects.mjs";
 
 const BRAIN = join(homedir(), ".claude", "brain");
 
@@ -51,21 +52,6 @@ function projectsWithStack() {
 	return readdirSync(dir)
 		.filter(name => name !== "_template" && existsSync(join(dir, name, "stack", "stack.json")))
 		.sort();
-}
-
-/**
- * Proyecto al que pertenece el repo desde el que se invocó.
- *
- * @returns La clave del proyecto, o `null` si el repo actual no está registrado.
- */
-function projectFromCwd() {
-	const repo = run("git", ["rev-parse", "--show-toplevel"]);
-
-	if (!repo) return null;
-
-	const { projects } = readJson(join(BRAIN, "projects.json"), { projects: {} });
-
-	return Object.entries(projects).find(([, config]) => config.repos?.includes(repo))?.[0] ?? null;
 }
 
 /**
@@ -124,7 +110,7 @@ if (args.includes("--list")) {
 	process.exit(0);
 }
 
-const project = wanted ?? projectFromCwd();
+const project = wanted ?? projectOf();
 
 if (!project) {
 	console.error(`No se indicó proyecto y el repo actual no está registrado.\nÚsala así: /fullstack-ticket <proyecto>\nDisponibles: ${projectsWithStack().join(", ") || "(ninguno)"}`);

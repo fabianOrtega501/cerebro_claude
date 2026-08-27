@@ -13,13 +13,18 @@
  * falla ahora, falla al mezclar, con conflictos que no eran necesarios.
  *
  * Uso:
- *   node create-branch.mjs --tipo feature --ticket 10842 --base desa \
- *        --desc "Filtro por tipo de vehiculo" --repos /ruta/a --repos /ruta/b
- *   node create-branch.mjs ... --dry-run      solo muestra qué haría
+ *   node create-branch.mjs --project aio --tipo feature --ticket 10842 --base desa \
+ *        --desc "Filtro por tipo de vehiculo"
+ *   node create-branch.mjs ... --repos /ruta/a --repos /ruta/b    repos sueltos
+ *   node create-branch.mjs ... --dry-run                          solo muestra qué haría
+ *
+ * Con `--project` los repos salen de `brain/projects.json`, que es lo normal: el proyecto ya se
+ * eligió al arrancar el checklist y repetir las rutas a mano invita a equivocarse de repo.
  */
 
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
+import { reposOf } from "../../../brain/lib/projects.mjs";
 
 /** Corre git. `ok` dice si tuvo éxito; nunca lanza. */
 function git(repo, args) {
@@ -88,11 +93,16 @@ const type = arg("tipo");
 const ticket = arg("ticket");
 const base = arg("base");
 const desc = arg("desc");
-const repos = arg("repos", { many: true });
+const project = arg("project");
+const repos = project ? reposOf(project) : arg("repos", { many: true });
 const dryRun = process.argv.includes("--dry-run");
 
 if (!["feature", "hotfix"].includes(type) || !base || !desc || !repos.length) {
-	console.error("Uso: node create-branch.mjs --tipo <feature|hotfix> [--ticket <numero>] --base <rama> --desc \"<descripcion>\" --repos <ruta> [--repos <ruta>...] [--dry-run]");
+	console.error("Uso: node create-branch.mjs --project <clave> --tipo <feature|hotfix> [--ticket <numero>] --base <rama> --desc \"<descripcion>\" [--dry-run]");
+	console.error("     (o --repos <ruta> [--repos <ruta>...] en vez de --project)");
+
+	if (project && !repos.length) console.error(`\nEl proyecto "${project}" no existe en projects.json o ninguno de sus repos está clonado.`);
+
 	process.exit(1);
 }
 
@@ -103,7 +113,7 @@ if (ticket && !/^\d+$/.test(ticket)) {
 
 const name = branchName({ type, ticket, base, desc });
 
-console.log(`Rama: ${name}\n`);
+console.log(`${project ? `Proyecto: ${project}\n` : ""}Rama: ${name}\n`);
 
 const problems = [];
 

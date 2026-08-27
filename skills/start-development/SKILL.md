@@ -5,18 +5,35 @@ description: Usar SIEMPRE al empezar un desarrollo nuevo, antes de escribir una 
 
 # Arrancar un desarrollo
 
-Checklist obligatorio antes de tocar código. Son dos pasos mecánicos y una recogida de contexto,
-en ese orden. **No saltarse ninguno ni cambiar el orden**: la rama tiene que nacer de un origen
+Checklist obligatorio antes de tocar código. Tres pasos mecánicos y una recogida de contexto, en
+ese orden. **No saltarse ninguno ni cambiar el orden**: la rama tiene que nacer de un origen
 actualizado, y eso solo se garantiza actualizando primero.
 
-## Paso 1 — Poner las ramas al día
+## Paso 1 — Preguntar el proyecto
+
+**Siempre lo primero, y siempre preguntado.** El usuario dice "iniciemos desarrollo" sin más:
+deducir el proyecto del directorio en el que está la terminal es cómo se acaba creando la rama
+en el repo equivocado, y peor, sin que nadie se entere.
 
 ```bash
-node ~/.claude/skills/start-development/lib/update-branches.mjs
+node ~/.claude/brain/lib/projects.mjs
 ```
 
-Sin argumentos toma los repos del proyecto actual desde `brain/projects.json`. Para otro
-proyecto, pasar las rutas: `... update-branches.mjs /ruta/a /ruta/b`.
+Lista los proyectos registrados y marca a cuál pertenece el repo actual. Preguntar con
+`AskUserQuestion` usando **esas** claves como opciones —nunca inventadas— y, si el repo actual
+pertenece a uno, ponerlo primero indicando que es el del directorio actual. Esa es una sugerencia
+razonable; **la decisión sigue siendo del usuario**.
+
+Si el proyecto que quiere no está en la lista, hay que agregarlo a `brain/projects.json` antes de
+seguir.
+
+A partir de aquí, **todo lleva `--project <clave>`**. No volver a deducir nada.
+
+## Paso 2 — Poner las ramas al día
+
+```bash
+node ~/.claude/skills/start-development/lib/update-branches.mjs --project <clave>
+```
 
 Trae de todos los remotos con `--prune` y adelanta **cada rama local que se pueda**, solo por
 fast-forward. Lo que no se puede adelantar se reporta sin tocarlo.
@@ -33,16 +50,19 @@ Al leer la salida:
 **Si la rama que se va a usar como base aparece en `sin tocar`, decirlo y parar.** Nacer de una
 base atrasada no falla ahora: falla al mezclar, con conflictos que no eran necesarios.
 
-## Paso 2 — Crear la rama
+## Paso 3 — Crear la rama
 
-Preguntar las cuatro cosas **en una sola interacción**, con `AskUserQuestion`:
+Faltan cuatro datos, pero **no caben en una sola llamada a `AskUserQuestion`**: esa herramienta
+es para elegir entre opciones, y una "pregunta" con una sola opción se rechaza. La descripción es
+texto libre puro, así que va aparte.
+
+**Una llamada a `AskUserQuestion` con tres preguntas:**
 
 | Pregunta | Opciones |
 |---|---|
 | ¿Feature o hotfix? | `feature` / `hotfix` |
-| ¿De qué rama sale? | Las ramas base reales del repo (`desa`, `qa`, `prod`), leídas de git, no inventadas |
-| Número de ticket | Texto libre; puede no haber |
-| Descripción del desarrollo | Texto libre, corta |
+| ¿De qué rama sale? | Las ramas base **reales**, leídas de git, no inventadas |
+| Número de ticket | "Escribir el número" (el usuario usa *Other*) / "Sin ticket" |
 
 Para las bases, ofrecer lo que el repo tenga de verdad:
 
@@ -50,12 +70,15 @@ Para las bases, ofrecer lo que el repo tenga de verdad:
 git -C <repo> branch -r --format='%(refname:short)' | sed 's|origin/||' | grep -xE 'desa|qa|prod|main|master'
 ```
 
+**Y en el mismo turno, pedir la descripción en texto**, para que el usuario conteste todo de una
+vez. Una frase corta; el script la normaliza.
+
 Después:
 
 ```bash
-node ~/.claude/skills/start-development/lib/create-branch.mjs \
+node ~/.claude/skills/start-development/lib/create-branch.mjs --project <clave> \
   --tipo <feature|hotfix> [--ticket <numero>] --base <rama> \
-  --desc "<descripcion>" --repos <ruta> [--repos <ruta>...] [--dry-run]
+  --desc "<descripcion>" [--dry-run]
 ```
 
 El nombre queda así, y lo arma el script — **no escribirlo a mano**:
@@ -68,15 +91,15 @@ hotfix/10999-fabian-originProd-CorreccionDeTotales
 
 Sin ticket, el nombre sale sin él: `feature/fabian-originDesa-AjustesColumnas`.
 
-**En un ticket que cruza dos repos, cada repo lleva su propia rama, con el mismo nombre.** Se
-pasan los dos `--repos` en la misma invocación: el script comprueba **todos** antes de crear
-ninguno, para no dejar un repo con rama y el otro sin ella.
+**Cada repo del proyecto lleva su propia rama, con el mismo nombre.** `--project` los toma todos
+de `projects.json` y el script comprueba **todos** antes de crear ninguno, para no dejar un repo
+con rama y el otro sin ella.
 
 Antes de crear, verifica que el árbol esté limpio, que la base exista y esté sincronizada con su
 remoto, y que no haya ya una rama igual (ni una que solo difiera en mayúsculas). Si algo falla,
 no crea nada y dice qué resolver.
 
-## Paso 3 — Recoger el contexto del ticket
+## Paso 4 — Recoger el contexto del ticket
 
 Con la rama ya creada, pedir al usuario, en una sola interacción:
 
@@ -89,8 +112,8 @@ Con la rama ya creada, pedir al usuario, en una sola interacción:
 
 ## Al terminar
 
-Reportar en tres líneas: qué se actualizó, qué rama quedó creada y en qué repos, y qué queda
-pendiente de lo que no se pudo poner al día.
+Reportar en tres líneas: qué proyecto y qué se actualizó, qué rama quedó creada y en qué repos, y
+qué queda pendiente de lo que no se pudo poner al día.
 
 Si el desarrollo cruza los dos lados de un proyecto, **seguir con `fullstack-ticket`** desde su
 Fase 1: la Fase 0 de aquella (situarse en el proyecto) y este checklist se complementan.

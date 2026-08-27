@@ -11,17 +11,18 @@
  * descarta: no puede perder trabajo.
  *
  * Uso:
- *   `node update-branches.mjs`                 los repos del proyecto actual
+ *   `node update-branches.mjs --project aio`   los repos de ese proyecto
  *   `node update-branches.mjs /ruta/a/repo …`  repos concretos
+ *   `node update-branches.mjs`                 deduce el proyecto del repo actual
  *   `node update-branches.mjs --json`          salida procesable
+ *
+ * **Preferir siempre `--project`.** Deducir el proyecto del directorio actual es un atajo para
+ * uso manual; en el checklist el proyecto lo elige el usuario, no el azar de dónde esté parada
+ * la terminal.
  */
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
-import { homedir } from "node:os";
-
-const BRAIN = join(homedir(), ".claude", "brain");
+import { projectOf, reposOf } from "../../../brain/lib/projects.mjs";
 
 /**
  * Corre git en un repo.
@@ -38,21 +39,15 @@ function git(repo, args) {
 	}
 }
 
-/** Repos del proyecto al que pertenece el directorio actual. Vacío si no está registrado. */
+/** Repos del proyecto al que pertenece el directorio actual, o el repo actual suelto. */
 function reposOfCurrentProject() {
+	const project = projectOf();
+
+	if (project) return reposOf(project);
+
 	const here = git(process.cwd(), ["rev-parse", "--show-toplevel"]);
 
-	if (!here.ok) return [];
-
-	try {
-		const { projects } = JSON.parse(readFileSync(join(BRAIN, "projects.json"), "utf8"));
-		const match = Object.values(projects).find(config => config.repos?.includes(here.out));
-
-		return match ? match.repos.filter(existsSync) : [here.out];
-	}
-	catch {
-		return [here.out];
-	}
+	return here.ok ? [here.out] : [];
 }
 
 /**
@@ -141,13 +136,30 @@ function updateRepo(repo) {
 
 const args = process.argv.slice(2);
 const asJson = args.includes("--json");
-const repos = args.filter(a => !a.startsWith("--"));
-const targets = repos.length ? repos : reposOfCurrentProject();
+const projectIndex = args.indexOf("--project");
+const project = projectIndex >= 0 ? args[projectIndex + 1] : null;
+const explicit = args.filter((a, i) => !a.startsWith("--") && i !== projectIndex + 1);
+
+let targets;
+
+if (project) {
+	targets = reposOf(project);
+
+	if (!targets.length) {
+		console.error(`El proyecto "${project}" no existe en projects.json o ninguno de sus repos está clonado.`);
+		process.exit(1);
+	}
+}
+else {
+	targets = explicit.length ? explicit : reposOfCurrentProject();
+}
 
 if (!targets.length) {
-	console.error("No se encontró ningún repo que actualizar. Pasa las rutas como argumentos.");
+	console.error("No se encontró ningún repo que actualizar. Usa --project <clave> o pasa las rutas.");
 	process.exit(1);
 }
+
+if (project) console.log(`Proyecto: ${project}\n`);
 
 const results = targets.map(updateRepo);
 
