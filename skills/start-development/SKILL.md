@@ -9,11 +9,46 @@ Checklist obligatorio antes de tocar código. Tres pasos mecánicos y una recogi
 ese orden. **No saltarse ninguno ni cambiar el orden**: la rama tiene que nacer de un origen
 actualizado, y eso solo se garantiza actualizando primero.
 
+## Paso 0 — Leer lo que ya dijo el usuario
+
+**Antes de preguntar nada.** El usuario puede haber pasado los datos al invocar:
+
+```
+/start-development aio feature desa 10842 Filtro por tipo de vehiculo
+```
+
+```bash
+node ~/.claude/skills/start-development/lib/parse-request.mjs <lo que escribió>
+```
+
+Reconoce cada dato por lo que es, **en cualquier orden**, y devuelve `missing` con lo que falta.
+Preguntar solo eso. Si `missing` viene vacío, **no se pregunta nada**: se va directo al paso 2.
+
+Preguntar por algo que el usuario ya escribió es el peor defecto que puede tener un checklist:
+lo vuelve un peaje en lugar de una ayuda.
+
+## Reparto de modelos
+
+Los pasos 2 y 3 son mecánicos —correr dos scripts y leer su salida— y no necesitan un modelo
+pesado. **Cuando no falte ningún dato, delegarlos al subagente `branch-starter`, que corre en
+Sonnet**, con el proyecto, tipo, base, ticket y descripción en el prompt:
+
+```
+Agent(subagent_type: "branch-starter", run_in_background: false,
+      prompt: "proyecto: aio | tipo: feature | base: desa | ticket: 10842 | descripción: ...")
+```
+
+El paso 4 y todo lo que sigue —entender el enunciado, decidir si toca los dos lados, fijar el
+contrato— se quedan en la sesión principal, que es donde el modelo pesado sí aporta.
+
+Si faltan datos que haya que preguntar, hacerlo primero en la sesión principal (el subagente no
+pregunta) y delegar después, ya con todo resuelto.
+
 ## Paso 1 — Preguntar el proyecto
 
-**Siempre lo primero, y siempre preguntado.** El usuario dice "iniciemos desarrollo" sin más:
-deducir el proyecto del directorio en el que está la terminal es cómo se acaba creando la rama
-en el repo equivocado, y peor, sin que nadie se entere.
+**Si el paso 0 no lo resolvió, se pregunta. Nunca se deduce.** El usuario dice "iniciemos
+desarrollo" sin más: tomar el proyecto del directorio en el que está la terminal es cómo se acaba
+creando la rama en el repo equivocado, y peor, sin que nadie se entere.
 
 ```bash
 node ~/.claude/brain/lib/projects.mjs
@@ -30,6 +65,10 @@ seguir.
 A partir de aquí, **todo lleva `--project <clave>`**. No volver a deducir nada.
 
 ## Paso 2 — Poner las ramas al día
+
+> Con todos los datos resueltos, este paso y el siguiente los ejecuta el subagente
+> `branch-starter` en Sonnet. Lo de abajo es lo que hace, y lo que hay que hacer a mano si se
+> corre sin él.
 
 ```bash
 node ~/.claude/skills/start-development/lib/update-branches.mjs --project <clave>
@@ -65,13 +104,13 @@ petición de texto con los dos datos libres.** Un solo intercambio, sin trampas.
 | Pregunta (opciones) | Valores |
 |---|---|
 | ¿Feature o hotfix? | `feature` / `hotfix` |
-| ¿De qué rama sale? | Las ramas base **reales**, leídas de git, no inventadas |
+| ¿De qué rama sale? | Las ramas base **reales**, no inventadas |
 
-Para las bases, ofrecer lo que el repo tenga de verdad:
+Las bases reales las devuelve `parse-request.mjs` en `bases`: son las que existen en **todos** los
+repos del proyecto. Una base que solo está en uno dejaría el desarrollo cojo.
 
-```bash
-git -C <repo> branch -r --format='%(refname:short)' | sed 's|origin/||' | grep -xE 'desa|qa|prod|main|master'
-```
+**Preguntar solo lo que esté en `missing`.** Si el usuario ya dijo el tipo, no se le vuelve a
+preguntar.
 
 Y en el texto del mismo turno, pedir:
 
