@@ -1,0 +1,27 @@
+{
+  "label": "AIO — ERP de flotas y aseo",
+  "ticketPrefix": "<numero>: SOFTWARE - AIO:",
+  "contract": "docs/contrato-backend.md",
+  "verifier": "check-contract.mjs",
+  "protectedBranches": ["desa", "qa", "prod"],
+  "repos": [
+    {
+      "role": "front",
+      "path": "/datos/proyectos/AIO/aio-app",
+      "stack": "Vue 3 + Vuetify + TypeScript",
+      "checks": ["pnpm typecheck", "pnpm lint"],
+      "generator": "pnpm CreateResourceFlow"
+    },
+    {
+      "role": "back",
+      "path": "/datos/proyectos/AIO/aio-backend",
+      "stack": "Laravel + PostgreSQL/PostGIS",
+      "checks": ["./vendor/bin/pint", "./vendor/bin/phpstan analyse app"],
+      "tests": "./vendor/bin/sail artisan test tests/Feature/Modules/<Modulo>"
+    }
+  ],
+  "containers": {
+    "AIO_BACKEND_CONTAINER": "el backend con Sail",
+    "AIO_DB_CONTAINER": "PostgreSQL con PostGIS"
+  }
+}

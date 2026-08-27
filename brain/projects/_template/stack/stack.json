@@ -1,0 +1,32 @@
+{
+  "//": "PLANTILLA. Copiar a brain/projects/<proyecto>/stack/stack.json y llenar. Los campos que no apliquen se borran; ninguno es obligatorio salvo repos[].path y repos[].role.",
+
+  "label": "Nombre legible del proyecto",
+  "//ticketPrefix": "Formato del prefijo de commit del equipo, si lo tienen",
+  "ticketPrefix": "",
+  "//contract": "Ruta, relativa a cada repo, del documento que describe el contrato entre los dos lados. Vacio si no existe todavia",
+  "contract": "",
+  "//verifier": "Script dentro de esta carpeta que verifica el contrato estaticamente. Vacio si no hay",
+  "verifier": "",
+  "//protectedBranches": "Ramas en las que NO se debe trabajar un ticket; el preflight avisa si algun repo esta en una de ellas",
+  "protectedBranches": ["main", "master", "desa", "qa", "prod"],
+
+  "repos": [
+    {
+      "role": "front",
+      "path": "/ruta/absoluta/al/repo",
+      "stack": "Con que esta hecho, en una linea",
+      "//checks": "Comandos de calidad que hay que pasar antes de cerrar",
+      "checks": []
+    },
+    {
+      "role": "back",
+      "path": "/ruta/absoluta/al/otro/repo",
+      "stack": "",
+      "checks": []
+    }
+  ],
+
+  "//containers": "Nombre de variable de entorno -> para que sirve el contenedor. Solo los que el ticket pueda necesitar para probar en vivo",
+  "containers": {}
+}
