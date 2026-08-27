@@ -20,6 +20,14 @@
 !/hooks/
 !/brain/
 
+# 2b) La memoria por proyecto SI se versiona; las transcripciones (.jsonl, cientos de MB) no.
+#     Es el mecanismo nativo de Claude para conocimiento con alcance de un solo proyecto.
+!/projects/
+/projects/*
+!/projects/*/
+/projects/*/*
+!/projects/*/memory/
+
 # 3) Basura que puede aparecer dentro de las carpetas rescatadas.
 **/node_modules/
 **/.DS_Store

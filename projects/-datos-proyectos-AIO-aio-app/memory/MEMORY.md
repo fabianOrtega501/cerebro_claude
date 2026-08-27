@@ -1,0 +1,1 @@
+- [Cerebro propio de Claude](cerebro-propio-claude.md) — ~/.claude es un repo git aparte que manda sobre el .claude/ de los repos

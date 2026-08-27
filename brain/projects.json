@@ -1,0 +1,45 @@
+{
+  "_comment": "Registro de proyectos del cerebro. Un proyecto agrupa uno o varios repos (aio son dos: front y back). Las skills de brain/projects/<proyecto>/skills/ se enchufan a TODOS los repos del proyecto. Editar a mano y correr: node ~/.claude/brain/lib/plug.mjs",
+  "projects": {
+    "aio": {
+      "label": "AIO — ERP de flotas y aseo",
+      "repos": [
+        "/datos/proyectos/AIO/aio-app",
+        "/datos/proyectos/AIO/aio-backend"
+      ]
+    },
+    "epsilon": {
+      "label": "Epsilon",
+      "repos": [
+        "/datos/proyectos/Epsilon/epsilon",
+        "/datos/proyectos/Epsilon/epsilon-backend"
+      ]
+    },
+    "status": {
+      "label": "Status",
+      "repos": [
+        "/datos/proyectos/status"
+      ]
+    },
+    "sipa": {
+      "label": "SIPA",
+      "repos": [
+        "/datos/proyectos/sipa"
+      ]
+    },
+    "rutamas": {
+      "label": "Ruta+ / rutamas movil",
+      "repos": [
+        "/datos/proyectos/rutamas-movil",
+        "/datos/proyectos/app-movil"
+      ]
+    },
+    "manuales": {
+      "label": "Manuales de usuario y tecnico",
+      "repos": [
+        "/datos/proyectos/manua-web",
+        "/datos/proyectos/manual-tecnico"
+      ]
+    }
+  }
+}
