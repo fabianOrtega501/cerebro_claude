@@ -33,7 +33,39 @@ git aparte, local.
 ## Preferencias de trabajo
 
 - Explicaciones en espanol, directas y sin relleno.
-- Nombres de codigo (funciones, variables, archivos) en ingles; comentarios y JSDoc en espanol.
-- Los JSDoc documentan el contrato, no repiten la firma: que significa el retorno, si lanza,
-  unidades, y efectos que sorprenden.
+- Nombres de codigo (funciones, variables, archivos) en ingles; comentarios y documentacion en espanol.
 - Nada de credenciales ni rutas absolutas en archivos que se versionan.
+
+## Documentar funciones: maximo 3 renglones
+
+**Tres renglones por funcion. Ni uno mas.** El limite es duro y no admite "es que esta funcion
+es especial": si no cabe, el problema es la funcion, no el limite.
+
+En esos tres renglones va, en este orden de prioridad:
+
+1. **Que hace**, concreto. Que devuelve o que cambia, no una categoria. `Corre git y devuelve la
+   salida limpia` sirve; `Gestiona la ejecucion de comandos` no dice nada.
+2. **Entradas y salidas**, solo cuando la firma no las explique sola. Que significa un `null`,
+   en que unidad viene un numero, si lanza o devuelve el error.
+
+Nada de bloques `@param` uno por argumento, nada de `@returns` que repita el tipo, nada de
+parrafos explicando por que se hizo asi. Si de verdad hace falta un porque, va como **comentario
+suelto junto a la linea que lo necesita**, no en la cabecera de la funcion.
+
+```js
+// Bien
+/** Sha del arbol de `.claude/` en HEAD. `null` si la carpeta no esta versionada. */
+
+// Mal: parrafo de contexto, @param que repite la firma, historia del bug que lo motivo
+```
+
+**Por que el limite.** Sin el, la documentacion crece hasta tapar el codigo: se lee mas prosa que
+implementacion, y lo unico importante —que un retorno vacio significa algo— queda enterrado entre
+lineas que el lector ya sabia. Documentacion de mas no es cautela, es ruido.
+
+**El codigo que ya existe en el cerebro NO cumple esta regla.** Se escribio con la regla anterior
+y el 25% de sus lineas son comentarios; hay bloques de quince renglones. Se dejo asi a proposito,
+no es que nadie se haya dado cuenta. **No lo tomes como ejemplo ni copies su estilo** al tocar un
+archivo viejo: lo que se escriba de nuevo va a 3 renglones, aunque quede al lado de un bloque
+largo. Si de paso puedes recortar el bloque que ya estabas editando, mejor; no abras una limpieza
+por tu cuenta.
