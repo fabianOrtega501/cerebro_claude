@@ -3,6 +3,20 @@
 Reglas y preferencias personales que aplican en **todos** los proyectos. Lo que sea especifico
 de un repo va en el `CLAUDE.md` de ese repo, no aqui.
 
+Este cerebro es **compartido por todos los proyectos**: AIO, Epsilon, Status, SIPA, Ruta+,
+manuales. El mapa completo y el modo de uso estan en `~/.claude/brain/README.md`.
+
+## Skills: transversales o de proyecto
+
+Una skill es **transversal** si sirve igual en dos proyectos que no comparten codigo; va en
+`~/.claude/skills/` y se ve en todas partes. Es **de proyecto** si menciona rutas, modulos,
+endpoints o contenedores de un solo sitio; va en `~/.claude/brain/projects/<proy>/skills/`,
+con el nombre de carpeta empezando por `local-`, y se enchufa con
+`node ~/.claude/brain/lib/plug.mjs`.
+
+Al crear una skill nueva, preguntar a cual de las dos pertenece antes de escribirla. En la duda,
+transversal.
+
 ## Como se relaciona esto con el `.claude/` de los repos
 
 Este directorio (`~/.claude`) es el cerebro y **tiene prioridad**. Los repos de trabajo traen su
