@@ -169,8 +169,18 @@ node ~/.claude/skills/update-manual/lib/close-orphans.mjs
 
 Ocurre porque **con Chrome/Brave instalado por snap no se pueden matar por señal**: el
 confinamiento devuelve `EACCES`. Un flujo que cierre con `chrome.process.kill()` deja el navegador
-vivo cada vez, y los va acumulando hasta que ninguna corrida vuelve a funcionar. Por eso lo de
-abajo no es una preferencia de estilo.
+vivo cada vez, y los va acumulando hasta que ninguna corrida vuelve a funcionar.
+
+El motor ya se defiende solo en tres frentes, así que esto debería ser raro:
+
+| Situación | Qué hace el motor |
+| --- | --- |
+| El puerto ya está ocupado al arrancar | `launchChrome` avisa, cierra al huérfano y lanza el suyo |
+| El script revienta con un error no capturado | Cierra los navegadores que había lanzado y sale con 1 |
+| Ctrl+C a mitad de corrida | Igual, y sale con 130 |
+
+Esa red **no sustituye** al `closeBrowser` en el `finally` de cada flujo: es lo que salva los
+casos que el `finally` no cubre.
 
 ### El cierre correcto
 

@@ -10,9 +10,12 @@
 // Solo va aquí lo que sirve para automatizar CUALQUIER web. Nada que sepa de
 // Vuetify, de Leaflet ni de la app: eso vive en el adaptador (lib/session.mjs).
 //
-// `app-movil` tiene su propia copia de este archivo, nacida del mismo origen.
-// Cada repo es dueño del suyo: pueden evolucionar por separado. Al corregir algo
-// aquí, vale la pena mirar si el mismo fallo existe allá, pero no es obligatorio.
+// Este es el motor ÚNICO del cerebro: lo comparten todos los proyectos. Un arreglo
+// aquí los beneficia a todos a la vez, y por eso mismo un cambio específico de una
+// app NO va aquí: va en el `session.mjs` de su perfil.
+//
+// Los repos de trabajo conservan copias propias, heredadas de antes de centralizar
+// esto. No están sincronizadas y no se mantienen desde aquí.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { spawn } from "node:child_process";
@@ -37,19 +40,145 @@ const CHROME_CANDIDATES = [
 ].filter(Boolean);
 
 /**
+ * Navegadores lanzados por este proceso que todavía no se han cerrado.
+ *
+ * Existe para la red de seguridad de abajo: sin este registro, un script que muere por una
+ * excepción o por Ctrl+C deja el navegador vivo ocupando el puerto, y la corrida siguiente se
+ * conecta a él en vez de lanzar uno nuevo.
+ */
+const openBrowsers = new Set();
+
+/** Los manejadores de cierre se instalan una sola vez, no en cada `launchChrome`. */
+let safetyNetInstalled = false;
+
+/**
+ * Comprueba si ya hay un navegador escuchando en un puerto de depuración.
+ *
+ * @param {number} port - Puerto a comprobar
+ * @param {number} [timeout=1500] - Tope de espera en milisegundos
+ * @returns {Promise<boolean>} `true` si algo respondió como navegador
+ */
+async function portIsBusy(port, timeout = 1500) {
+	try {
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), timeout);
+		const response = await fetch(`http://127.0.0.1:${port}/json/version`, { signal: controller.signal });
+
+		clearTimeout(timer);
+
+		return response.ok;
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * Pide por el protocolo el cierre de lo que esté ocupando un puerto.
+ *
+ * @param {number} port - Puerto ocupado
+ * @returns {Promise<boolean>} `true` si el puerto quedó libre
+ */
+async function closeWhateverIsOn(port) {
+	try {
+		const info = await (await fetch(`http://127.0.0.1:${port}/json/version`)).json();
+		const socket = new WebSocket(info.webSocketDebuggerUrl);
+
+		await new Promise((ok, no) => {
+			socket.onopen = ok;
+			socket.onerror = no;
+			setTimeout(no, 4000);
+		});
+
+		socket.send(JSON.stringify({ id: 1, method: "Browser.close" }));
+		await wait(1200);
+		socket.close();
+	} catch {
+		// No respondió: o ya se fue, o no es un navegador. Lo dirá la comprobación siguiente.
+	}
+
+	for (let attempt = 0; attempt < 10; attempt++) {
+		if (!await portIsBusy(port, 600)) return true;
+		await wait(400);
+	}
+
+	return false;
+}
+
+/**
+ * Instala el cierre automático ante final de proceso, Ctrl+C o error no capturado.
+ *
+ * Es una red de seguridad, no el mecanismo principal: cada flujo debe cerrar con `closeBrowser`
+ * en su `finally`. Pero un `throw` fuera del try, un Ctrl+C a mitad de corrida o un fallo al
+ * importar dejan el navegador vivo, y **con Chrome de snap no se puede matar por señal**
+ * (`EACCES`): el huérfano se queda escuchando y rompe la corrida siguiente.
+ *
+ * No se engancha a `exit` porque ahí ya no se puede esperar nada asíncrono, y cerrar el
+ * navegador exige un ida y vuelta por el protocolo.
+ */
+function installSafetyNet() {
+	if (safetyNetInstalled) return;
+
+	safetyNetInstalled = true;
+
+	const closeAll = async (code) => {
+		// Por puerto y no con `closeBrowser`: aquí no hay conexión CDP a mano —la que tuviera el
+		// flujo se perdió con el error— y `closeBrowser` sin ella no llega a mandar la orden.
+		for (const browser of [...openBrowsers]) {
+			openBrowsers.delete(browser);
+			await closeWhateverIsOn(browser.port).catch(() => {});
+			try { browser.process?.unref(); } catch { /* ya no está */ }
+		}
+
+		process.exit(code);
+	};
+
+	process.on("SIGINT", () => closeAll(130));
+	process.on("SIGTERM", () => closeAll(143));
+	process.on("uncaughtException", (error) => {
+		console.error("Error no capturado:", error?.message ?? error);
+		closeAll(1);
+	});
+	process.on("unhandledRejection", (reason) => {
+		console.error("Promesa rechazada sin capturar:", reason?.message ?? reason);
+		closeAll(1);
+	});
+}
+
+/**
  * Lanza Chrome headless con el puerto de depuración abierto.
  *
  * Cada llamada crea un perfil temporal nuevo, así que la sesión arranca siempre limpia.
  *
+ * Si el puerto ya está ocupado por un navegador huérfano de una corrida anterior, **lo cierra
+ * antes de lanzar el nuevo**. Sin eso el fallo es silencioso y desconcertante: la comprobación
+ * de "¿ya levantó?" la contesta el navegador viejo, así que el flujo se conecta a la pestaña de
+ * otra corrida y falla mucho después, esperando un selector que en la página sí está.
+ *
  * @param {object} [options]
  * @param {number} [options.port=9222] - Puerto de depuración. Cambiarlo permite varias corridas a la vez
  * @param {number} [options.scale=1] - Factor de escala del dispositivo
- * @returns {Promise<{process: object, port: number}>} El proceso, que **hay que matar**
- *          con `.kill()` al terminar, y el puerto donde quedó escuchando
- * @throws {Error} Si no encuentra el ejecutable o si Chrome no abre el puerto
+ * @returns {Promise<{process: object, port: number}>} El proceso y el puerto donde quedó
+ *          escuchando. Ciérralo con `closeBrowser`, **nunca** con `.kill()`: con Chrome de snap
+ *          la señal falla con `EACCES` y deja el navegador vivo
+ * @throws {Error} Si no encuentra el ejecutable, si el puerto sigue ocupado tras intentar
+ *          liberarlo, o si Chrome no abre el puerto
  */
 export async function launchChrome({ port = 9222, scale = 1 } = {}) {
 	const { existsSync } = await import("node:fs");
+
+	if (await portIsBusy(port)) {
+		console.warn(`Aviso: el puerto ${port} ya estaba ocupado por un navegador de otra corrida; se cierra.`);
+
+		if (!await closeWhateverIsOn(port)) {
+			throw new Error(
+				`El puerto ${port} sigue ocupado y no se pudo liberar.\n`
+				+ `Corre: node ~/.claude/skills/update-manual/lib/close-orphans.mjs\n`
+				+ `O usa otro puerto con --puerto.`,
+			);
+		}
+	}
+
+	installSafetyNet();
 	const chrome = CHROME_CANDIDATES.find((candidate) => existsSync(candidate));
 	if (!chrome) {
 		throw new Error("No se encontró Chrome ni Edge. Define la ruta del ejecutable en la variable de entorno CHROME_PATH.");
@@ -77,7 +206,12 @@ export async function launchChrome({ port = 9222, scale = 1 } = {}) {
 			const response = await fetch(`http://127.0.0.1:${port}/json/version`);
 			if (response.ok) {
 				await response.json();
-				return { process: process_, port };
+
+				const handle = { process: process_, port };
+
+				openBrowsers.add(handle);
+
+				return handle;
 			}
 		} catch {
 			// aún no levanta
@@ -270,13 +404,28 @@ export async function waitUntil(cdp, expression, { timeout = 30000, what = null 
  * @returns {Promise<void>} No lanza nunca: está pensado para llamarse desde un `finally`
  */
 export async function closeBrowser(cdp, chrome) {
+	if (chrome) openBrowsers.delete(chrome);
+
+	/*
+	 * Sin conexión CDP hay que ir por el puerto. Antes esto fallaba en silencio: `Promise.race`
+	 * con un `undefined` dentro resuelve de inmediato, así que la orden de cierre nunca salía y
+	 * el navegador quedaba vivo sin que nadie se enterara.
+	 */
+	if (!cdp) {
+		if (chrome?.port) await closeWhateverIsOn(chrome.port).catch(() => {});
+
+		try { chrome?.process?.unref(); } catch { /* ya no está */ }
+
+		return;
+	}
+
 	try {
 		/*
 		 * Con carrera contra el reloj: `Browser.close` casi nunca responde, porque el navegador
 		 * cierra el WebSocket mientras se apaga y la promesa del comando se queda esperando para
 		 * siempre. Lo que importa es que la orden salga.
 		 */
-		await Promise.race([cdp?.send("Browser.close"), wait(3000)]);
+		await Promise.race([cdp.send("Browser.close"), wait(3000)]);
 	} catch {
 		try {
 			chrome?.process?.kill();
