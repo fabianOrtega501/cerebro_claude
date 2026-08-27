@@ -1,0 +1,26 @@
+# El cerebro se versiona con LISTA BLANCA, no lista negra.
+#
+# Claude Code escribe muchas cosas dentro de ~/.claude (transcripciones, credenciales,
+# snapshots del shell) y va agregando carpetas nuevas con cada version. Si esto fuera
+# una lista negra, cada archivo nuevo entraria al repo por defecto y tarde o temprano
+# se colaria algo que no debe. Al reves, lo que no esta explicitamente permitido
+# simplemente no existe para git.
+#
+# Para versionar algo nuevo hay que agregarlo aqui a mano. Es a proposito.
+
+# 1) Ignorar absolutamente todo.
+/*
+
+# 2) Rescatar solo lo que es "cerebro".
+!/.gitignore
+!/settings.json
+!/CLAUDE.md
+!/skills/
+!/agents/
+!/hooks/
+!/brain/
+
+# 3) Basura que puede aparecer dentro de las carpetas rescatadas.
+**/node_modules/
+**/.DS_Store
+**/*.log

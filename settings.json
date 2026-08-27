@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose *)",
+      "Bash(docker-compose ps *)",
+      "Bash(grep -rln 'protected $table = '\\\\''menu'\\\\''\\\\|protected $table = \"menu\"' app/)",
+      "Bash(grep -rln 'router.push\\\\|$router' resources/js/src/views/Dashboard/)",
+      "Bash(xargs -I{} sed -n '{},+8p' resources/js/src/router.js)",
+      "Bash(grep -rho 'AppActiveUser[.a-zA-Z]*\\\\|userInfo[.a-zA-Z'\\\\'']*\\\\|getItem\\('\\\\''user[^\\)]*\\)\\\\|$store.state[.a-zA-Z]*[Uu]ser[.a-zA-Z]*' resources/js/src/views resources/js/src/store)"
+    ]
+  },
+  "effortLevel": "medium",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/claude-upstream-notice.mjs\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
