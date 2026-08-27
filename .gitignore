@@ -13,6 +13,7 @@
 
 # 2) Rescatar solo lo que es "cerebro".
 !/.gitignore
+!/README.md
 !/settings.json
 !/CLAUDE.md
 !/skills/
