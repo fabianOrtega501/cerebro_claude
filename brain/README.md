@@ -16,6 +16,7 @@ absorbe sin aprobacion.
 | `~/.claude/brain/projects/<proy>/skills/local-*` | Skills **de un proyecto** | Solo los repos de ese proyecto, via symlink |
 | `~/.claude/brain/projects/<proy>/manual/` | Perfil del manual: adaptador, modulos, NOTES | Lo carga la skill `update-manual` |
 | `~/.claude/brain/projects/<proy>/stack/` | Stack full-stack: repos, comandos, NOTES, verificador | Lo carga la skill `fullstack-ticket` |
+| `~/.claude/brain/projects/<proy>/docs/` | Documentacion tecnica: donde vive, que cuenta como negocio | Lo carga la skill `update-tech-docs` |
 | `~/.claude/brain/projects/_template/` | Plantillas para agregar un proyecto | — |
 | `~/.claude/projects/<repo>/memory/` | Conocimiento de un repo | Ese repo; Claude lo recuerda solo |
 | `~/.claude/CLAUDE.md` | Reglas y preferencias | Todos los proyectos, siempre cargado |
@@ -59,6 +60,7 @@ procedimiento vive una vez en `~/.claude/skills/` y lo especifico en un perfil b
 |---|---|---|
 | `update-manual` | `<proy>/manual/` | Deduce el proyecto del repo actual |
 | `start-development` | — (usa `projects.json`) | Automatica al empezar un desarrollo |
+| `update-tech-docs` | `<proy>/docs/` | Cuando cambia una regla de negocio, o al avisar el hook del push |
 | `fullstack-ticket` | `<proy>/stack/` | `/fullstack-ticket <proyecto>`, o deduce del repo actual |
 
 Agregar un proyecto a cualquiera de las dos es escribir su perfil. **El motor no se toca**; si

@@ -27,4 +27,8 @@ export const PROFILE = {
 
 	/** Dónde vive el adaptador de la app, relativo a esta carpeta. */
 	session: "./lib/session.mjs",
+
+	/** Repo del front y carpetas cuyo cambio el usuario final percibe. Las usa el hook del push. */
+	uiRepo: "/datos/proyectos/AIO/aio-app",
+	uiGlobs: ["src/views/pages", "src/pages"],
 }

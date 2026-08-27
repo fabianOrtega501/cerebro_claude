@@ -95,7 +95,8 @@ Es estático y **no sustituye probar contra el backend corriendo**.
 
 - Mismo prefijo de ticket en los dos repos: `0010461: SOFTWARE - AIO: <descripción>`.
 - Si el backend cambió una regla de negocio, un estado o una integración, su documentación va
-  **en el mismo MR** (`aio-backend/docs/`).
+  **en el mismo MR** (`aio-backend/docs/`). Usa la skill `update-tech-docs`; el estándar completo
+  está en `aio-backend/docs/README.md` y es normativo.
 - Si cambió algo que el usuario ve, **ofrecer la skill `update-manual`** del cerebro (funciona
   desde cualquiera de los dos repos, a diferencia de la copia `update-web-manual` que solo está
   en el front).

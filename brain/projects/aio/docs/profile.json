@@ -1,0 +1,46 @@
+{
+  "//": "Perfil de documentacion tecnica del AIO para la skill transversal update-tech-docs.",
+  "//alcance": "Solo backend. El front no documenta reglas de negocio; lo que el usuario ve va al manual web (skill update-manual).",
+
+  "label": "AIO backend",
+  "repo": "/datos/proyectos/AIO/aio-backend",
+
+  "//standard": "El estandar NO se define aqui: ya esta escrito y es del equipo. La skill lo lee.",
+  "standard": "docs/README.md",
+
+  "docsRoot": "docs",
+  "modulesDir": "docs/modulos",
+  "architectureDir": "docs/arquitectura",
+
+  "//sourceGlobs": "Carpetas de app/ cuyo cambio puede alterar una regla de negocio. Controllers quedan fuera a proposito: su contrato lo documenta Swagger, no el markdown.",
+  "sourceGlobs": [
+    "app/Services/Modules",
+    "app/Jobs/Modules",
+    "app/Actions",
+    "app/Models/Modules",
+    "app/Enums",
+    "app/Rules"
+  ],
+
+  "//moduleFrom": "Como sacar el modulo de una ruta de codigo: el segmento que sigue a Modules/.",
+  "moduleFrom": "Modules/([^/]+)/",
+
+  "//modules": "Nombre en el codigo -> carpeta en docs/modulos. Las que no coinciden estan asi en el repo; no se normalizan desde aqui.",
+  "modules": {
+    "Avl": "AVL",
+    "CustomerZone": "customer-zone",
+    "DocumentaryFilm": "documentary-film",
+    "Maintenance": "maintenance",
+    "Mobile": "mobile",
+    "Operation": "operation",
+    "Respel": "respel",
+    "Settings": "settings",
+    "Tires": "tires",
+    "VehicleControl": "vehicle-control"
+  },
+
+  "//ignoreModules": "Modulos sin reglas de negocio propias que documentar.",
+  "ignoreModules": ["Standard", "Osm"],
+
+  "//conflicto": "docs/modules/ (ingles) es un arbol paralelo que contradice el estandar §2.3. Se escribe SIEMPRE en docs/modulos/. Ver CONFLICTO.md."
+}
