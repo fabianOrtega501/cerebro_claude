@@ -52,17 +52,20 @@ base atrasada no falla ahora: falla al mezclar, con conflictos que no eran neces
 
 ## Paso 3 — Crear la rama
 
-Faltan cuatro datos, pero **no caben en una sola llamada a `AskUserQuestion`**: esa herramienta
-es para elegir entre opciones, y una "pregunta" con una sola opción se rechaza. La descripción es
-texto libre puro, así que va aparte.
+Faltan cuatro datos, y **solo dos de ellos son elecciones**. `AskUserQuestion` sirve para elegir
+entre opciones; el ticket y la descripción son texto libre y meterlos ahí sale mal:
 
-**Una llamada a `AskUserQuestion` con tres preguntas:**
+- Una "pregunta" con una sola opción **se rechaza** — la descripción no cabe.
+- Una opción etiquetada *"Escribir el número"* **se puede seleccionar como si fuera la
+  respuesta**, y entonces hay que volver a pedir el número igualmente. Pasó en la segunda prueba.
 
-| Pregunta | Opciones |
+Así que: **una llamada a `AskUserQuestion` con las dos preguntas reales, y en el mismo turno una
+petición de texto con los dos datos libres.** Un solo intercambio, sin trampas.
+
+| Pregunta (opciones) | Valores |
 |---|---|
 | ¿Feature o hotfix? | `feature` / `hotfix` |
 | ¿De qué rama sale? | Las ramas base **reales**, leídas de git, no inventadas |
-| Número de ticket | "Escribir el número" (el usuario usa *Other*) / "Sin ticket" |
 
 Para las bases, ofrecer lo que el repo tenga de verdad:
 
@@ -70,8 +73,10 @@ Para las bases, ofrecer lo que el repo tenga de verdad:
 git -C <repo> branch -r --format='%(refname:short)' | sed 's|origin/||' | grep -xE 'desa|qa|prod|main|master'
 ```
 
-**Y en el mismo turno, pedir la descripción en texto**, para que el usuario conteste todo de una
-vez. Una frase corta; el script la normaliza.
+Y en el texto del mismo turno, pedir:
+
+1. **Número de ticket** — solo dígitos; decir que puede no haberlo, y entonces el nombre sale sin él.
+2. **Descripción corta** — una frase; el script la normaliza a PascalCase sin tildes.
 
 Después:
 
