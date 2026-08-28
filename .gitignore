@@ -22,6 +22,11 @@
 !/hooks/
 !/brain/
 
+# 2c) El snapshot del `.claude/` de cada repo es una foto del trabajo del EQUIPO, no del
+#     cerebro: skills que escribieron ellos. `upstream.mjs` lo regenera cuando hace falta y
+#     `plug.mjs` refija la linea base, asi que no pierde nada por no viajar en el repo.
+/brain/upstream/
+
 # 2b) La memoria por proyecto SI se versiona; las transcripciones (.jsonl, cientos de MB) no.
 #     Es el mecanismo nativo de Claude para conocimiento con alcance de un solo proyecto.
 !/projects/

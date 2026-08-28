@@ -29,6 +29,7 @@ import {
 } from "../../lib/browser.mjs";
 import { sql, waitForTable } from "../../lib/localdb.mjs";
 import { DEFAULT_BASE, type } from "../../lib/session.mjs";
+import { setting } from "../../lib/config.mjs";
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {
@@ -52,12 +53,26 @@ const NIT_UNKNOWN = arg("nitInexistente", "999999999-9");
 /**
  * Empresas ya configuradas, para la captura del selector.
  *
- * Se siembran en la base local (que es lo que lista la pantalla) con los mismos nombres que ya
- * aparecen en las capturas publicadas del manual, para que el documento sea coherente.
+ * Se siembran en la base local (que es lo que lista la pantalla). Los nombres y dominios reales
+ * salen de `~/.claude/secrets.env`, que no se versiona: identifican a clientes y no tienen por
+ * que viajar en el repo. Sin ese archivo se capturan los de ejemplo, y el manual queda con
+ * nombres genericos en vez de con los que ya estan publicados.
  */
 const CONFIGURED = [
-	{ id: 1, identification_code: NIT, name: "EMPRESA DEMO S.A.S", api: "https://api.ejemplo.local/api", is_default: 1 },
-	{ id: 2, identification_code: "800000000-0", name: "EMPRESA SECUNDARIA S.A E.S.P.", api: "https://api2.ejemplo.local/api", is_default: 0 },
+	{
+		id: 1,
+		identification_code: NIT,
+		name: setting("AMI_COMPANY_A_NAME", "EMPRESA DEMO S.A.S"),
+		api: setting("AMI_COMPANY_A_API", "https://api.ejemplo.local/api"),
+		is_default: 1,
+	},
+	{
+		id: 2,
+		identification_code: setting("AMI_COMPANY_B_NIT", "800000000-0"),
+		name: setting("AMI_COMPANY_B_NAME", "EMPRESA SECUNDARIA S.A E.S.P."),
+		api: setting("AMI_COMPANY_B_API", "https://api2.ejemplo.local/api"),
+		is_default: 0,
+	},
 ];
 
 /**

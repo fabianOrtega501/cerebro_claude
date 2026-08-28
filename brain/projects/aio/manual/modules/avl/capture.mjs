@@ -2,7 +2,7 @@
  * Capturas del módulo AVL para el manual: capa de rutas, popup de la ruta y modal de detalle.
  *
  * Uso:
- *   node modules/avl/capture.mjs --salida ./capturas --empresa "EMPRESA DEMO S.A.S" \
+ *   node modules/avl/capture.mjs --salida ./capturas --empresa "<nombre de la empresa>" \
  *     [--base http://localhost:5173] [--email <usuario>] [--password <clave>] \
  *     [--servicio "Matenimiento Cestas"] [--vista gps-history|vehicle-tracking] \
  *     [--solo modal|popup]
