@@ -2,7 +2,7 @@
   "label": "AMI — app movil de campo (front) + backend del AIO",
   "//backendCompartido": "aio-backend NO es de AMI: pertenece al proyecto aio y lo comparten aio-app, app-movil y cualquier otro consumidor. Un cambio ahi puede romper a los otros dos. Se declara aqui para poder crear la rama y fijar el contrato, no porque sea propiedad de AMI.",
 
-  "ticketPrefix": "<numero>: SOFTWARE - AIO:",
+  "ticketPrefix": "<numero>: SOFTWARE - AMI:",
   "contract": "docs/contrato-backend.md",
   "verifier": "",
   "protectedBranches": ["desa", "qa", "prod"],

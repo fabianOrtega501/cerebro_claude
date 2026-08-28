@@ -36,6 +36,18 @@ ticket, prefijo de commit, checks del proyecto y gestor de paquetes **realmente 
 Si `base` viene `null`, la rama no codifica su origen: **preguntar contra qué rama se integra**.
 No adivinarlo.
 
+**Si `siblings` trae algo, el ticket toca los dos lados.** Son los demás repos del proyecto que
+están en la **misma rama** y tienen cambios sin commitear o commits sin subir. No es un bloqueante
+—cerrar este repo es válido— pero hay que **decirlo antes de empezar, no después del push**:
+
+```json
+"siblings": [{ "repo": ".../aio-backend", "role": "back", "dirty": true, "files": 2, "ahead": 0 }]
+```
+
+Preguntar si se cierran los dos en esta pasada. Cerrar el front y dejar el back en el disco es
+exactamente el fallo que describe el `CLAUDE.md` del cerebro: el trabajo a medias en un lado
+esperando a que se note después. Y se nota tarde, cuando el MR del front no funciona sin el otro.
+
 ## Fase 1 — Limpiar
 
 Primero mirar qué hay, con criterio propio:

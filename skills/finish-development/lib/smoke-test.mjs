@@ -15,7 +15,23 @@
 
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { launchChrome, connectPage, closeBrowser, wait, evaluate } from "../../update-manual/lib/browser.mjs";
+import { setting } from "../../update-manual/lib/config.mjs";
+
+/*
+ * `browser.mjs` busca el navegador en `process.env.CHROME_PATH`, no en los settings, y esa
+ * variable solo existe si la sesion arranco en un repo que la declara. Trabajando desde el
+ * cerebro no esta, y el fallo aparece como "no se encontro Chrome" aunque este configurado.
+ *
+ * Se resuelve aqui y se inyecta ANTES de cargar el modulo: su lista de candidatos se congela al
+ * importarlo, de ahi que el import sea dinamico.
+ */
+if (!process.env.CHROME_PATH) {
+	const chromePath = setting("CHROME_PATH");
+
+	if (chromePath) process.env.CHROME_PATH = chromePath;
+}
+
+const { launchChrome, connectPage, closeBrowser, wait, evaluate } = await import("../../update-manual/lib/browser.mjs");
 
 const args = process.argv.slice(2);
 const arg = (name, fallback = null) => (args.includes(name) ? args[args.indexOf(name) + 1] : fallback);
@@ -86,19 +102,36 @@ try {
 		 * `openSession` lanza SU navegador y devuelve la conexion; no acepta una de fuera. Por eso
 		 * aqui no se abre Chrome antes: se delega y se engancha despues, aun a costa de perderse
 		 * los errores del propio login (que igual se reportan, porque openSession lanza si falla).
+		 *
+		 * Que el login falle NO aborta el humo test: se sigue sin sesion. Un login roto tapando que
+		 * la app ni siquiera carga es peor que no tener login.
 		 */
-		const session = await import(join(homedir(), ".claude", "brain", "projects", arg("--project", "aio"), "manual", "lib", "session.mjs"));
+		const project = arg("--project", "aio");
 
-		// Sin empresa no se cargan los permisos y toda ruta interna rebota a not-authorized.
-		({ cdp, chrome } = await session.openSession({ base, ...session.testCredentials(), company: arg("--company", "Empresa Demo"), port }));
-		loggedIn = true;
-		await watch(cdp);
+		try {
+			const session = await import(join(homedir(), ".claude", "brain", "projects", project, "manual", "lib", "session.mjs"));
+
+			if (typeof session.openSession !== "function")
+				throw new Error(`El proyecto "${project}" no expone openSession() en manual/lib/session.mjs. No todos entran igual: AMI es offline-first y siembra la sesion por API, no por formulario.`);
+
+			// Sin empresa no se cargan los permisos y toda ruta interna rebota a not-authorized.
+			({ cdp, chrome } = await session.openSession({ base, ...session.testCredentials(), company: arg("--company", "Empresa Demo"), port }));
+			loggedIn = true;
+		}
+		catch (error) {
+			errors.push({ type: "login", text: `${error.message.split("\n")[0]} Se sigue sin sesion: solo se cubre lo que se ve sin entrar.` });
+			await closeBrowser(cdp, chrome);
+			cdp = null;
+			chrome = null;
+		}
 	}
-	else {
+
+	if (!cdp) {
 		chrome = await launchChrome({ port });
 		cdp = await connectPage(chrome.port);
-		await watch(cdp);
 	}
+
+	await watch(cdp);
 
 	for (const path of paths.length ? paths : ["/"]) {
 		await cdp.send("Page.navigate", { url: `${base}${path}` });
@@ -114,10 +147,9 @@ try {
 	}
 }
 catch (error) {
-	// Un login fallido no es un error del codigo: se marca aparte para no dar por roto lo que no se miro.
-	const failedLogin = args.includes("--login") && !loggedIn;
-
-	errors.push({ type: failedLogin ? "login" : "driver", text: error.message.split("\n").slice(0, 3).join(" | ").slice(0, 400) });
+	// El login ya tiene su propio catch: lo que llegue aqui es del driver o de la navegacion, y
+	// etiquetarlo como "login" haria que no cuente como fallo bloqueante.
+	errors.push({ type: "driver", text: error.message.split("\n").slice(0, 3).join(" | ").slice(0, 400) });
 }
 finally {
 	await closeBrowser(cdp, chrome);
@@ -125,11 +157,19 @@ finally {
 
 const blocking = errors.filter(e => e.type !== "login");
 
+// Sin una sola ruta visitada no se comprobo nada, y decir que si es peor que fallar.
+if (!visited.length) blocking.push({ type: "driver", text: "No se llego a visitar ninguna ruta: el humo test no comprobo nada." });
+
 /*
  * Rebotar a not-authorized o login es un fallo aunque la consola este limpia: se pidio ver una
  * pantalla y no se vio. Sin esto el humo test da "ok" por rutas que nunca se abrieron.
  */
-const bounced = visited.filter(v => v.redirected);
+/*
+ * Sin sesion, que la app mande al login no es un fallo: es lo que debe hacer. Contarlo como tal
+ * deja el humo test en rojo permanente en los proyectos donde no se puede entrar, y un rojo que
+ * siempre esta encendido no lo mira nadie.
+ */
+const bounced = visited.filter(v => v.redirected && !(!loggedIn && /login/i.test(v.landed)));
 
 console.log(JSON.stringify({
 	ok: blocking.length === 0 && bounced.length === 0,

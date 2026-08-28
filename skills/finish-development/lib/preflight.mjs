@@ -56,6 +56,33 @@ function ticketFromBranch(branch) {
 	return match ? match[1] : null;
 }
 
+/**
+ * Los demas repos del proyecto que estan en la MISMA rama y tienen trabajo sin cerrar.
+ *
+ * Un ticket que toca los dos lados deja la misma rama en los dos repos. Mirar solo el directorio
+ * actual es como se cierra medio ticket sin enterarse: el front sube y el back se queda en el
+ * disco esperando a que alguien se acuerde.
+ */
+function siblings(stack, currentRepo, branch) {
+	const others = (stack?.repos ?? []).filter(r => r.path !== currentRepo && existsSync(join(r.path, ".git")));
+	const found = [];
+
+	for (const repo of others) {
+		if (git(repo.path, ["branch", "--show-current"]).out !== branch) continue;
+
+		const dirty = git(repo.path, ["status", "--porcelain"]).out;
+		const tracked = git(repo.path, ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]);
+		const compare = tracked.ok ? tracked.out : `origin/${baseFromBranch(branch) ?? "HEAD"}`;
+		const ahead = git(repo.path, ["rev-parse", "--verify", "--quiet", compare]).ok
+			? Number(git(repo.path, ["rev-list", "--count", `${compare}..HEAD`]).out ?? 0)
+			: 0;
+
+		if (dirty || ahead > 0) found.push({ repo: repo.path, role: repo.role ?? null, dirty: Boolean(dirty), files: dirty ? dirty.split("\n").length : 0, ahead, hasUpstream: tracked.ok });
+	}
+
+	return found;
+}
+
 /** Gestor de paquetes realmente disponible, para no proponer un `pnpm` que no esta instalado. */
 function packageManager() {
 	for (const candidate of ["pnpm", "npm"]) {
@@ -97,6 +124,7 @@ if (protectedBranches.includes(branch)) blockers.push(`Estas en "${branch}", una
 if (!dirty && !(Number(counts[1]) > 0)) blockers.push("No hay nada que subir: el arbol esta limpio y no hay commits por delante del remoto.");
 
 const repoConfig = (stack?.repos ?? []).find(r => r.path === repo) ?? null;
+const pendientes = siblings(stack, repo, branch);
 
 console.log(JSON.stringify({
 	repo,
@@ -116,4 +144,6 @@ console.log(JSON.stringify({
 	checks: repoConfig?.checks ?? [],
 	packageManager: packageManager(),
 	blockers,
+	// No es un blocker: cerrar este repo es valido. Pero hay que decirlo ANTES del push, no despues.
+	siblings: pendientes,
 }, null, 2));
