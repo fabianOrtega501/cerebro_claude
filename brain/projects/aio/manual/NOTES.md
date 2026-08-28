@@ -212,6 +212,42 @@ Cada uno de estos puntos costó una corrida fallida:
   coordenadas está pegado al borde del mapa: con margen se agarra el fondo blanco de la página.
   Para esos casos, pasarle a `screenshot` un `clip` calculado sobre el contenedor.
 
+- **Los pasos de un `AppStepper` no siempre son clicables.** Si la vista le pasa
+  `is-active-step-valid`, el componente entra en modo validación y anula el `@click` de cada
+  paso: el único camino es el par de botones Anterior / Siguiente del formulario. Y la clase
+  `.stepper-icon-step` **solo existe cuando el paso trae `icon`**; sin ícono el componente cae
+  en su rama numerada y hay que buscar por `.step-title`.
+- **Cada fila de `DataTable` trae sus acciones por duplicado**: la tabla de escritorio y la
+  variante de tarjetas para móvil, con las mismas clases y una de las dos oculta. Un
+  `row.querySelector('.v-show')` devuelve la primera, que puede ser la invisible: su rectángulo
+  es 0×0 y el click cae sobre el velo del diálogo sin que pase nada. Hay que recorrer todas y
+  quedarse con la que tenga tamaño.
+- **Los `id` de `AppTextField` y `AppAutocomplete` cambian en cada render.** Se calculan como
+  `app-<tipo>-<etiqueta>-<aleatorio>` dentro de un `computed`, así que un id leído antes de
+  tocar un select ya no existe después. Hay que resolver el campo por su etiqueta en el momento
+  de usarlo.
+- **La etiqueta no siempre está dentro del componente.** Varias vistas ponen el rótulo como un
+  `<label class="v-label">` **hermano**, justo antes del campo (Nombre y Descripción del paso
+  Planes). Y Vuetify añade su propia etiqueta flotante, vacía: hay que quedarse con la primera
+  que tenga texto y, si no hay ninguna, con el `placeholder`.
+- **No todo campo es un `App*`.** `Tipo Vehículo` del paso Planes es un `VAutocomplete` pelado;
+  si el barrido solo busca los envoltorios del proyecto, ese campo se queda sin llenar y el
+  formulario no valida. Ojo al deducir el tipo: un `VAutocomplete` **también** lleva la clase
+  `v-text-field`, así que hay que decidir por `.v-select` / `.v-autocomplete`.
+- **Los tooltips de las celdas son `.v-overlay--active`.** Si el "diálogo más alto" se busca por
+  esa clase, un tooltip que quedó abierto se lleva el papel y a partir de ahí no se encuentra
+  ningún botón. Acotar a los overlays que contengan un `.v-card`.
+- **Un select múltiple deja su menú abierto tras elegir**, y ese `.v-list` tapa los botones del
+  diálogo. Se cierra con la tecla real (`pressEscape`), no con un `KeyboardEvent` sintético
+  sobre `document`; los diálogos son `persistent`, así que el Escape no se lleva la modal.
+- **Elegir un valor en un select puede devolver el formulario a esqueletos** mientras recarga
+  los campos que dependen de él (Actividad depende de Sistema). Una relectura inmediata cae en
+  ese hueco y no ve ningún campo: hay que volver a esperar a que el formulario monte, y esperar
+  también a los campos que están **deshabilitados** mientras cargan.
+- **El `.footer-dialog` de `DialogComponent` es `position: fixed` a lo ancho de la ventana**,
+  con `z-index: 999`: se lleva el click de cualquier botón que caiga en esa franja, y el
+  síntoma es que no pasa nada. Bajar el scroll del diálogo sube los botones por encima.
+
 ## Al terminar, en este repo
 
 **Levantar el dev server reescribe `components.d.ts`**, que regenera `unplugin-vue-components` al
@@ -241,6 +277,17 @@ git diff --numstat components.d.ts
 | Móvil > Censo | `modules/mobile/visits/capture.mjs` | `census` (tabla de visitas y pestaña Información Visitas: `Censo.md`) |
 | Público > Portal Ciudadano | `modules/public/citizen-portal/capture.mjs` | `citizen-portal` (la página del QR y su menú de accesibilidad: `ConsultaElementosPublico.md`). Sin login y sin backend |
 | Público > Portal Ciudadano | `modules/public/citizen-portal/capture-recycling.mjs` | `citizen-portal-recycling` (mapa de puntos de acopio: `ReciclajeVoluminosos.md`). Sin login, pero **sí** necesita el backend y datos publicados |
+| Mantenimiento > Planes | `modules/maintenance/plans/capture.mjs` | Los cuatro pasos de líneas del wizard (Actividades, Puestos de Trabajo, Herramientas, Suministros) |
+| Mantenimiento > Planes | `modules/maintenance/plans/capture-crud.mjs` | Una captura por operación del CRUD, en los tres modos del wizard (`--modo edicion\|creacion\|consulta`). Sirve además como prueba: imprime al final la lista de hallazgos, y una corrida limpia termina en `hallazgos (0)` |
+
+La navegación del wizard —abrir la pestaña Planes, abrir el wizard de una fila, saltar entre
+pasos— vive en `modules/maintenance/plans/wizard.mjs`, compartida por los dos flujos. Ninguno de
+los dos tiene todavía `mappings.mjs`, así que `copy-to-manual.mjs` no los cubre: las capturas
+salen a la carpeta que se le pase y se copian a mano si hacen falta en el manual.
+
+Para el CRUD hay que apuntar a un plan **sin líneas** (en los datos de prueba, `PRUEBA CRUD
+Wizard`): con un plan grande la fila recién creada cae en la última página y la comprobación da
+negativo. Para el modo consulta conviene lo contrario, un plan con datos (`DEMO Plan`).
 
 Para el wizard de la ruta hay que pasar `--ruta` con una que tenga registros en sus pestañas: en
 los datos de prueba, `MAR-01` (Ruta #2) tiene personal, peajes y puntos de control, y ninguna ruta

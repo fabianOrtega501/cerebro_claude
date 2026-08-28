@@ -195,6 +195,14 @@ que no hace falta un `cdp.close()` antes.
 
 Al escribir un flujo nuevo, **cópiale el cierre a uno que ya lo haga bien** en vez de improvisarlo.
 
+### Un click que no hace nada
+
+**Antes de dar un click por bueno, comprueba con `elementFromPoint` que en esas coordenadas está
+el elemento que crees.** Un velo de diálogo, un tooltip que quedó abierto o una barra fija se
+llevan el evento sin error ninguno, y el síntoma aparece pasos después y en otro sitio. Vale
+también para elementos duplicados: si el DOM tiene dos variantes del mismo botón —una de
+escritorio y una de móvil— la oculta mide 0×0 y su centro cae sobre cualquier otra cosa.
+
 Al escribir un flujo nuevo, conviene la misma pauta: verificar cada paso en el momento en vez de
 dejar que el error salte tres pasos después, lejos de su causa.
 
