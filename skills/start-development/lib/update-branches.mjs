@@ -11,7 +11,7 @@
  * descarta: no puede perder trabajo.
  *
  * Uso:
- *   `node update-branches.mjs --project aio`   los repos de ese proyecto
+ *   `node update-branches.mjs --project aio`   los repos del proyecto, incluidos los compartidos
  *   `node update-branches.mjs /ruta/a/repo …`  repos concretos
  *   `node update-branches.mjs`                 deduce el proyecto del repo actual
  *   `node update-branches.mjs --json`          salida procesable
@@ -22,7 +22,30 @@
  */
 
 import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { homedir } from "node:os";
 import { projectOf, reposOf } from "../../../brain/lib/projects.mjs";
+
+/**
+ * Repos que hay que poner al dia para un proyecto: los suyos mas los ajenos con los que trabaja.
+ * AMI comparte `aio-backend`; sin esto su base quedaria atrasada y la rama naceria mal.
+ */
+function reposToUpdate(project) {
+	const own = reposOf(project);
+	const stackFile = join(homedir(), ".claude", "brain", "projects", project, "stack", "stack.json");
+
+	if (!existsSync(stackFile)) return own;
+
+	try {
+		const declared = (JSON.parse(readFileSync(stackFile, "utf8")).repos ?? []).map(r => r.path).filter(existsSync);
+
+		return [...new Set([...own, ...declared])];
+	}
+	catch {
+		return own;
+	}
+}
 
 /**
  * Corre git en un repo.
@@ -143,7 +166,7 @@ const explicit = args.filter((a, i) => !a.startsWith("--") && i !== projectIndex
 let targets;
 
 if (project) {
-	targets = reposOf(project);
+	targets = reposToUpdate(project);
 
 	if (!targets.length) {
 		console.error(`El proyecto "${project}" no existe en projects.json o ninguno de sus repos está clonado.`);
