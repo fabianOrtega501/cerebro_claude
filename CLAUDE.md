@@ -34,7 +34,14 @@ git aparte, local.
 
 - Explicaciones en espanol, directas y sin relleno.
 - Nombres de codigo (funciones, variables, archivos) en ingles; comentarios y documentacion en espanol.
-- Nada de credenciales ni rutas absolutas en archivos que se versionan.
+- **Credenciales: en ningun archivo versionado, nunca.** Van a `~/.claude/secrets.env`, que la
+  lista blanca del `.gitignore` deja fuera del repo. Los scripts las leen de ahi.
+- **Rutas absolutas: aqui si, en un repo de trabajo jamas.** El cerebro es local y personal, y hay
+  cosas que no funcionan sin ellas: `projects.json` registra donde esta clonado cada repo, y
+  `additionalDirectories` de `settings.json` no expande variables de entorno. En el `.claude/` de
+  un repo del equipo no tienen nada que hacer: ahi la ruta de tu maquina no le sirve a nadie.
+- Esa lista de directorios **no se escribe a mano**: sale de `projects.json` y la genera
+  `brain/lib/sync-directories.mjs`, que `plug.mjs` ya corre. Una sola fuente de verdad.
 
 ## Si el desarrollo cambia de lado, se dice y se cambia de skill
 

@@ -26,6 +26,7 @@
 import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, readlinkSync, rmSync, symlinkSync, writeFileSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 import { BRAIN_DIR, currentTree, inspect, markReviewed } from "./upstream.mjs";
+import { syncDirectories } from "./sync-directories.mjs";
 
 /** Prefijo obligatorio de toda skill privada. Es lo que la hace invisible para git. */
 const PRIVATE_PREFIX = "local-";
@@ -175,3 +176,15 @@ for (const [project, config] of entries) {
 console.log("\nSkills transversales activas en todos los proyectos:");
 for (const skill of readdirSync(join(BRAIN_DIR, "..", "skills")))
   console.log(`  - ${skill}`);
+
+// Registrar un proyecto y no poder entrar a su repo sin aprobarlo es el mismo descuido en dos
+// archivos. Se hace aqui para que registrar y poder trabajar sean un solo paso.
+const dirs = syncDirectories({ check: statusOnly });
+
+console.log("\nDirectorios permitidos (settings.json):");
+if (!dirs.changed)
+  console.log(`  al dia con projects.json (${dirs.total} repos)`);
+else if (statusOnly)
+  console.log(`  DESINCRONIZADO: faltan ${dirs.added.length}, sobran ${dirs.removed.length}. Corre plug.mjs sin --status.`);
+else
+  console.log(`  actualizados: ${dirs.total} repos (+${dirs.added.length} / -${dirs.removed.length})`);
