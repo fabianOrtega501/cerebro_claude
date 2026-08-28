@@ -63,8 +63,10 @@ escribe codigo ni documentacion; avisa y se aparta.
 |---|---|---|
 | `claude-upstream-notice` | Despues de `git pull`/`merge`/`rebase` | Si el `.claude/` del repo cambio, lo avisa y arranca `sync-brain` |
 | `docs-on-push` | Despues de `git push` | Avisa si quedo documentacion sin actualizar, tecnica o de manual |
+| `brain-unpushed-notice` | Al terminar una respuesta | Avisa si el cerebro tiene algo sin commitear o sin subir a `backup`/`github` |
 
-Ninguno bloquea. Los dos avisan una sola vez por version.
+Ninguno bloquea. Los dos primeros avisan una sola vez por version; el tercero, una sola vez por
+estado: mientras no cambie lo pendiente, no repite.
 
 ### Agentes
 
@@ -161,11 +163,19 @@ alias cerebro='git -C ~/.claude'    # comodo para el dia a dia
 cerebro status
 cerebro log --oneline
 cerebro add -A && cerebro commit -m "..."
-cerebro push backup main            # respaldo
+cerebro push backup main            # respaldo local
+cerebro push github main            # respaldo remoto
 ```
 
-**Respaldo:** remoto `backup` en `/datos/backups/claude-brain.git`, un repo bare en otra particion.
-No protege de perder el disco, si de borrar `~/.claude` por accidente o de una mezcla mal hecha.
+**Dos respaldos, porque protegen de cosas distintas:**
+
+| Remoto | Donde | De que protege |
+|---|---|---|
+| `backup` | `/datos/backups/claude-brain.git` (repo bare, otra particion) | Borrar `~/.claude`, una mezcla mal hecha |
+| `github` | `github.com/fabianOrtega501/cerebro_claude` (privado) | Perder el disco: las dos particiones son del mismo NVMe |
+
+El hook `brain-unpushed-notice` avisa cuando falta subir a cualquiera de los dos, se este
+trabajando en el repo que se este.
 
 - Restaurar: `git clone /datos/backups/claude-brain.git` y copiar encima.
 - Deshacer: `cerebro revert <sha>`.

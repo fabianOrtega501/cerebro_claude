@@ -43,6 +43,53 @@ git aparte, local.
 - Esa lista de directorios **no se escribe a mano**: sale de `projects.json` y la genera
   `brain/lib/sync-directories.mjs`, que `plug.mjs` ya corre. Una sola fuente de verdad.
 
+## Que se aprende, y donde va
+
+El cerebro no se alimenta solo, pero **tampoco espera a que lo pidan**. Cuando en una sesion
+aparezca algo que encaje abajo, hay que **proponerlo con el texto ya redactado** y esperar el si.
+Proponer cuesta una linea; no proponer significa volver a explicar lo mismo dentro de un mes.
+
+**Que merece guardarse.** Lo que seguira siendo cierto la proxima vez:
+
+| Aparece | Va a |
+|---|---|
+| Una correccion tuya sobre como trabajar (*"no hagas X"*, *"prefiero Y"*) | `projects/<repo>/memory/` con tipo `feedback` |
+| Una restriccion del entorno que costo descubrir (un comando que falla, un contenedor que hay que usar) | `projects/<repo>/memory/` con tipo `project` |
+| Una convencion del equipo que se repite en varios tickets | `CLAUDE.md` del cerebro, si aplica a todos los proyectos |
+| Un procedimiento con pasos, que se va a repetir | Una **skill** (transversal o `local-`, segun la regla de arriba) |
+| Algo que llego en el `.claude/` de un repo | `sync-brain` decide; nunca se absorbe a mano |
+
+**Que NO se guarda.** Esto importa mas que lo anterior, porque el ruido no se nota al escribirlo,
+se nota meses despues cuando ensucia todas las sesiones:
+
+- Lo que el repo ya dice: estructura, historial de git, lo que esta en su `CLAUDE.md`.
+- Decisiones de un ticket concreto, que no se repetiran.
+- Lo que se puede volver a averiguar en diez segundos.
+- Un detalle que solo valia dentro de esta conversacion.
+
+**Antes de escribir, buscar.** Si ya hay una memoria del mismo tema se actualiza esa, no se crea
+otra. Dos memorias que dicen casi lo mismo son peores que una desactualizada: no se sabe cual
+manda. Y si algo resulta ser falso, se borra.
+
+**Al cerrar la sesion**, si hubo correcciones o descubrimientos que no se guardaron, decirlo antes
+de terminar. No guardarlo por tu cuenta: ofrecerlo.
+
+## El cerebro se commitea y se respalda
+
+Un aprendizaje que solo existe en este disco no esta asegurado. El cerebro se edita **desde
+cualquier repo** —absorber algo estando en aio-app escribe en `~/.claude`— asi que el `git status`
+del repo en el que trabajas nunca lo delata.
+
+El hook `brain-unpushed-notice` avisa al terminar una respuesta si queda algo sin commitear o sin
+subir, y no repite hasta que el estado cambie. Cuando avise, **decirlo en una linea y ofrecer
+hacerlo**; si el usuario dice que no, no insistir.
+
+```bash
+git -C ~/.claude add -A && git -C ~/.claude commit -m "..."
+git -C ~/.claude push backup main     # protege de borrar ~/.claude
+git -C ~/.claude push github main     # protege de perder el disco
+```
+
 ## Si el desarrollo cambia de lado, se dice y se cambia de skill
 
 Al arrancar, el usuario declara si el ticket toca **front**, **back**, **los dos** o **no lo sabe**.

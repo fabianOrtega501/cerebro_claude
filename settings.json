@@ -44,6 +44,17 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/brain-unpushed-notice.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "statusLine": {

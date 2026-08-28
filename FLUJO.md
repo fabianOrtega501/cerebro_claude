@@ -15,7 +15,7 @@
 | **Manual** | Tu | `/gen-changes-controls` solo corre si lo pides |
 
 Un encadenamiento **no es automatico**: se propone y tu puedes decir que no. La unica pieza que
-actua sin preguntar es el hook, y ninguno de los dos escribe nada: solo avisan.
+actua sin preguntar es el hook, y ninguno de los tres escribe nada: solo avisan.
 
 ---
 
@@ -52,6 +52,14 @@ flowchart TD
     PULL -->|"hook<br/>claude-upstream-notice"| H2{{"Cambio el .claude/<br/>del repo?"}}
     H2 ==> SB["<b>sync-brain</b><br/>clasifica y recomienda"]
     SB -.->|"solo lo aprobado"| BRAIN[("~/.claude<br/><i>el cerebro</i>")]
+
+    APR{{"aparecio algo que<br/>vale para la proxima?"}} -.->|"se propone, tu apruebas"| BRAIN
+    DEV -.-> APR
+    DEVF -.-> APR
+    DEVB -.-> APR
+
+    BRAIN -->|"hook<br/>brain-unpushed-notice"| H3{{"queda algo sin<br/>commitear o sin subir?"}}
+    H3 ==> RESP[["git push backup main<br/>git push github main"]]
 
     UTD -.->|"si tambien cambio la UI"| UM
 
