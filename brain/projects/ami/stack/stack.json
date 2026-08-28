@@ -1,0 +1,32 @@
+{
+  "label": "AMI — app movil de campo (front) + backend del AIO",
+  "//backendCompartido": "aio-backend NO es de AMI: pertenece al proyecto aio y lo comparten aio-app, app-movil y cualquier otro consumidor. Un cambio ahi puede romper a los otros dos. Se declara aqui para poder crear la rama y fijar el contrato, no porque sea propiedad de AMI.",
+
+  "ticketPrefix": "<numero>: SOFTWARE - AIO:",
+  "contract": "docs/contrato-backend.md",
+  "verifier": "",
+  "protectedBranches": ["desa", "qa", "prod"],
+
+  "repos": [
+    {
+      "role": "front",
+      "path": "/datos/proyectos/app-movil",
+      "stack": "Ionic Vue 3 + Capacitor 8 + TypeScript, offline-first sobre SQLite",
+      "checks": ["npm run lint", "npm run build"],
+      "//dev": "El 5173 suele estar ocupado por aio-app: npm run dev -- --port 5180 --strictPort"
+    },
+    {
+      "role": "back",
+      "path": "/datos/proyectos/AIO/aio-backend",
+      "stack": "Laravel + PostgreSQL/PostGIS — COMPARTIDO con aio",
+      "shared": true,
+      "checks": ["./vendor/bin/pint", "./vendor/bin/phpstan analyse app"],
+      "tests": "./vendor/bin/sail artisan test tests/Feature/Modules/<Modulo>"
+    }
+  ],
+
+  "containers": {
+    "AIO_BACKEND_CONTAINER": "el backend con Sail",
+    "AIO_DB_CONTAINER": "PostgreSQL con PostGIS"
+  }
+}

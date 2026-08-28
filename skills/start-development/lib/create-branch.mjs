@@ -31,31 +31,40 @@ import { homedir } from "node:os";
 import { reposOf } from "../../../brain/lib/projects.mjs";
 
 /**
- * Repos de un proyecto filtrados por lado (`front`, `back` o `both`).
- * Los roles salen del `stack.json`; sin el, `--side` se ignora y se devuelven todos.
+ * Repos donde crear la rama, segun el lado (`front`, `back`, `both`).
+ * Manda el `stack.json` del proyecto; sin el, se usan los de `projects.json`.
  */
 function reposBySide(project, side) {
-	const all = reposOf(project);
-
-	if (!side || side === "both") return all;
+	let stack = null;
 
 	try {
-		const stack = JSON.parse(readFileSync(join(homedir(), ".claude", "brain", "projects", project, "stack", "stack.json"), "utf8"));
-		const wanted = stack.repos?.filter(r => r.role === side).map(r => r.path).filter(p => all.includes(p)) ?? [];
-
-		if (!wanted.length) {
-			console.warn(`Aviso: el proyecto "${project}" no declara ningun repo con role "${side}"; se usan todos.`);
-
-			return all;
-		}
-
-		return wanted;
+		stack = JSON.parse(readFileSync(join(homedir(), ".claude", "brain", "projects", project, "stack", "stack.json"), "utf8"));
 	}
 	catch {
-		console.warn(`Aviso: "${project}" no tiene stack.json con roles; se ignora --side y se usan todos sus repos.`);
+		if (side && side !== "both") console.warn(`Aviso: "${project}" no tiene stack.json con roles; se ignora --side.`);
 
-		return all;
+		return reposOf(project);
 	}
+
+	/*
+	 * Se toman los repos del stack y NO los de `projects.json`. Un proyecto puede trabajar sobre
+	 * un repo que no le pertenece: AMI comparte `aio-backend` con AIO. Intersecar las dos listas
+	 * dejaria fuera justo ese caso, y `--side back` no crearia ninguna rama.
+	 */
+	const declared = (stack.repos ?? []).filter(r => existsSync(r.path));
+	const wanted = (!side || side === "both") ? declared : declared.filter(r => r.role === side);
+
+	if (!wanted.length) {
+		console.warn(`Aviso: el proyecto "${project}" no declara ningun repo con role "${side}"; se usan los de projects.json.`);
+
+		return reposOf(project);
+	}
+
+	for (const repo of wanted.filter(r => r.shared)) {
+		console.warn(`Aviso: ${repo.path} esta COMPARTIDO con otros proyectos. La rama que se cree ahi la ven todos.`);
+	}
+
+	return wanted.map(r => r.path);
 }
 
 /** Corre git. `ok` dice si tuvo éxito; nunca lanza. */

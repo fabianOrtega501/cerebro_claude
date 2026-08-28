@@ -8,6 +8,13 @@
         "/datos/proyectos/AIO/aio-backend"
       ]
     },
+    "ami": {
+      "label": "AMI — app movil de campo del ecosistema AIO",
+      "//": "Su backend es aio-backend, que pertenece al proyecto aio. Aqui solo va el front; el backend compartido se declara en stack/stack.json.",
+      "repos": [
+        "/datos/proyectos/app-movil"
+      ]
+    },
     "epsilon": {
       "label": "Epsilon",
       "repos": [
@@ -30,8 +37,7 @@
     "rutamas": {
       "label": "Ruta+ / rutamas movil",
       "repos": [
-        "/datos/proyectos/rutamas-movil",
-        "/datos/proyectos/app-movil"
+        "/datos/proyectos/rutamas-movil"
       ]
     },
     "manuales": {

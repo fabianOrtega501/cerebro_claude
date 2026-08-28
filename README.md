@@ -1,7 +1,7 @@
 # El cerebro
 
 Configuracion propia de Claude Code. Vive en `~/.claude`, es un **repo git local** (sin GitLab) y
-la comparten **todos los proyectos**: AIO, Epsilon, Status, SIPA, Ruta+, manuales.
+la comparten **todos los proyectos**: AIO, AMI, Epsilon, Status, SIPA, Ruta+, manuales.
 
 **Principio unico: el cerebro manda.** Los repos de trabajo traen su propio `.claude/` con skills
 del equipo. Eso es una fuente de ideas, no una autoridad. El flujo va siempre **repo -> cerebro**,

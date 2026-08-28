@@ -1,8 +1,12 @@
 # El cerebro
 
 Configuracion propia de Claude, viva en `~/.claude`, versionada en un repo git **local**
-(no GitLab) y **compartida por todos los proyectos**: AIO, Epsilon, Status, SIPA, Ruta+,
+(no GitLab) y **compartida por todos los proyectos**: AIO, AMI, Epsilon, Status, SIPA, Ruta+,
 manuales.
+
+**Un repo pertenece a un solo proyecto** en `projects.json`; ahi se declara quien es el dueno.
+Que un proyecto *trabaje* sobre un repo ajeno se declara en su `stack/stack.json`: AMI comparte
+`aio-backend`, que es de AIO.
 
 El principio: **el cerebro manda**. El `.claude/` que traen los repos de trabajo es una fuente
 de ideas, no una autoridad. El flujo es siempre repo -> cerebro, nunca al reves, y nada se
