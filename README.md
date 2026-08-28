@@ -22,6 +22,8 @@ nunca al reves, y nada se absorbe sin aprobacion.
 
 Nada mas hay que configurar. Todo lo de abajo es para cuando quieras **cambiar** como funciona.
 
+**Como se encadenan entre si:** [FLUJO.md](FLUJO.md), con el mapa mental.
+
 ---
 
 ## 1. Las tres piezas, en simple
