@@ -7,6 +7,18 @@
       "Bash(grep -rln 'router.push\\\\|$router' resources/js/src/views/Dashboard/)",
       "Bash(xargs -I{} sed -n '{},+8p' resources/js/src/router.js)",
       "Bash(grep -rho 'AppActiveUser[.a-zA-Z]*\\\\|userInfo[.a-zA-Z'\\\\'']*\\\\|getItem\\('\\\\''user[^\\)]*\\)\\\\|$store.state[.a-zA-Z]*[Uu]ser[.a-zA-Z]*' resources/js/src/views resources/js/src/store)"
+    ],
+    "additionalDirectories": [
+      "/datos/proyectos/AIO/aio-app",
+      "/datos/proyectos/AIO/aio-backend",
+      "/datos/proyectos/app-movil",
+      "/datos/proyectos/Epsilon/epsilon",
+      "/datos/proyectos/Epsilon/epsilon-backend",
+      "/datos/proyectos/status",
+      "/datos/proyectos/sipa",
+      "/datos/proyectos/rutamas-movil",
+      "/datos/proyectos/manua-web",
+      "/datos/proyectos/manual-tecnico"
     ]
   },
   "effortLevel": "medium",
