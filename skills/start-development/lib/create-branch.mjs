@@ -15,6 +15,7 @@
  * Uso:
  *   node create-branch.mjs --project aio --tipo feature --ticket 10842 --base desa \
  *        --desc "Filtro por tipo de vehiculo"
+ *   node create-branch.mjs ... --side front                       solo el repo de ese lado
  *   node create-branch.mjs ... --repos /ruta/a --repos /ruta/b    repos sueltos
  *   node create-branch.mjs ... --dry-run                          solo muestra qué haría
  *
@@ -24,7 +25,38 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { homedir } from "node:os";
 import { reposOf } from "../../../brain/lib/projects.mjs";
+
+/**
+ * Repos de un proyecto filtrados por lado (`front`, `back` o `both`).
+ * Los roles salen del `stack.json`; sin el, `--side` se ignora y se devuelven todos.
+ */
+function reposBySide(project, side) {
+	const all = reposOf(project);
+
+	if (!side || side === "both") return all;
+
+	try {
+		const stack = JSON.parse(readFileSync(join(homedir(), ".claude", "brain", "projects", project, "stack", "stack.json"), "utf8"));
+		const wanted = stack.repos?.filter(r => r.role === side).map(r => r.path).filter(p => all.includes(p)) ?? [];
+
+		if (!wanted.length) {
+			console.warn(`Aviso: el proyecto "${project}" no declara ningun repo con role "${side}"; se usan todos.`);
+
+			return all;
+		}
+
+		return wanted;
+	}
+	catch {
+		console.warn(`Aviso: "${project}" no tiene stack.json con roles; se ignora --side y se usan todos sus repos.`);
+
+		return all;
+	}
+}
 
 /** Corre git. `ok` dice si tuvo éxito; nunca lanza. */
 function git(repo, args) {
@@ -94,11 +126,17 @@ const ticket = arg("ticket");
 const base = arg("base");
 const desc = arg("desc");
 const project = arg("project");
-const repos = project ? reposOf(project) : arg("repos", { many: true });
+const side = arg("side");
+const repos = project ? reposBySide(project, side) : arg("repos", { many: true });
+
+if (side && !["front", "back", "both"].includes(side)) {
+	console.error(`--side admite front, back o both; llego "${side}".`);
+	process.exit(1);
+}
 const dryRun = process.argv.includes("--dry-run");
 
 if (!["feature", "hotfix"].includes(type) || !base || !desc || !repos.length) {
-	console.error("Uso: node create-branch.mjs --project <clave> --tipo <feature|hotfix> [--ticket <numero>] --base <rama> --desc \"<descripcion>\" [--dry-run]");
+	console.error("Uso: node create-branch.mjs --project <clave> --tipo <feature|hotfix> [--ticket <numero>] --base <rama> --desc \"<descripcion>\" [--side front|back|both] [--dry-run]");
 	console.error("     (o --repos <ruta> [--repos <ruta>...] en vez de --project)");
 
 	if (project && !repos.length) console.error(`\nEl proyecto "${project}" no existe en projects.json o ninguno de sus repos está clonado.`);

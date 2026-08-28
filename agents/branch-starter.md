@@ -11,8 +11,9 @@ Trabajo mecánico: dos scripts y un reporte. **No hay nada que diseñar aquí.**
 propósito, porque esta parte no necesita más y así la sesión principal no paga el precio de un
 modelo pesado para actualizar ramas.
 
-Recibes en el prompt: `proyecto`, `tipo` (feature/hotfix), `base`, `ticket` (puede faltar) y
-`descripción`. Si alguno falta, **no lo inventes ni lo deduzcas**: dilo y termina.
+Recibes en el prompt: `proyecto`, `tipo` (feature/hotfix), `base`, `ticket` (puede faltar),
+`descripción` y `lado` (`front`, `back`, `both`). Si alguno falta, **no lo inventes ni lo
+deduzcas**: dilo y termina.
 
 ## 1. Poner las ramas al día
 
@@ -31,8 +32,10 @@ línea y sigue.
 
 ```bash
 node ~/.claude/skills/start-development/lib/create-branch.mjs --project <proyecto> \
-  --tipo <tipo> [--ticket <numero>] --base <base> --desc "<descripción>"
+  --tipo <tipo> [--ticket <numero>] --base <base> --desc "<descripción>" --side <lado>
 ```
+
+`--side` decide en qué repos se crea: `front` o `back` solo en el de ese rol, `both` en todos.
 
 **No armes el nombre a mano**: lo construye el script, y esa es la única forma de que salga con
 la convención del equipo. Si el script se niega —árbol sucio, base atrasada, rama ya existente—

@@ -30,10 +30,17 @@ flowchart TD
     SD -.->|"delega pasos 2 y 3"| BS["<b>branch-starter</b><br/><i>subagente · Sonnet</i>"]
     BS -.->|"rama creada"| SD
 
-    SD ==>|"si cruza front y back"| FT["<b>fullstack-ticket</b><br/>contrato antes de codificar"]
+    SD --> Q{{"que lado toca?<br/><i>lo declara el usuario</i>"}}
+    Q ==>|"front"| DEVF["Desarrollo normal<br/><i>solo el repo del front</i>"]
+    Q ==>|"back"| DEVB["Desarrollo normal<br/><i>solo el repo del back</i>"]
+    Q ==>|"los dos · no lo se"| FT["<b>fullstack-ticket</b><br/>contrato antes de codificar"]
+    DEVF -.->|"aparece que falta el otro lado"| FT
+    DEVB -.->|"aparece que falta el otro lado"| FT
     FT -.->|"si esta en rama protegida"| SD
 
     FT ==> DEV["Desarrollo<br/><i>codigo en los dos repos</i>"]
+    DEVF --> PUSH
+    DEVB --> PUSH
 
     DEV --> PUSH[["git push"]]
     DEV --> PULL[["git pull / merge"]]
@@ -54,7 +61,7 @@ flowchart TD
     classDef user fill:#1a7f37,stroke:#1a7f37,color:#fff
     class SD,FT,UM,UTD,SB,GC skill
     class BS agent
-    class H1,H2 hook
+    class H1,H2,Q hook
     class U user
 ```
 
@@ -80,11 +87,16 @@ flowchart TD
    │        2. ramas al dia      ─┐                        │
    │        3. crear rama         ├─► branch-starter       │
    │                              │   (subagente, Sonnet)  │
-   │        4. enunciado del ticket                        │
+   │        4. enunciado + QUE LADO TOCA                   │
+   │              │                                        │
+   │      front ──┼── back ── los dos / no lo se            │
+   │        │     │     │           │                       │
+   │        ▼     │     ▼           │                       │
+   │   desarrollo solo un repo      │                       │
+   │        │                       │                       │
+   │        └── aparece que falta ──┤                       │
+   │            el otro lado        │                       │
    │                              │                        │
-   │                              ▼                        │
-   │                    cruza front y back? ──── no ──► desarrollo normal
-   │                              │ si                     │
    │                              ▼                        │
    ├── /fullstack-ticket aio ◄────┘                        │
    │        0. situarse ── en rama protegida? ─► vuelve a start-development
@@ -120,8 +132,8 @@ flowchart TD
 2. **Pregunta lo que falte.** Proyecto siempre primero, y **nunca deducido** del directorio.
 3. **Delega a `branch-starter`** (Sonnet) actualizar ramas y crear la rama, si no falta ningun dato.
 4. **Te pide el contexto**: enunciado, recurso nuevo o ajuste, modulo de referencia.
-5. **Se detiene.** Si el ticket cruza los dos lados, **propone** seguir con `fullstack-ticket`. No
-   arranca solo.
+5. **Se detiene y enruta segun el lado que declaraste:** los dos o "no lo se" -> propone
+   `fullstack-ticket`; un solo lado -> desarrollo normal en ese repo. **Propone; no arranca solo.**
 
 Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra ramas.
 
@@ -133,6 +145,7 @@ Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra r
 |---|---|---|
 | Antes de escribir codigo | `start-development` | La pides tu |
 | El ticket cruza front y back | `fullstack-ticket` | Encadenada, o la pides |
+| A mitad del desarrollo aparece el otro lado | `fullstack-ticket` | Reclasificacion: se avisa, se crea la rama que falta y se entra por la Fase 3 |
 | Cambio una regla de negocio del back | `update-tech-docs` | Hook del push, o la pides |
 | Cambio algo que el usuario ve | `update-manual` | Hook del push, o al cerrar `fullstack-ticket` |
 | Un pull trajo cambios en `.claude/` | `sync-brain` | Hook del pull |

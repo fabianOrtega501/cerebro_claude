@@ -105,6 +105,13 @@ petición de texto con los dos datos libres.** Un solo intercambio, sin trampas.
 |---|---|
 | ¿Feature o hotfix? | `feature` / `hotfix` |
 | ¿De qué rama sale? | Las ramas base **reales**, no inventadas |
+| ¿Qué lado toca? | `front` / `back` / los dos / **no lo sé** |
+
+**Sobre el lado: se pregunta como expectativa, no como veredicto.** Decide dónde se crea la rama,
+no si el análisis sobra. "No lo sé" es una respuesta perfectamente válida y frecuente —para eso
+está la Fase 1 de `fullstack-ticket`— y hay que ofrecerla sin que parezca la opción mala.
+
+En proyectos de un solo repo la pregunta no aplica: omitirla.
 
 Las bases reales las devuelve `parse-request.mjs` en `bases`: son las que existen en **todos** los
 repos del proyecto. Una base que solo está en uno dejaría el desarrollo cojo.
@@ -135,9 +142,13 @@ hotfix/10999-fabian-originProd-CorreccionDeTotales
 
 Sin ticket, el nombre sale sin él: `feature/fabian-originDesa-AjustesColumnas`.
 
-**Cada repo del proyecto lleva su propia rama, con el mismo nombre.** `--project` los toma todos
-de `projects.json` y el script comprueba **todos** antes de crear ninguno, para no dejar un repo
-con rama y el otro sin ella.
+**Cada repo lleva su propia rama, con el mismo nombre.** `--side` decide en cuáles: `front` o
+`back` crean solo en el repo de ese rol —los roles salen del `stack.json` del proyecto—, y sin
+`--side`, o con `both` y con "no lo sé", se crea en todos. El script comprueba **todos** antes de
+crear ninguno, para no dejar un repo con rama y el otro sin ella.
+
+Crear la rama solo donde se necesita evita ramas huérfanas en el otro repo. Y si más adelante
+resulta que sí hacía falta, se crea entonces: es una línea.
 
 Antes de crear, verifica que el árbol esté limpio, que la base exista y esté sincronizada con su
 remoto, y que no haya ya una rama igual (ni una que solo difiera en mayúsculas). Si algo falla,
@@ -154,16 +165,27 @@ Con la rama ya creada, pedir al usuario, en una sola interacción:
 3. **Módulo o pantalla de referencia**, si conoce alguno parecido. Copiar el patrón que ya existe
    vale más que inventar.
 
-## Al terminar
+## Al terminar — a dónde va cada camino
 
 Reportar en tres líneas: qué proyecto y qué se actualizó, qué rama quedó creada y en qué repos, y
-qué queda pendiente de lo que no se pudo poner al día.
+qué queda pendiente de lo que no se pudo poner al día. Después, según el lado:
 
-Si el desarrollo cruza los dos lados de un proyecto, **seguir con `fullstack-ticket`** desde su
-Fase 1: la Fase 0 de aquella (situarse en el proyecto) y este checklist se complementan.
+| Lado declarado | Qué sigue |
+|---|---|
+| **Los dos** | Seguir con `fullstack-ticket` desde su **Fase 1**. Su Fase 0 y este checklist se complementan |
+| **No lo sé** | Seguir con `fullstack-ticket` igualmente: su Fase 1 existe justo para decidirlo, y salir temprano es barato |
+| **Solo front** | Desarrollo normal en el repo del front |
+| **Solo back** | Desarrollo normal en el repo del back |
+
+**El lado declarado no cierra la puerta.** Si durante el desarrollo aparece que hace falta el otro
+lado, hay que decirlo y cambiar de skill: el procedimiento está en `~/.claude/CLAUDE.md`, sección
+*"Si el desarrollo cambia de lado"*. Vive ahí y no aquí porque tiene que seguir vigente mucho
+después de que esta skill haya terminado.
 
 ## Lo que esta skill NO hace
 
 - **No commitea ni empuja nada.** Solo crea la rama local.
 - **No resuelve divergencias.** Las reporta; qué hacer con una rama divergida lo decide el usuario.
 - **No borra ramas locales** cuya remota desapareció. Lo menciona y ofrece.
+- **No decide qué lado toca el ticket.** Recoge lo que el usuario espera; determinarlo de verdad es
+  la Fase 1 de `fullstack-ticket`.

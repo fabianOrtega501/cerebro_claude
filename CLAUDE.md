@@ -36,6 +36,30 @@ git aparte, local.
 - Nombres de codigo (funciones, variables, archivos) en ingles; comentarios y documentacion en espanol.
 - Nada de credenciales ni rutas absolutas en archivos que se versionan.
 
+## Si el desarrollo cambia de lado, se dice y se cambia de skill
+
+Al arrancar, el usuario declara si el ticket toca **front**, **back**, **los dos** o **no lo sabe**.
+Eso es su expectativa, no un veredicto: un campo nuevo visible casi siempre arrastra migracion,
+request, service y permiso, y eso no se ve desde el enunciado.
+
+**En cuanto descubras que hace falta el otro lado, parate y dilo.** No sigas "resolviendolo por
+encima" en el repo en el que estas, y sobre todo no dejes el trabajo a medias en un lado esperando
+que se note despues.
+
+Que hacer, en este orden:
+
+1. **Decirlo explicitamente**: que encontraste, por que obliga al otro lado, y que faltaria hacer.
+2. **Esperar confirmacion.** Puede que el usuario prefiera partir el ticket en dos.
+3. **Crear la rama que falta** en el otro repo, con el mismo nombre:
+   `node ~/.claude/skills/start-development/lib/create-branch.mjs --project <p> --side <lado que falta> ...`
+4. **Pasar a `fullstack-ticket`** desde su Fase 3, la de fijar el contrato. Las fases 1 y 2 ya las
+   hiciste sin saberlo: descubrir que falta el otro lado *es* haber encuadrado el ticket.
+
+Senales tipicas de que un ticket "solo de front" toca el backend: un campo que hay que persistir,
+una pantalla o accion nueva (necesita permiso), un filtro que la API no soporta, un dato que no
+viene en la respuesta actual. Al reves, un ticket "solo de back" toca el front cuando cambia la
+forma de una respuesta que alguien ya consume.
+
 ## Documentar funciones: maximo 3 renglones
 
 **Tres renglones por funcion. Ni uno mas.** El limite es duro y no admite "es que esta funcion
