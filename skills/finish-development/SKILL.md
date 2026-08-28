@@ -64,12 +64,22 @@ demuestra que el proyecto compila de verdad.
 Y que arranque, que es distinto de que compile:
 
 ```bash
-node ~/.claude/skills/finish-development/lib/smoke-test.mjs --url <url> --path <ruta tocada>
+node ~/.claude/skills/finish-development/lib/smoke-test.mjs --url <url> --login --path <ruta tocada>
 ```
 
-Necesita el dev server arriba. Recoge excepciones, `console.error` y peticiones fallidas. Con
-`--login` entra a la app si el proyecto tiene sesión configurada; sin credenciales cubre solo la
-pantalla de login, y **eso hay que decirlo, no dar por verificado lo que no se miró**.
+Necesita el dev server arriba. Recoge excepciones, `console.error` y peticiones fallidas.
+
+**`--login` casi siempre hace falta.** Sin él solo se ve la pantalla de acceso. Y con él hace
+falta la empresa: sin empresa seleccionada los permisos no se cargan y **toda ruta interna rebota
+a `not-authorized` sin lanzar un solo error**. Por eso se pasa `--company` (por defecto
+`"Empresa Demo"`); si el usuario de pruebas trabaja en otra, hay que indicarla.
+
+El campo `landed` dice dónde se acabó de verdad. Si no coincide con la ruta pedida, `ok` es
+`false`: se pidió ver una pantalla y no se vio.
+
+**Límite conocido**: una ruta que no existe **no** rebota —el router monta su página de error
+manteniendo la URL—, así que pasa como buena. El humo test comprueba que lo que carga no explota,
+no que la ruta que escribiste exista.
 
 **Si algo falla, se arregla antes de seguir.** No se commitea un árbol que no compila.
 
