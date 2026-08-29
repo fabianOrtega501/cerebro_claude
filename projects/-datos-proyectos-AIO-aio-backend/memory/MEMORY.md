@@ -1,2 +1,3 @@
 - [Ejecutar artisan con Sail](run-artisan-via-sail.md) — usar `./vendor/bin/sail artisan`, el PHP del host no tiene driver pgsql
 - [.env.testing con skip-worktree](env-testing-skip-worktree.md) — está versionado pese al .gitignore; la marca local mantiene sus cambios fuera de los commits
+- [Commit sin número de ticket](commit-sin-numero-de-ticket.md) — usar `SOFTWARE - AIO: <descripción>` cuando no hay GLPI
