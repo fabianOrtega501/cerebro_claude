@@ -114,7 +114,16 @@ una pantalla o accion nueva (necesita permiso), un filtro que la API no soporta,
 viene en la respuesta actual. Al reves, un ticket "solo de back" toca el front cuando cambia la
 forma de una respuesta que alguien ya consume.
 
-## Documentar funciones: maximo 3 renglones
+## Documentar funciones: maximo 3 renglones (solo en el cerebro)
+
+**Esta regla rige el codigo propio de `~/.claude`**: los `.mjs` de las skills, los hooks, los
+scripts de `brain/`. En un repo del equipo **manda el estandar de ese repo**, no este. En el
+backend del AIO, por ejemplo, el estandar pide PHPDoc completo —prosa con que hace, como lo hace
+y por que, mas `@param` y `@return`— y ahi se escribe asi, aunque aqui se prohiba.
+
+Confundir los dos ambitos lleva a dejar funciones nuevas mudas en un repo compartido, o a llenar
+el cerebro de bloques de quince lineas. Son reglas distintas porque el lector es distinto: aqui
+el unico lector eres tu, y alli hay un equipo que no escribio el codigo.
 
 **Tres renglones por funcion. Ni uno mas.** El limite es duro y no admite "es que esta funcion
 es especial": si no cabe, el problema es la funcion, no el limite.
