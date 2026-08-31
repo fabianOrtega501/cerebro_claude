@@ -30,4 +30,4 @@ mejoras que traen, y sin subir nada suyo al repo.
 **How to apply:** nunca commitear cambios de configuracion personal al repo de trabajo; las
 skills privadas dentro de un repo van con prefijo `local-` (ya excluidas en
 `.git/info/exclude`, no en el `.gitignore` versionado). Absorber algo al cerebro implica
-commitear en `~/.claude`. Ver [[gen-changes-controls]].
+commitear en `~/.claude`. Ver la skill `gen-changes-controls`.

@@ -1,2 +1,1 @@
-- [Claves i18n al final](i18n-keys-al-final.md) — las traducciones nuevas se agregan al final del archivo de locales, no en medio
 - [Docs de funciones: 3 líneas](docs-funciones-3-lineas.md) — máximo 3 líneas de descripción más @param y @returns; el porqué va como comentario suelto

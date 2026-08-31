@@ -19,4 +19,4 @@ unico importante queda enterrado entre lineas que el lector ya sabia.
 **How to apply:** en la descripcion va que hace y que devuelve, concreto. Si un retorno tiene
 semantica (un valor centinela, que no lanza, unidades), esa es la linea que no se puede omitir.
 El **porque** de una decision tecnica no va en la cabecera: va como comentario suelto junto a la
-linea que lo necesita. Ver tambien [[i18n-keys-al-final]] para otra correccion ya reincidida.
+linea que lo necesita. Ver tambien el `CLAUDE.md` del cerebro, seccion *"Preferencias de trabajo"* para otra correccion ya reincidida.

@@ -33,6 +33,15 @@ git aparte, local.
 ## Preferencias de trabajo
 
 - Explicaciones en espanol, directas y sin relleno.
+- **Todo desarrollo arranca en modo plan.** Antes de editar un archivo hay que contar que se
+  analizo, que se encontro en el codigo y como se piensa resolver, y esperar el si. Una
+  implementacion hecha antes de tiempo obliga a deshacer trabajo y esconde el razonamiento que el
+  queria validar.
+- **Las claves de traduccion nuevas van al final del archivo de locales**, nunca intercaladas junto
+  a las del mismo tema. Insertar en medio cambia el contexto de lineas que nadie toco y provoca
+  conflictos cuando dos ramas agregan claves en la misma zona; al final, cada clave es una linea
+  agregada limpia. Aplica a todos los locales del proyecto por igual, para que no se desincronice
+  su orden.
 - Nombres de codigo (funciones, variables, archivos) en ingles; comentarios y documentacion en espanol.
 - **Credenciales: en ningun archivo versionado, nunca.** Van a `~/.claude/secrets.env`, que la
   lista blanca del `.gitignore` deja fuera del repo. Los scripts las leen de ahi.
@@ -89,6 +98,41 @@ git -C ~/.claude add -A && git -C ~/.claude commit -m "..."
 git -C ~/.claude push backup main     # protege de borrar ~/.claude
 git -C ~/.claude push github main     # protege de perder el disco
 ```
+
+## Al probar, solo lecturas
+
+Para verificar permisos, autorizacion o el efecto de un cambio llamando a una API, invocar **solo
+endpoints de lectura**. Un `PUT`, `POST` o `DELETE` "de control" ejecuta la accion de verdad.
+
+Para comprobar un middleware de permisos basta con que la peticion lo atraviese: corre antes del
+controlador, asi que un `GET` distingue igual de bien entre autorizado y rechazado. La escritura no
+aporta nada y si destruye datos, y las tablas de auditoria suelen guardar la peticion pero **no el
+estado anterior**, asi que no hay vuelta atras.
+
+Si de verdad hace falta ejercitar una escritura: leer y anotar el registro completo antes, o crear
+uno propio para la prueba y borrarlo. Nunca sobre un registro existente sin haber guardado su
+estado. Y si ya paso, decirlo de inmediato y preguntar como restaurar, en vez de adivinar el valor
+previo.
+
+La misma cautela vale para las banderas que prometen simular: hay proyectos donde
+`migrate --pretend` **ejecuta** los cambios.
+
+## La VPN es excluyente
+
+La VPN del usuario no se puede tener a medias: encendida da acceso a la red interna y quita las
+bases locales; apagada, al contrario.
+
+| VPN | Bases locales (postgres en docker) | GitLab interno (192.168.100.34) |
+|---|---|---|
+| **Encendida** | inalcanzables: los comandos que necesitan base se cuelgan hasta el timeout | funciona: `git push`, `fetch` |
+| **Apagada** | funcionan sin tocar nada | `ssh: connect to host ... port 22: Connection timed out` |
+
+Los dos sintomas se parecen a otra cosa —un firewall del host bloqueando docker, un problema de
+llaves de git— y diagnosticar por ahi lleva a pedir `sudo` y a conclusiones falsas.
+
+**Si algo que necesita base de datos se cuelga, preguntar si la VPN esta encendida; si un `push` o
+un `fetch` da timeout de SSH, preguntar si esta apagada.** Al cerrar un desarrollo esto ordena el
+trabajo: se migra y se prueba sin VPN, y para el push hay que encenderla.
 
 ## Si el desarrollo cambia de lado, se dice y se cambia de skill
 
