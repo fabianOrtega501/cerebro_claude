@@ -119,12 +119,17 @@ previo.
 La misma cautela vale para las banderas que prometen simular: hay proyectos donde
 `migrate --pretend` **ejecuta** los cambios.
 
-## La VPN es excluyente
+## La VPN es excluyente, pero solo hace falta desde fuera
 
-La VPN del usuario no se puede tener a medias: encendida da acceso a la red interna y quita las
-bases locales; apagada, al contrario.
+**Primero: en que red esta el usuario.** En la **red corporativa** el GitLab interno
+(192.168.100.34) se alcanza directo y **la VPN no hace falta para nada**: se trabaja con ella
+apagada de principio a fin, bases locales incluidas. La VPN existe para las **redes externas**
+(casa, datos moviles), y solo ahi entra en juego lo de abajo.
 
-| VPN | Bases locales (postgres en docker) | GitLab interno (192.168.100.34) |
+Cuando si se necesita, no se puede tener a medias: encendida da acceso a la red interna y quita
+las bases locales; apagada, al contrario.
+
+| VPN (desde red externa) | Bases locales (postgres en docker) | GitLab interno (192.168.100.34) |
 |---|---|---|
 | **Encendida** | inalcanzables: los comandos que necesitan base se cuelgan hasta el timeout | funciona: `git push`, `fetch` |
 | **Apagada** | funcionan sin tocar nada | `ssh: connect to host ... port 22: Connection timed out` |
@@ -132,9 +137,14 @@ bases locales; apagada, al contrario.
 Los dos sintomas se parecen a otra cosa —un firewall del host bloqueando docker, un problema de
 llaves de git— y diagnosticar por ahi lleva a pedir `sudo` y a conclusiones falsas.
 
-**Si algo que necesita base de datos se cuelga, preguntar si la VPN esta encendida; si un `push` o
-un `fetch` da timeout de SSH, preguntar si esta apagada.** Al cerrar un desarrollo esto ordena el
-trabajo: se migra y se prueba sin VPN, y para el push hay que encenderla.
+**No pedir que encienda la VPN antes de un push por precaucion.** Si esta en la red corporativa,
+es una peticion inutil que ademas le tumba las bases locales; y la sesion no puede saber en que
+red esta. Lo correcto es **intentar el push** y, solo si da timeout de SSH, preguntar por la VPN.
+En el sentido contrario si conviene preguntar de entrada: si algo que necesita base de datos se
+cuelga, es que la VPN quedo encendida.
+
+Pasó en el ticket 10812 (2026-09-01): se pidio encender la VPN para el push estando en la red
+corporativa, y el push funcionaba sin ella.
 
 ## Si el desarrollo cambia de lado, se dice y se cambia de skill
 
