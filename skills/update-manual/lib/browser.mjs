@@ -602,6 +602,15 @@ export async function moveMouseTo(cdp, x, y) {
 }
 
 /**
+ * Teclea `text` en el elemento con foco, anexandolo a lo que ya haya. Sin foco se pierde, sin error.
+ * Hace falta en los buscadores de N caracteres: escuchan el evento de busqueda de Vuetify, que
+ * no se dispara asignando `input.value`. `Input.insertText` entra por el camino del teclado real.
+ */
+export async function insertText(cdp, text) {
+	await cdp.send("Input.insertText", { text });
+}
+
+/**
  * Dibuja un recuadro rojo sobre un elemento, para señalar en la captura dónde tiene que mirar
  * el usuario.
  *

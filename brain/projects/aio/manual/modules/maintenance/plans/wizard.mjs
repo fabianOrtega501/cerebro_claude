@@ -78,9 +78,15 @@ export const rowActionButton = (cdp, text, action = ".v-update") =>
       const filas = [...document.querySelectorAll('tbody tr')]
         .filter(tr => tr.getClientRects().length > 0)
         .filter(tr => tr.textContent.includes(${JSON.stringify(text)}));
-      // El encabezado del diálogo es \`position: fixed\`: una fila que quede debajo devuelve
-      // coordenadas correctas pero el click se lo lleva la cabecera. Se centra la fila antes.
-      if (filas[0]) filas[0].scrollIntoView({ block: 'center' });
+      // El encabezado del diálogo es \`position: fixed\` y ocupa la franja superior: una fila
+      // que quede debajo devuelve coordenadas correctas pero el click se lo lleva la cabecera.
+      // Solo se desplaza cuando hace falta —centrar una fila que ya se ve la mete justo debajo
+      // de esa cabecera— y se deja \`nearest\`, que la acerca lo mínimo.
+      if (filas[0]) {
+        const r = filas[0].getBoundingClientRect();
+        if (r.top < 200 || r.bottom > window.innerHeight - 40)
+          filas[0].scrollIntoView({ block: 'nearest' });
+      }
       for (const row of filas) {
         // Cada fila trae el bloque de acciones dos veces —la tabla de escritorio y la
         // variante de tarjetas para móvil—, y una de las dos está oculta: hay que recorrer
@@ -244,17 +250,36 @@ export const stepperState = (cdp) =>
  *          wizard no se movió (típicamente porque la validación del paso actual lo frena)
  */
 export const goToStep = async (cdp, label) => {
-	for (let attempt = 0; attempt < 12; attempt++) {
+	// Un salto puede no prender porque justo en ese instante había un velo de carga encima
+	// del botón. Se reintenta unas cuantas veces antes de darlo por imposible.
+	let fallidos = 0;
+
+	for (let attempt = 0; attempt < 16; attempt++) {
 		const { labels, active } = await stepperState(cdp);
 
 		const target = labels.indexOf(label);
 		if (target < 0) return false;
 		if (active === target) return true;
 
+		// La tabla del paso monta su propio velo de carga (`vue-loading-overlay`), que se pinta
+		// por encima de los botones: pulsar Siguiente debajo de él no hace nada y el wizard
+		// parece atascado.
+		await waitUntil(cdp, `document.querySelectorAll('.v-dialog .vl-overlay, .v-dialog .vl-background').length === 0`, { timeout: 10000 })
+			.catch(() => {});
+
 		await scrollDialogToBottom(cdp);
 
-		const button = await centerOfText(cdp, ".v-dialog .v-btn", active < target ? "Siguiente" : "Anterior");
+		const rotulo = active < target ? "Siguiente" : "Anterior";
+		const button = await centerOfText(cdp, ".v-dialog .v-btn", rotulo);
 		if (!button) return false;
+
+		const encima = await evaluate(
+			cdp,
+			`(() => { const e = document.elementFromPoint(${button.x}, ${button.y});
+        return e && e.closest('.v-btn') ? 'boton' : (e ? e.tagName + '.' + String(e.className || '') : 'nada'); })()`,
+		);
+
+		if (encima !== "boton") console.log(`    (el paso ${active} -> ${target}: el click en "${rotulo}" cae sobre ${encima})`);
 
 		await clickAt(cdp, button.x, button.y);
 
@@ -269,8 +294,15 @@ export const goToStep = async (cdp, label) => {
 			{ timeout: 15000, what: `el paso ${label}` },
 		).then(() => true).catch(() => false);
 
-		if (!moved) return false;
+		if (!moved) {
+			fallidos += 1;
+			if (fallidos >= 3) return false;
 
+			await wait(1500);
+			continue;
+		}
+
+		fallidos = 0;
 		await wait(900);
 	}
 

@@ -21,7 +21,7 @@
  * poder confirmarlas después en la base de datos.
  */
 
-import { clickAt, closeBrowser, evaluate, moveMouseTo, pressEscape, screenshot, setViewport, wait, waitUntil } from "../../../lib/browser.mjs";
+import { clickAt, closeBrowser, evaluate, insertText, moveMouseTo, pressEscape, screenshot, setViewport, wait, waitUntil } from "../../../lib/browser.mjs";
 import {
 	DEFAULT_BASE,
 	describeScreen,
@@ -109,6 +109,8 @@ const TABS = [
 		key: "suministros",
 		paso: "Suministros",
 		valores: { Cantidad: MARCA_CREAR_CORTA },
+		// El insumo se elige con el buscador de tres caracteres, no con una lista desplegable.
+		terminos: { Suministros: "SUM" },
 		editable: "Cantidad",
 		marcaCrear: MARCA_CREAR_CORTA,
 		marcaEditar: MARCA_EDITAR_CORTA,
@@ -269,6 +271,19 @@ const fieldsInTop = (cdp) =>
 	);
 
 /**
+ * Fragmento que devuelve las opciones **reales** del menú abierto.
+ *
+ * Un menú desplegado no siempre trae opciones: puede traer el enlace "Agregar …" que abre otra
+ * modal, o los avisos del buscador de tres caracteres ("Mín. 3 caracteres para buscar",
+ * "Cargando...", "No se han encontrado datos!"). Todos se pintan como `.v-list-item` y, si se
+ * cuentan, la prueba elige un aviso creyendo que eligió un insumo.
+ */
+const MENU_OPTIONS = `[...document.querySelectorAll('.v-overlay--active .v-list-item')]
+  .filter(e => e.getClientRects().length)
+  .filter(e => !/^agregar/i.test(e.textContent.trim()))
+  .filter(e => !/no data available|sin datos|no hay datos|caracteres para buscar|cargando|no se han encontrado/i.test(e.textContent.trim()))`;
+
+/**
  * Elige la primera opción real del menú abierto de un select.
  *
  * Los selects de estas pestañas traen un `append-item` con el enlace "Agregar ..." que abre
@@ -280,10 +295,7 @@ const selectFirstOption = async (cdp) => {
 	const option = await evaluate(
 		cdp,
 		`(() => {
-      const items = [...document.querySelectorAll('.v-overlay--active .v-list-item')]
-        .filter(e => e.getClientRects().length)
-        .filter(e => !/^agregar/i.test(e.textContent.trim()))
-        .filter(e => !/no data available|sin datos|no hay datos/i.test(e.textContent.trim()));
+      const items = ${MENU_OPTIONS};
       const e = items[0]; if (!e) return null;
       const r = e.getBoundingClientRect();
       return { texto: e.textContent.trim(), x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
@@ -346,10 +358,15 @@ const typeByLabel = (cdp, label, value) =>
  * No se usa `openSelect` de `lib/session.mjs` porque aquí el campo se localiza por etiqueta
  * y el menú puede tardar en llegar por API mientras el diálogo sigue cargando.
  *
+ * Algunos campos no son listas sino **buscadores de tres caracteres**
+ * (`AioDataFetcherSelect`): abren vacíos a propósito y solo consultan cuando se teclea. Para
+ * esos hay que pasar `termino`.
+ *
  * @param {string} label - Etiqueta del campo
+ * @param {string} [termino] - Qué teclear si el menú abre sin opciones
  * @returns {Promise<boolean>} `false` si tras los reintentos el menú siguió vacío
  */
-const openField = async (cdp, label) => {
+const openField = async (cdp, label, termino = null) => {
 	const rect = await evaluate(
 		cdp,
 		`(() => { const w = ${wrapperByLabel(label)}; if (!w) return null;
@@ -363,15 +380,29 @@ const openField = async (cdp, label) => {
 	for (let attempt = 0; attempt < 5; attempt++) {
 		await clickAt(cdp, rect.x, rect.y);
 
+		// Un buscador de tres caracteres abre vacío a propósito: se teclea antes de esperar.
 		const ok = await waitUntil(
 			cdp,
-			`[...document.querySelectorAll('.v-overlay--active .v-list-item')]
-        .filter(e => !/^agregar/i.test(e.textContent.trim()))
-        .filter(e => !/no data available|sin datos/i.test(e.textContent.trim())).length > 0`,
-			{ timeout: 8000 },
+			`${MENU_OPTIONS}.length > 0`,
+			{ timeout: termino ? 1500 : 8000 },
 		).then(() => true).catch(() => false);
 
 		if (ok) return true;
+
+		if (termino) {
+			// El campo ya tiene el foco por el click: se teclea de verdad, porque estos
+			// buscadores escuchan el evento de búsqueda de Vuetify y no el valor del input.
+			await insertText(cdp, termino);
+			await wait(2000);
+
+			const conTexto = await waitUntil(
+				cdp,
+				`${MENU_OPTIONS}.length > 0`,
+				{ timeout: 10000 },
+			).then(() => true).catch(() => false);
+
+			if (conTexto) return true;
+		}
 
 		await pressEscape(cdp);
 		await wait(1200);
@@ -427,9 +458,10 @@ const closeMenus = async (cdp) => {
  * Actividad se cargan según el sistema.
  *
  * @param {object} valores - Valor por etiqueta para los campos de texto
+ * @param {object} [terminos] - Qué teclear, por etiqueta, en los buscadores de tres caracteres
  * @returns {Promise<string[]>} Las etiquetas que quedaron sin llenar
  */
-const fillTopForm = async (cdp, valores) => {
+const fillTopForm = async (cdp, valores, terminos = {}) => {
 	const intentados = new Set();
 
 	for (let paso = 0; paso < 30; paso++) {
@@ -459,7 +491,7 @@ const fillTopForm = async (cdp, valores) => {
 			continue;
 		}
 
-		if (!await openField(cdp, pendiente.label)) {
+		if (!await openField(cdp, pendiente.label, terminos[pendiente.label] ?? null)) {
 			anotar(pendiente.label, "el select nunca cargó opciones");
 			continue;
 		}
@@ -692,7 +724,10 @@ const crudEnEdicion = async (cdp, tab) => {
 	await closeExtraDialogs(cdp);
 
 	if (!await goToStep(cdp, tab.paso)) {
-		anotar(tab.key, `no se pudo llegar al paso ${tab.paso}`);
+		const { labels, active } = await stepperState(cdp);
+
+		anotar(tab.key, `no se pudo llegar al paso ${tab.paso}; se quedó en "${labels[active] ?? "?"}"`);
+		await shot(cdp, `${outputDir}/${tab.key}-00-atascado.png`);
 
 		return;
 	}
@@ -724,7 +759,7 @@ const crudEnEdicion = async (cdp, tab) => {
 
 	await wait(600);
 
-	const sinLlenar = await fillTopForm(cdp, tab.valores);
+	const sinLlenar = await fillTopForm(cdp, tab.valores, tab.terminos);
 	if (sinLlenar.length) anotar(tab.key, `campos sin llenar al crear: ${sinLlenar.join(", ")}`);
 
 	await closeMenus(cdp);
@@ -761,7 +796,7 @@ const crudEnEdicion = async (cdp, tab) => {
 		if (await clickInTop(cdp, "Agregar")) {
 			await waitForFormReady(cdp);
 			await wait(600);
-			await fillTopForm(cdp, tab.valores);
+			await fillTopForm(cdp, tab.valores, tab.terminos);
 			await closeMenus(cdp);
 			await scrollDialogToBottom(cdp);
 			await clickInTop(cdp, "Guardar");
@@ -910,6 +945,18 @@ const crudEnEdicion = async (cdp, tab) => {
 			await waitForFormReady(cdp);
 			await wait(800);
 
+			// Antes de elegir nada: los campos que dependen de otro tienen que verse bloqueados.
+			const bloqueados = await evaluate(
+				cdp,
+				`(${FIELDS_IN})(${TOP}).map(w => ({
+          campo: (${LABEL_OF})(w),
+          bloqueado: !!w.querySelector('input')?.disabled,
+        }))`,
+			);
+
+			console.log(`    buscador al abrir: ${JSON.stringify(bloqueados)}`);
+			await shotTop(cdp, `${outputDir}/${tab.key}-07a-buscar-vacio.png`);
+
 			// Solo el primer campo: llenar todos convierte la búsqueda en una consulta exacta
 			// y la captura deja de parecerse a lo que hace el usuario.
 			const campos = await fieldsInTop(cdp);
@@ -917,7 +964,7 @@ const crudEnEdicion = async (cdp, tab) => {
 
 			let elegido = null;
 
-			if (primero && await openField(cdp, primero.label)) {
+			if (primero && await openField(cdp, primero.label, tab.terminos?.[primero.label] ?? null)) {
 				elegido = await selectFirstOption(cdp);
 				await closeMenus(cdp);
 			}
@@ -930,8 +977,7 @@ const crudEnEdicion = async (cdp, tab) => {
 				else {
 					const opciones = await evaluate(
 						cdp,
-						`[...document.querySelectorAll('.v-overlay--active .v-list-item')]
-              .filter(e => e.getClientRects().length).map(e => e.textContent.trim()).slice(0, 4)`,
+						`${MENU_OPTIONS}.map(e => e.textContent.trim()).slice(0, 4)`,
 					);
 
 					console.log(`    actividades de "${elegido}": ${JSON.stringify(opciones)}`);
@@ -1061,7 +1107,7 @@ const recorrerCreacion = async (cdp) => {
 
 		if (!await waitForFormReady(cdp)) anotar(`${tab.key}/creación`, "el formulario de Agregar se quedó en esqueletos");
 		await wait(600);
-		await fillTopForm(cdp, tab.valores);
+		await fillTopForm(cdp, tab.valores, tab.terminos);
 		await closeMenus(cdp);
 		await scrollDialogToBottom(cdp);
 		await clickInTop(cdp, "Guardar");
@@ -1137,6 +1183,21 @@ const main = async () => {
 
 			anotar("página", `error de JavaScript: ${detalle.split("\n")[0].slice(0, 200)}`);
 		});
+		// Vue no relanza los errores de render: los escribe con `console.error`, que llega por
+		// otro evento. Sin esto, un componente que revienta al montar se ve solo como un paso
+		// del wizard que no avanza.
+		cdp.on("Runtime.consoleAPICalled", (evento) => {
+			if (evento.type !== "error") return;
+
+			const texto = (evento.args ?? [])
+				.map((a) => a.value ?? a.description ?? a.preview?.description ?? "")
+				.join(" ")
+				.replace(/\s+/g, " ")
+				.slice(0, 300);
+
+			if (texto) anotar("consola", texto);
+		});
+
 		await cdp.send("Runtime.enable");
 
 		await goTo(cdp, base, PLANS_VIEW, { selector: ".v-data-table" });
