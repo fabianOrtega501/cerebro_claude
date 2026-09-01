@@ -165,6 +165,33 @@ Con la rama ya creada, pedir al usuario, en una sola interacción:
 3. **Módulo o pantalla de referencia**, si conoce alguno parecido. Copiar el patrón que ya existe
    vale más que inventar.
 
+## Paso 5 — El plan lleva diagrama de flujo. Siempre
+
+Antes de tocar un archivo hay que exponer el plan y esperar el sí —eso ya lo exige el `CLAUDE.md`—,
+y **ese plan incluye un diagrama de flujo del comportamiento nuevo**, en Mermaid. No es opcional ni
+depende del tamaño del ticket.
+
+El diagrama va **junto al plan, antes de implementar**, no como resumen al terminar. Su valor está
+en que el usuario vea el recorrido completo y detecte la rama que falta *mientras corregirlo cuesta
+una frase*. Puesto al final ya no evita nada: solo documenta lo que se hizo.
+
+**Qué tiene que mostrar:**
+
+- El **camino completo** de la petición o del proceso: desde donde entra hasta donde sale.
+- **Cada punto de decisión** con su condición escrita, no un `¿válido?` genérico.
+- **Cada salida**, incluidas las de error, con lo que ve el usuario.
+- Lo que **no cambia**, si el ticket es un ajuste: sombreado o anotado, para que se distinga de lo
+  nuevo de un vistazo.
+
+Un diagrama que solo dice `entrada -> validar -> guardar` no sirve: lo que se está validando es
+justamente donde están las decisiones que el usuario tiene que confirmar.
+
+**Si el ticket tiene varios flujos** —crear y editar, síncrono y asíncrono, API y job—, va un
+diagrama por cada uno. Meterlos todos en uno los vuelve ilegibles.
+
+Y un diagrama **no reemplaza la prosa del plan**: qué archivos se tocan, qué regla vive dónde y qué
+se decidió no hacer sigue yendo escrito. El diagrama muestra el recorrido; el texto, las razones.
+
 ## Al terminar — a dónde va cada camino
 
 Reportar en tres líneas: qué proyecto y qué se actualizó, qué rama quedó creada y en qué repos, y
