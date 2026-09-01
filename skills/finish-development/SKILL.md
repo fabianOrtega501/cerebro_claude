@@ -145,14 +145,27 @@ este paso se pushea roto con la conciencia tranquila, que es peor que pushear ro
 
 Si el merge no trajo nada (`merged: false`, ya al día), se puede saltar.
 
-## Fase 7 — Manuales
+## Fase 7 — Documentación: manuales y control de cambios
 
-Si el desarrollo cambió **lo que el usuario ve** (vistas, tablas, modales, textos, flujos),
-ofrecer `update-manual`. Si cambió una **regla de negocio, máquina de estados o integración**,
-ofrecer `update-tech-docs`.
+Tres cosas que se ofrecen, **ninguna se ejecuta sin permiso**:
 
-Ofrecer, no ejecutar sin permiso: el manual vive en otro repo, lleva su propio commit y las
-capturas hay que revisarlas a ojo. No es automático y no hay que venderlo como tal.
+| Si el desarrollo cambió | Ofrecer |
+|---|---|
+| **Lo que el usuario ve**: vistas, tablas, modales, textos, flujos | `update-manual` |
+| Una **regla de negocio, máquina de estados o integración** | `update-tech-docs` |
+| Cualquier cosa que vaya a un despliegue | `gen-changes-controls` |
+
+El manual vive en otro repo, lleva su propio commit y las capturas hay que revisarlas a ojo. No es
+automático y no hay que venderlo como tal.
+
+**El control de cambios se ofrece siempre, aquí.** `gen-changes-controls` está marcada como de uso
+manual y **no se dispara sola**: eso significa que no se genera sin pedirlo, no que no haya que
+ofrecerlo. Este es el punto donde toca, porque es el único momento en que están a la vez el diff, el
+porqué del ticket y lo que se descubrió al probar —los tres apartados que el formato pide—, y
+reconstruirlo una semana después sale peor y más lento.
+
+Ofrecerlo en una línea, con el ticket y el nombre de la rama. Si el usuario dice que no, no
+insistir.
 
 ## Fase 8 — Push
 
