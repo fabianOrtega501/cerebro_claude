@@ -5,3 +5,4 @@
 - [.env.testing con skip-worktree](env-testing-skip-worktree.md) — está versionado pese al .gitignore; la marca local mantiene sus cambios fuera de los commits
 - [El lint del AIO reformatea todo](lint-del-aio-reformatea-todo.md) — en aio-app `pnpm lint` es `eslint --fix` sobre todo el repo: verificar con `--no-fix` y `build`
 - [Cerebro propio de Claude](cerebro-propio-claude.md) — ~/.claude es un repo git aparte que manda sobre el .claude/ de los repos
+- [Los conflictos los resuelve el usuario](conflictos-los-resuelve-el-usuario.md) — parar el merge y esperar su orden antes de commitear

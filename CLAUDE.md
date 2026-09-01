@@ -36,7 +36,9 @@ git aparte, local.
 - **Todo desarrollo arranca en modo plan.** Antes de editar un archivo hay que contar que se
   analizo, que se encontro en el codigo y como se piensa resolver, y esperar el si. Una
   implementacion hecha antes de tiempo obliga a deshacer trabajo y esconde el razonamiento que el
-  queria validar.
+  queria validar. **Rige sin excepcion, tambien al venir de una skill**: que `start-development`
+  ya haya corrido comandos no autoriza a empezar a editar, y ni siquiera un enunciado que diga
+  exactamente que lineas tocar exime de exponer el plan primero.
 - **Las claves de traduccion nuevas van al final del archivo de locales**, nunca intercaladas junto
   a las del mismo tema. Insertar en medio cambia el contexto de lineas que nadie toco y provoca
   conflictos cuando dos ramas agregan claves en la misma zona; al final, cada clave es una linea
