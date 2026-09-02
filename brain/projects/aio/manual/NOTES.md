@@ -114,6 +114,29 @@ Cada uno de estos puntos costó una corrida fallida:
 - **Al cerrar un `VDialog`, Vuetify devuelve el foco al botón que lo abrió**, que queda con su
   anillo de foco puesto. Es correcto para el teclado, pero en la captura se lee como si el botón
   estuviera activado: un `document.activeElement?.blur()` después de cerrar lo deja limpio.
+- **El canvas del captcha cambio de clase con el rediseno del ticket 10898**: ahora es
+  `captcha__canvas` y antes `captcha-canvas`. `CAPTCHA_HOOK` acepta las dos, porque las ramas sin
+  ese ticket mezclado siguen con la vieja. Si algun dia se retira la antigua, ese hook es el unico
+  sitio a tocar; si se olvida, **el login automatizado deja de funcionar en todos los modulos**,
+  con un timeout que parece de red.
+- **`openPublicPage` acepta `captchaHook: true`.** Hay vistas publicas con captcha —el registro de
+  asistencia a capacitaciones— y ahi `readCaptcha` no funcionaba: el hook solo lo inyectaba
+  `openSession`. Se inyecta antes de navegar; despues no engancha.
+- **La accion de escuchar el codigo no se ve en los navegadores snap.** Brave y Firefox de snap no
+  alcanzan el `speech-dispatcher` del sistema, asi que `speechSynthesis.getVoices()` devuelve 0 y
+  el componente esconde el boton (es su comportamiento correcto). Las capturas del bloque de
+  verificacion **hay que tomarlas con el Chrome `.deb`** (`/usr/bin/google-chrome`), que si trae
+  voces; con Brave sale una sola accion y el manual quedaria documentando de menos.
+- **El boton flotante de accesibilidad del portal ciudadano tapa el contenido de detras.** Queda
+  fijo sobre el borde derecho y se come el campo que tenga debajo. En las capturas del bloque de
+  verificacion se oculta por CSS (`.a11y-widget__fab`), que es lo que hace la vista `citizen-portal-verification`;
+  el manual ya lo documenta aparte con `boton-accesibilidad.png`.
+- **Dibujar en el `SignaturePad` tiene dos trampas.** La primera: los `mouseMoved` necesitan
+  `buttons: 1`, porque sin el mapa de botones pulsados signature_pad los toma por un
+  desplazamiento sin trazo y el lienzo queda vacio. La segunda: el lienzo del registro de
+  asistencia queda al borde inferior de la ventana, asi que **hay que desplazarlo antes de medirlo**
+  o los puntos del trazo caen fuera del viewport y los eventos no llegan a ninguna parte. Conviene
+  comprobar el resultado leyendo el canal alfa del canvas en vez de suponer que se dibujo.
 - **El login tiene captcha, y no se puede saltar por entorno.** El bypass del formulario exige
   `VITE_APP_ENV === 'QA'` y el `.env` local trae `LOCAL`. El captcha son 5 dígitos que
   `Captcha.vue` dibuja en un `<canvas>`, así que no se leen del DOM: se enganchan envolviendo

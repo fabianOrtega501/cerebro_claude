@@ -38,4 +38,11 @@ export const MAPPINGS = {
 		"reciclaje-escaneado.png": "Operaciones/ConsultaElementosPublico/ReciclajeVoluminosos/punto-escaneado.png",
 		"reciclaje-globo-escaneado.png": "Operaciones/ConsultaElementosPublico/ReciclajeVoluminosos/globo-escaneado.png",
 	},
+
+	// El bloque de verificacion de seguridad vive en dos pantallas distintas del portal, cada una
+	// con su documento: la consulta de radicado y el paso 4 del reporte de queja.
+	"citizen-portal-verification": {
+		"formulario-consulta.png": "Operaciones/ConsultaElementosPublico/ConsultarRadicado/formulario-consulta.png",
+		"contacto-verificacion.png": "Operaciones/ConsultaElementosPublico/ReportarQueja/contacto-verificacion.png",
+	},
 };

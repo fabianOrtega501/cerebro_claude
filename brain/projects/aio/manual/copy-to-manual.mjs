@@ -17,14 +17,16 @@ import { copyScreenshots, imagesRoot, resolveManualRoot } from "./lib/manual.mjs
 
 // Al agregar un módulo, importa su mappings.mjs y agrégalo aquí. Es el único punto
 // que hay que tocar fuera de la carpeta del módulo.
+import { MAPPINGS as authLogin } from "./modules/auth/login/mappings.mjs";
 import { MAPPINGS as avl } from "./modules/avl/mappings.mjs";
 import { MAPPINGS as maintenanceSystems } from "./modules/maintenance/systems/mappings.mjs";
 import { MAPPINGS as mobileVisits } from "./modules/mobile/visits/mappings.mjs";
 import { MAPPINGS as operationsDispatches } from "./modules/operations/dispatches/mappings.mjs";
 import { MAPPINGS as operationsRoutes } from "./modules/operations/routes/mappings.mjs";
+import { MAPPINGS as operationsTraining } from "./modules/operations/training-records/mappings.mjs";
 import { MAPPINGS as publicCitizenPortal } from "./modules/public/citizen-portal/mappings.mjs";
 
-const MAPPINGS_BY_VIEW = { ...avl, ...maintenanceSystems, ...mobileVisits, ...operationsDispatches, ...operationsRoutes, ...publicCitizenPortal };
+const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...maintenanceSystems, ...mobileVisits, ...operationsDispatches, ...operationsRoutes, ...operationsTraining, ...publicCitizenPortal };
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {

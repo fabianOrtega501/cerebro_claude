@@ -99,13 +99,16 @@ export async function type(cdp, selector, value) {
  *
  * Se resetea al llegar a 5 porque `generateCaptcha()` redibuja en cada intento fallido y en
  * cada refresco: siempre queda el código vigente.
+ *
+ * Acepta dos clases de canvas: `captcha__canvas` es la del rediseño (ticket 10898) y
+ * `captcha-canvas` la anterior, que sigue viva en las ramas que no lo tienen mezclado.
  */
 const CAPTCHA_HOOK = `
 (() => {
   window.__captchaChars = [];
   const original = CanvasRenderingContext2D.prototype.fillText;
   CanvasRenderingContext2D.prototype.fillText = function (text, x, y) {
-    if (this.canvas && this.canvas.classList.contains('captcha-canvas')) {
+    if (this.canvas && (this.canvas.classList.contains('captcha__canvas') || this.canvas.classList.contains('captcha-canvas'))) {
       if (window.__captchaChars.length >= 5) window.__captchaChars = [];
       window.__captchaChars.push(String(text));
     }
@@ -322,6 +325,7 @@ export async function openPublicPage({
 	port = 9222,
 	width = VIEWPORT.width,
 	height = VIEWPORT.height,
+	captchaHook = false,
 }) {
 	const chrome = await launchChrome({ port });
 	const cdp = await connectPage(port);
@@ -330,6 +334,10 @@ export async function openPublicPage({
 	await cdp.send("Runtime.enable");
 	await setViewport(cdp, { width, height });
 	await injectOnLoad(cdp, HIDE_DEVTOOLS);
+
+	// Hay vistas publicas con captcha —el registro de asistencia—: con esto `readCaptcha`
+	// funciona igual que en las de sesion. Se inyecta antes de navegar o no engancha.
+	if (captchaHook) await injectOnLoad(cdp, CAPTCHA_HOOK);
 
 	await cdp.send("Page.navigate", { url: `${base}${path}` });
 	if (selector) await waitForSelector(cdp, selector, { timeout: 90000 });
