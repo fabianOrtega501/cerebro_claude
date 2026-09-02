@@ -20,4 +20,5 @@ Peor: si hubiera habido trabajo sin commitear de otro ticket, se habria mezclado
 archivos de la rama** y comparar el conteo contra `HEAD` (con `git stash`) para saber si aportas
 errores nuevos; el repo arrastra ~1200 problemas preexistentes, asi que un fallo global no dice
 nada. Lo que si demuestra que compila es `pnpm build`. `pnpm typecheck` tambien falla de base
-(hoy por `WorkOrdersCalendar.vue:754`). Ver [[run-artisan-via-sail]] para el lado del back.
+(hoy por `WorkOrdersCalendar.vue:754`). Ver [[pint-solo-archivos-del-ticket]] para el equivalente en el back, y
+[[run-artisan-via-sail]] para correr sus comandos.
