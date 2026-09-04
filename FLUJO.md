@@ -30,7 +30,13 @@ flowchart TD
     SD -.->|"delega pasos 2 y 3"| BS["<b>branch-starter</b><br/><i>subagente · Sonnet</i>"]
     BS -.->|"rama creada"| SD
 
-    SD --> Q{{"que lado toca?<br/><i>lo declara el usuario</i>"}}
+    SD --> M{{"modo del ticket?<br/><i>lo elige el usuario</i>"}}
+    M ==>|"entrega"| Q
+    M ==>|"practica"| PT["<b>practice-ticket</b><br/>1. clase de los temas<br/>2. el escribe, yo guio<br/>3. review exigente"]
+    PT ==> Q
+    PT <-.->|"lecciones, bitacora y temario"| LRN[("brain/learning<br/><i>el material y que sabe hacer</i>")]
+
+    Q{{"que lado toca?<br/><i>lo declara el usuario</i>"}}
     Q ==>|"front"| DEVF["Desarrollo normal<br/><i>solo el repo del front</i>"]
     Q ==>|"back"| DEVB["Desarrollo normal<br/><i>solo el repo del back</i>"]
     Q ==>|"los dos · no lo se"| FT["<b>fullstack-ticket</b><br/>contrato antes de codificar"]
@@ -67,9 +73,9 @@ flowchart TD
     classDef agent fill:#8250df,stroke:#8250df,color:#fff
     classDef hook fill:#bf8700,stroke:#bf8700,color:#fff
     classDef user fill:#1a7f37,stroke:#1a7f37,color:#fff
-    class SD,FT,UM,UTD,SB,GC skill
+    class SD,FT,UM,UTD,SB,GC,PT skill
     class BS agent
-    class H1,H2,Q hook
+    class H1,H2,Q,M hook
     class U user
 ```
 
@@ -95,7 +101,14 @@ flowchart TD
    │        2. ramas al dia      ─┐                        │
    │        3. crear rama         ├─► branch-starter       │
    │                              │   (subagente, Sonnet)  │
-   │        4. enunciado + QUE LADO TOCA                   │
+   │        4. enunciado + QUE LADO TOCA + QUE MODO        │
+   │              │                                        │
+   │      modo practica ──► /practice-ticket               │
+   │        1. CLASE de los temas del ticket               │
+   │           (material en learning/lessons/)             │
+   │        2. tu escribes, yo guio con pistas             │
+   │        3. review exigente, tu corriges                │
+   │        4. bitacora y temario en learning/             │
    │              │                                        │
    │      front ──┼── back ── los dos / no lo se            │
    │        │     │     │           │                       │
@@ -142,6 +155,9 @@ flowchart TD
 4. **Te pide el contexto**: enunciado, recurso nuevo o ajuste, modulo de referencia.
 5. **Se detiene y enruta segun el lado que declaraste:** los dos o "no lo se" -> propone
    `fullstack-ticket`; un solo lado -> desarrollo normal en ese repo. **Propone; no arranca solo.**
+6. **Y segun el modo:** en `practica`, encadena `practice-ticket`, que conduce el desarrollo
+   entero —clase primero, luego tu tecleas y yo guio y reviso—. En `entrega`, todo sigue como
+   siempre.
 
 Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra ramas.
 
@@ -152,6 +168,7 @@ Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra r
 | Momento | Skill | Como llega |
 |---|---|---|
 | Antes de escribir codigo | `start-development` | La pides tu |
+| El ticket se hace como ejercicio (clase + desarrollo tuyo) | `practice-ticket` | Encadenada si elegiste modo practica |
 | El ticket cruza front y back | `fullstack-ticket` | Encadenada, o la pides |
 | A mitad del desarrollo aparece el otro lado | `fullstack-ticket` | Reclasificacion: se avisa, se crea la rama que falta y se entra por la Fase 3 |
 | Cambio una regla de negocio del back | `update-tech-docs` | Hook del push, o la pides |
@@ -169,3 +186,6 @@ Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra r
   capturas**. Tarda de 2 a 4 minutos y una corrida puede salir con el mapa a medio dimensionar.
 - **Absorber cambios del equipo.** `sync-brain` clasifica y recomienda; aprobar es tuyo.
 - **Commitear.** Ninguna skill commitea en un repo de trabajo sin que lo pidas.
+- **Aprender por ti.** En modo practica hay clase antes del codigo, pero el codigo lo escribes tu:
+  la skill da pistas graduadas y revisa, y no teclea. Salirse del modo lo decides tu, en cualquier
+  momento.

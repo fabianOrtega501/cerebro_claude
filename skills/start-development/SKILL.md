@@ -106,6 +106,13 @@ petición de texto con los dos datos libres.** Un solo intercambio, sin trampas.
 | ¿Feature o hotfix? | `feature` / `hotfix` |
 | ¿De qué rama sale? | Las ramas base **reales**, no inventadas |
 | ¿Qué lado toca? | `front` / `back` / los dos / **no lo sé** |
+| ¿Modo entrega o modo práctica? | `entrega` (lo escribo yo) / `practica` (lo escribe él, yo guío) |
+
+**Sobre el modo**: `entrega` es el flujo de siempre. `practica` significa que el ticket se hace
+como ejercicio —primero una clase de los temas que ejercita, después él teclea mientras yo guío
+con pistas graduadas y reviso— y lo desarrolla la skill `practice-ticket`. Se pregunta por ticket, no se deduce: un hotfix urgente no tiene por qué pagar
+el costo de la práctica, y a la inversa, un ticket tranquilo es la ocasión de aprovecharlo.
+El modo **no** afecta el nombre de la rama ni ningún script.
 
 **Sobre el lado: se pregunta como expectativa, no como veredicto.** Decide dónde se crea la rama,
 no si el análisis sobra. "No lo sé" es una respuesta perfectamente válida y frecuente —para eso
@@ -208,6 +215,16 @@ qué queda pendiente de lo que no se pudo poner al día. Después, según el lad
 lado, hay que decirlo y cambiar de skill: el procedimiento está en `~/.claude/CLAUDE.md`, sección
 *"Si el desarrollo cambia de lado"*. Vive ahí y no aquí porque tiene que seguir vigente mucho
 después de que esta skill haya terminado.
+
+**Y según el modo**, encima de lo anterior:
+
+| Modo | Qué sigue |
+|---|---|
+| **Entrega** | Todo igual que siempre |
+| **Práctica** | Encadenar `practice-ticket`, que conduce el desarrollo entero. Si el lado es "los dos" o "no lo sé", el contrato lo sigue fijando `fullstack-ticket` y su resultado entra como insumo de la Fase 3 de `practice-ticket` |
+
+En modo práctica, el plan del paso 5 lo redacta **el usuario** y yo lo corrijo. La exigencia del
+diagrama no cambia; cambia quién lo dibuja.
 
 ## Lo que esta skill NO hace
 

@@ -22,6 +22,7 @@ absorbe sin aprobacion.
 | `~/.claude/brain/projects/<proy>/stack/` | Stack full-stack: repos, comandos, NOTES, verificador | Lo carga la skill `fullstack-ticket` |
 | `~/.claude/brain/projects/<proy>/docs/` | Documentacion tecnica: donde vive, que cuenta como negocio | Lo carga la skill `update-tech-docs` |
 | `~/.claude/brain/projects/_template/` | Plantillas para agregar un proyecto | — |
+| `~/.claude/brain/learning/` | **Modo practica**: lecciones, temario y bitacoras | Lo carga la skill `practice-ticket` |
 | `~/.claude/projects/<repo>/memory/` | Conocimiento de un repo | Ese repo; Claude lo recuerda solo |
 | `~/.claude/CLAUDE.md` | Reglas y preferencias | Todos los proyectos, siempre cargado |
 | `~/.claude/hooks/` | Disparadores automaticos | Segun como se registren en `settings.json` |
@@ -63,6 +64,7 @@ procedimiento vive una vez en `~/.claude/skills/` y lo especifico en un perfil b
 | Skill | Perfil | Como se invoca |
 |---|---|---|
 | `update-manual` | `<proy>/manual/` | Deduce el proyecto del repo actual |
+| `practice-ticket` | `brain/learning/` (uno solo, no por proyecto) | La encadena `start-development` si el modo elegido es practica |
 | `start-development` | — (usa `projects.json`) | Automatica al empezar un desarrollo |
 | `update-tech-docs` | `<proy>/docs/` | Cuando cambia una regla de negocio, o al avisar el hook del push |
 | `fullstack-ticket` | `<proy>/stack/` | `/fullstack-ticket <proyecto>`, o deduce del repo actual |

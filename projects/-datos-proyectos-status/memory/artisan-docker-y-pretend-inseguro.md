@@ -1,6 +1,6 @@
 ---
 name: artisan-docker-y-pretend-inseguro
-description: Artisan solo corre dentro del contenedor status; migrate --pretend SÍ ejecuta cambios cuando la migración usa Schema::connection()
+description: Artisan solo corre dentro del contenedor status; migrate --pretend SÍ ejecuta cambios con Schema::connection(); ERR_CONNECTION_RESET = entrypoint esperando a Postgres
 metadata: 
   node_type: memory
   type: reference
@@ -16,3 +16,12 @@ metadata:
 `php artisan route:list` está roto por un typo preexistente en [routes/ModulosApi/Aprovechamiento.php](routes/ModulosApi/Aprovechamiento.php) (`MtPrestadofresController`, commit 0225910b). Para verificar rutas usar `docker exec status php artisan tinker --execute="foreach (Route::getRoutes() as \$r) {...}"`.
 
 Ver también [[build-assets-laravel-mix]] para el front.
+
+**`ERR_CONNECTION_RESET` en localhost:8086** (añadido 2026-09-03): el entrypoint sigue esperando a
+Postgres y Apache no arrancó; confirmar con `docker logs status`. Desde esa fecha `docker/entrypoint.sh`
+espera `DB_WAIT_TIMEOUT` segundos (20 en local vía `docker-compose.yml`, 0 = infinito en servidores) y
+arranca igual sin migrar ni sembrar. El contenedor lee el `.env` al **crearse**: tras cambiar `DB_HOST`
+hay que `docker compose up -d` (recrea), no basta `restart`; si cambia el entrypoint, `--build`. El
+`.env` local a veces apunta a la base de QA (172.17.10.14), inalcanzable sin VPN y que además colisiona
+con la red `docker0` (172.17.0.0/16); para trabajar en local: `DB_HOST=host.docker.internal`,
+`DB_PORT=5433` (contenedor `postgres_postgis_17`, base `status`).

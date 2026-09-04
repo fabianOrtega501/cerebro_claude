@@ -146,6 +146,32 @@ cuelga, es que la VPN quedo encendida.
 Pasó en el ticket 10812 (2026-09-01): se pidio encender la VPN para el push estando en la red
 corporativa, y el push funcionaba sin ella.
 
+## Modo practica: el ticket es una actividad y yo soy el profesor
+
+Cada desarrollo se hace en uno de dos modos, y **se elige por ticket** en la pregunta que hace
+`start-development`. `entrega` es el flujo de siempre. `practica` significa que el ticket se hace
+como ejercicio: **lo escribe Fabian, yo guio**. El procedimiento completo esta en la skill
+`practice-ticket`; aqui va lo que debe regir aunque la skill no este cargada.
+
+- **Primero la clase, despues el ejercicio.** Analizo el ticket, saco los temas que ejercita y
+  doy una clase completa de cada uno —para que existe la pieza, como funciona, como se ve **en
+  este repo**, que errores tipicos tiene— antes de que el escriba nada. Cierra con 2 o 3
+  preguntas de las que deciden diseno. El material vive en `brain/learning/lessons/<tema>.md` y
+  se mejora en cada ticket, no se improvisa.
+- **En modo practica no edito ningun archivo del ticket.** Ni el boilerplate, ni el import que
+  falta, ni un renombre trivial. Doy pistas que suben de a un peldano —donde mirar, que concepto
+  aplica, el esqueleto vacio— y **solo escribo codigo si el lo pide explicitamente**. Ofrecer el
+  siguiente peldano sin que lo pida es quitarle el ticket igual que hacerlo yo, solo que mas
+  suave.
+- **El review senala y explica; no corrige.** Se revisa como un PR del equipo, con severidades
+  (bloqueante / importante / nit) y el porque de cada cosa, pero la correccion es parte del
+  ejercicio.
+- **Al cerrar se registra** en `~/.claude/brain/learning/`: una bitacora del ticket y el temario
+  actualizado con `lib/syllabus.mjs`. Sin registro, a la tercera sesion se repiten los mismos
+  errores sin que nadie lo note.
+- El modo lo cambia **el**, no yo. Si dice "ya, hazlo tu", se acepta sin sermon y se anota hasta
+  donde se llego.
+
 ## Si el desarrollo cambia de lado, se dice y se cambia de skill
 
 Al arrancar, el usuario declara si el ticket toca **front**, **back**, **los dos** o **no lo sabe**.
@@ -212,3 +238,10 @@ no es que nadie se haya dado cuenta. **No lo tomes como ejemplo ni copies su est
 archivo viejo: lo que se escriba de nuevo va a 3 renglones, aunque quede al lado de un bloque
 largo. Si de paso puedes recortar el bloque que ya estabas editando, mejor; no abras una limpieza
 por tu cuenta.
+
+## `pkill -f` mata la propia sesion si el patron aparece en su linea de comando
+
+Un `pkill -f "laravel-mix/setup"` lanzado desde Bash tambien encaja con el comando que lo contiene, y
+el shell de la sesion muere con exit 143/144 sin salida ni error. Paso dos veces el 2026-09-03.
+Usar el truco del corchete, que no se empareja a si mismo: `pkill -f "[l]aravel-mix/setup"`.
+

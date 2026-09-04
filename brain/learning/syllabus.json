@@ -1,0 +1,140 @@
+{
+  "_comment": "Temario vivo del modo practica. NO editar a mano: usar node ~/.claude/brain/learning/lib/syllabus.mjs. Niveles: pendiente -> visto -> practicado -> dominado. Un tema es una capacidad concreta y repetible, no un lenguaje entero.",
+  "topics": {
+    "laravel-migraciones": {
+      "label": "Migraciones y cambios de esquema en Laravel",
+      "level": "pendiente",
+      "keywords": ["migracion", "columna", "tabla", "campo nuevo", "esquema", "indice", "llave foranea"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "laravel-eloquent": {
+      "label": "Modelos, relaciones y consultas con Eloquent",
+      "level": "pendiente",
+      "keywords": ["modelo", "relacion", "eloquent", "consulta", "query", "scope", "join", "listado"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "laravel-validacion": {
+      "label": "Validacion de entrada con Form Requests",
+      "level": "pendiente",
+      "keywords": ["validacion", "request", "regla", "obligatorio", "formulario", "campo requerido"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "laravel-servicios": {
+      "label": "Separar la logica de negocio en servicios, fuera del controlador",
+      "level": "pendiente",
+      "keywords": ["servicio", "logica de negocio", "controlador", "refactor", "proceso"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "api-endpoints": {
+      "label": "Disenar un endpoint: ruta, contrato de respuesta y codigos de estado",
+      "level": "pendiente",
+      "keywords": ["endpoint", "api", "ruta", "respuesta", "json", "servicio web", "contrato"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "permisos-y-gates": {
+      "label": "Permisos, roles y control de acceso",
+      "level": "pendiente",
+      "keywords": ["permiso", "rol", "acceso", "gate", "middleware", "autorizacion", "menu"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "vue-componentes": {
+      "label": "Componer y comunicar componentes Vue (props, eventos, slots)",
+      "level": "pendiente",
+      "keywords": ["componente", "vue", "props", "evento", "modal", "popup", "vista"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "vue-estado": {
+      "label": "Estado compartido y store en el front",
+      "level": "pendiente",
+      "keywords": ["store", "estado", "vuex", "global", "sesion", "usuario logueado"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "front-formularios": {
+      "label": "Formularios en el front: binding, validacion y errores del servidor",
+      "level": "pendiente",
+      "keywords": ["formulario", "campo", "guardar", "editar", "validacion", "mensaje de error"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "front-tablas-y-filtros": {
+      "label": "Listados: tablas, paginacion, filtros y busqueda",
+      "level": "pendiente",
+      "keywords": ["tabla", "listado", "filtro", "buscar", "paginacion", "columna", "orden"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "i18n-traducciones": {
+      "label": "Claves de traduccion y locales",
+      "level": "pendiente",
+      "keywords": ["traduccion", "idioma", "locale", "texto", "etiqueta", "i18n"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "sql-consultas": {
+      "label": "SQL a mano: agregaciones, subconsultas y rendimiento",
+      "level": "pendiente",
+      "keywords": ["sql", "consulta", "reporte", "agrupar", "suma", "conteo", "lento", "indice"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "depuracion": {
+      "label": "Depurar: leer el error, aislar la causa y comprobar la hipotesis",
+      "level": "pendiente",
+      "keywords": ["error", "falla", "bug", "no funciona", "excepcion", "log", "hotfix"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "git-flujo": {
+      "label": "Ramas, merges y resolucion de conflictos",
+      "level": "pendiente",
+      "keywords": ["rama", "merge", "conflicto", "rebase", "commit", "integrar"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    },
+    "lectura-de-codigo": {
+      "label": "Ubicarse en un repo ajeno: encontrar el patron que ya existe y copiarlo",
+      "level": "pendiente",
+      "keywords": ["patron", "similar", "existente", "referencia", "como se hace", "modulo parecido"],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
+    }
+  }
+}
