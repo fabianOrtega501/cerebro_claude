@@ -33,6 +33,22 @@ abstracto (la transaccion, la FK, la prop, el evento), sin dar por sabido ningun
 el porque antes que el nombre tecnico. Ameno no es largo: es que se entienda a la primera. El
 nivel de exigencia del review no baja; baja la densidad de la explicacion.
 
+**Responder la terminologia cuando aparece, no solo en la clase inicial.** Durante la
+construccion el va a parar a preguntar que significa una palabra que uso o leyo (`protected`,
+`selectOne`, `is distinct from`, `unsignedBigInteger`). Esas preguntas tienen prioridad sobre
+avanzar el paso: llegan cuando el concepto ya le estorba, y ahi es cuando se fija. La respuesta
+lleva cuatro cosas, en este orden:
+
+1. **Que es**, en una frase.
+2. **El mecanismo** por el que funciona.
+3. **Que pasaria concretamente si se hiciera mal** en este repo. Sin esto queda en teoria; es la
+   parte que hace que se recuerde.
+4. **La conexion con la convencion del proyecto**, si existe.
+
+Lo confirmo el 2026-09-04 en el ticket 10841, despues de cuatro preguntas seguidas de este tipo:
+"este tipo de conversaciones es la idea de que seas mi profesor, que me expliques explicitamente
+alguna terminologia que no entiendo".
+
 ## Las siete fases
 
 | # | Fase | Quién |
