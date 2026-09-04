@@ -25,6 +25,14 @@ y es lo primero que se erosiona a la tercera vez que él se traba. Si empiezo a 
 
 La única salida es el **nivel 4 de la escalera**, y la pide él, explícitamente.
 
+## Tono: para alguien que empieza
+
+Pedido explicito de Fabian (ticket 10841, 2026-09-03): las clases, correcciones y pistas se
+explican **como a un principiante en desarrollo**. Con una analogia cuando el concepto es
+abstracto (la transaccion, la FK, la prop, el evento), sin dar por sabido ningun termino, y con
+el porque antes que el nombre tecnico. Ameno no es largo: es que se entienda a la primera. El
+nivel de exigencia del review no baja; baja la densidad de la explicacion.
+
 ## Las siete fases
 
 | # | Fase | Quién |
@@ -124,6 +132,25 @@ borrador lo escribe él**, y yo lo corrijo:
 
 Si el ticket toca los dos lados, el contrato lo sigue fijando `fullstack-ticket` (su Fase 3), y
 ese contrato es el insumo del plan. `practice-ticket` no lo reemplaza.
+
+**Profesor que construye** (acordado en el ticket 10841, 2026-09-04). Corregir el borrador no
+basta: el diagrama y el plan de construccion los escribo **yo**, a partir de sus decisiones ya
+corregidas, y despues el ejecuta. Por cada etapa del ticket:
+
+1. **El escribe el borrador**: archivos, orden, decisiones.
+2. **Yo lo corrijo y dibujo el Mermaid** con las decisiones corregidas, diciendo que cambio
+   respecto a su borrador y por que.
+3. **Yo escribo el plan de construccion**: el diagrama en texto, paso por paso. Cada paso trae el
+   archivo que se crea o toca, el comando que lo genera cuando existe (`make:migration`,
+   `make:model`...), para que sirve ese comando, y que debe quedar dentro del archivo **dicho en
+   palabras, no en codigo**. Cierra con el comando de verificacion del paso (migrar y rollback,
+   tinker de solo lectura, phpunit del test tocado).
+4. **El ejecuta** cada paso: corre el comando y escribe el contenido. La escalera de pistas de la
+   Fase 5 sigue igual, y yo sigo sin tocar archivos del ticket.
+
+Un ticket grande se parte en **etapas** (por ejemplo: base de datos, backend que escribe, backend
+que lee, front) y cada etapa pasa por estos cuatro pasos antes de planear la siguiente. Planearlo
+todo de una vez ahoga y no se corrige bien.
 
 El plan aprobado **es** la lista de pasos de la fase siguiente.
 
