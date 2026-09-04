@@ -145,6 +145,8 @@ corregidas, y despues el ejecuta. Por cada etapa del ticket:
    `make:model`...), para que sirve ese comando, y que debe quedar dentro del archivo **dicho en
    palabras, no en codigo**. Cierra con el comando de verificacion del paso (migrar y rollback,
    tinker de solo lectura, phpunit del test tocado).
+El diagrama y el plan de construccion se guardan en `brain/learning/plans/<fecha>-<proyecto>-<ticket>-<etapa>.md`, para que el los abra con la vista previa de VS Code y no dependan del chat.
+
 4. **El ejecuta** cada paso: corre el comando y escribe el contenido. La escalera de pistas de la
    Fase 5 sigue igual, y yo sigo sin tocar archivos del ticket.
 
