@@ -201,18 +201,24 @@ una pantalla o accion nueva (necesita permiso), un filtro que la API no soporta,
 viene en la respuesta actual. Al reves, un ticket "solo de back" toca el front cuando cambia la
 forma de una respuesta que alguien ya consume.
 
-## Documentar funciones: maximo 3 renglones (solo en el cerebro)
+## Documentar funciones: maximo 3 renglones, en todas partes
 
-**Esta regla rige el codigo propio de `~/.claude`**: los `.mjs` de las skills, los hooks, los
-scripts de `brain/`. En un repo del equipo **manda el estandar de ese repo**, no este. En el
-backend del AIO, por ejemplo, el estandar pide PHPDoc completo —prosa con que hace, como lo hace
-y por que, mas `@param` y `@return`— y ahi se escribe asi, aunque aqui se prohiba.
+**Rige en todo lo que se escriba**: el codigo propio de `~/.claude` y tambien los repos de
+trabajo. No hay excepcion por repo ni por lenguaje. Si el `CLAUDE.md` de un repo pide PHPDoc con
+prosa de que hace, como lo hace y por que, esa parte esta desactualizada y manda esta regla; lo
+corrigio Fabian el 2026-09-04 en Status, tras dos revisiones en que se escribieron bloques largos.
 
-Confundir los dos ambitos lleva a dejar funciones nuevas mudas en un repo compartido, o a llenar
-el cerebro de bloques de quince lineas. Son reglas distintas porque el lector es distinto: aqui
-el unico lector eres tu, y alli hay un equipo que no escribio el codigo.
+**Que va y que no va:**
 
-**Tres renglones por funcion. Ni uno mas.** El limite es duro y no admite "es que esta funcion
+- Se documenta **solo la funcion, metodo, clase o constante**. Nada interno: ni el porque de una
+  condicion, ni como funciona un operador, ni el orden de dos instrucciones. Eso, si hace falta,
+  es un comentario suelto junto a la linea.
+- **Documentacion tecnica.** Ningun numero de ticket, ni de Mantis, ni de GLPI, ni referencia a
+  una historia de usuario. El codigo se lee sin ese contexto.
+- **`@param` y `@return` siempre**, uno por argumento. Esto es lo unico que sobrevive del
+  estandar viejo, y no cuenta dentro de los tres renglones.
+
+**Tres renglones de prosa por funcion. Ni uno mas.** El limite es duro y no admite "es que esta funcion
 es especial": si no cabe, el problema es la funcion, no el limite.
 
 En esos tres renglones va, en este orden de prioridad:
@@ -222,9 +228,9 @@ En esos tres renglones va, en este orden de prioridad:
 2. **Entradas y salidas**, solo cuando la firma no las explique sola. Que significa un `null`,
    en que unidad viene un numero, si lanza o devuelve el error.
 
-Nada de bloques `@param` uno por argumento, nada de `@returns` que repita el tipo, nada de
-parrafos explicando por que se hizo asi. Si de verdad hace falta un porque, va como **comentario
-suelto junto a la linea que lo necesita**, no en la cabecera de la funcion.
+Nada de parrafos explicando por que se hizo asi, nada de explicar un operador de SQL o de PHP
+al lector. Si de verdad hace falta un porque, va como **comentario suelto junto a la linea que lo
+necesita**, no en la cabecera de la funcion.
 
 ```js
 // Bien

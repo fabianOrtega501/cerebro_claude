@@ -4,3 +4,4 @@
 - [Build assets Laravel Mix](build-assets-laravel-mix.md) — correr el front (npm run dev → BrowserSync :3000 sobre el contenedor), flag OpenSSL condicional (servidor Node 14), consola limpia, quirk de .copy() en watch
 - [Artisan en Docker y --pretend inseguro](artisan-docker-y-pretend-inseguro.md) — artisan solo en el contenedor; migrate --pretend ejecuta de verdad; route:list roto; ERR_CONNECTION_RESET = entrypoint esperando a Postgres, recrear con compose up -d
 - [CSS sin ::v-deep](css-no-v-deep.md) — en los .vue de Status siempre :deep(), nunca ::v-deep ni >>> (avisos de Vue 2.7)
+- [PHPDoc de tres renglones](phpdoc-tres-renglones.md) — documentacion tecnica, maximo 3 renglones mas @param/@return, nada interno ni tickets
