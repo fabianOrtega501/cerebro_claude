@@ -39,7 +39,28 @@ hace falta configurar, cómo verificar que hay datos, la estructura de su manual
 flujo ya escrito y —lo más valioso— la lista de trampas de esa app, cada una pagada con una
 corrida fallida.
 
-## 3. Arquitectura
+## 3. Preparar la rama del manual — antes de escribir nada ahí
+
+La documentación **no se escribe sobre lo que estuviera activo** en el repo del manual: nace de
+`qa` fresco, igual que una rama de desarrollo, para que quede en su propio commit y su propio MR,
+revisable aparte del código.
+
+```bash
+node ~/.claude/skills/update-manual/lib/prepare-branch.mjs --project <proyecto> --nombre <rama>
+```
+
+Pone `qa` al día por fast-forward (fetch + merge/adelanto de referencia, nunca merge de verdad ni
+descarte) y crea `<rama>` a partir de ahí. Si `<rama>` ya existe localmente —re-ejecuciones dentro
+del mismo ticket—, la activa en vez de fallar.
+
+**`--nombre` por defecto es el nombre de la rama del desarrollo que motivó el cambio** (la que
+tengas activa en el repo de código al ofrecer el manual). Solo pon uno distinto si esa rama ya se
+usó antes para otra cosa en el repo del manual.
+
+Si `qa` divergió o tiene commits que el remoto no tiene, el script se para y avisa: eso se resuelve
+a mano, nunca sobre la marcha.
+
+## 4. Arquitectura
 
 ```
 ~/.claude/skills/update-manual/          MOTOR TRANSVERSAL
@@ -96,7 +117,7 @@ Crear `~/.claude/brain/projects/<proyecto>/manual/` con su `profile.mjs`, su `se
 puentes y su `NOTES.md`. **El motor no se toca.** Si al hacerlo descubres que sí hay que tocarlo,
 probablemente estás metiendo algo específico donde no va.
 
-## 4. Ejecución
+## 5. Ejecución
 
 ```bash
 cd ~/.claude/brain/projects/<proyecto>/manual
@@ -163,7 +184,7 @@ await clearHighlights(cdp);   // siempre, antes de seguir con otra captura
 Si el elemento que documentas es pequeño o está rodeado de detalle, va señalado. Para una pantalla
 completa que se explica sola, no hace falta.
 
-## 5. Ortografía: siempre correcta, aunque el archivo no lo esté
+## 6. Ortografía: siempre correcta, aunque el archivo no lo esté
 
 Varios documentos de los manuales están escritos **sin tildes**. Es un defecto heredado, **no un
 estilo que haya que imitar**.
@@ -183,7 +204,7 @@ cambio que sí te pidieron.
 Hay que esperar **algo de adentro** —su título, un campo, el botón de guardar—. Vale para cualquier
 framework que monte los modales con posición fija, Vuetify incluido.
 
-## 6. Cuando algo falla
+## 7. Cuando algo falla
 
 ### Primero: navegadores huérfanos
 
@@ -234,7 +255,7 @@ escritorio y una de móvil— la oculta mide 0×0 y su centro cae sobre cualquie
 Al escribir un flujo nuevo, conviene la misma pauta: verificar cada paso en el momento en vez de
 dejar que el error salte tres pasos después, lejos de su causa.
 
-## 7. Al terminar
+## 8. Al terminar
 
 - **No dejar nada fuera del cerebro**: ni scripts en el repo, ni entradas en `package.json`. Si te
   hizo falta una utilidad, **agrégala** (al motor si sirve a todos los proyectos, al perfil si no);
@@ -248,3 +269,12 @@ dejar que el error salte tres pasos después, lejos de su causa.
   y `git -C ~/.claude push backup main`.
 - Reportar qué capturas se regeneraron, qué documentos se editaron y qué imágenes previas se
   dejaron intactas.
+- El commit del manual queda en la rama que creó el paso 3, no en la que estuviera antes. **Después
+  de commitear, hacer el push** en el repo del manual:
+
+  ```bash
+  git push -u origin <rama>     # primera vez que se sube esta rama
+  git push                      # si ya tenía upstream
+  ```
+
+  Abrir el MR hacia `qa` queda fuera de esta skill: esta sube la rama, no la mezcla.

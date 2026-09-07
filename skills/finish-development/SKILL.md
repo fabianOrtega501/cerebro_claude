@@ -155,8 +155,9 @@ Tres cosas que se ofrecen, **ninguna se ejecuta sin permiso**:
 | Una **regla de negocio, máquina de estados o integración** | `update-tech-docs` |
 | Cualquier cosa que vaya a un despliegue | `gen-changes-controls` |
 
-El manual vive en otro repo, lleva su propio commit y las capturas hay que revisarlas a ojo. No es
-automático y no hay que venderlo como tal.
+El manual vive en otro repo, en su propia rama nacida de `qa` (mismo nombre que esta, por
+defecto), lleva su propio commit y las capturas hay que revisarlas a ojo. No es automático y no
+hay que venderlo como tal.
 
 **El control de cambios se ofrece siempre, aquí.** `gen-changes-controls` está marcada como de uso
 manual y **no se dispara sola**: eso significa que no se genera sin pedirlo, no que no haya que
