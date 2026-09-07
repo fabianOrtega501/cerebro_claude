@@ -62,5 +62,5 @@
     "command": "node \"$HOME/.claude/statusline.mjs\"",
     "padding": 0
   },
-  "model": "opus[1m]"
+  "model": "claude-fable-5-1[1m]"
 }

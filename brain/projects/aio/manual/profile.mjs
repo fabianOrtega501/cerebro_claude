@@ -31,4 +31,14 @@ export const PROFILE = {
 	/** Repo del front y carpetas cuyo cambio el usuario final percibe. Las usa el hook del push. */
 	uiRepo: "/datos/proyectos/AIO/aio-app",
 	uiGlobs: ["src/views/pages", "src/pages"],
+
+	/**
+	 * Base local contra la que `lib/seed.mjs` aplica los datos de demostración.
+	 * El contenedor se declara por nombre de variable, no fijo: varía por máquina.
+	 */
+	db: {
+		containerSetting: "AIO_DB_CONTAINER",
+		name: "aio",
+		user: "postgres",
+	},
 }

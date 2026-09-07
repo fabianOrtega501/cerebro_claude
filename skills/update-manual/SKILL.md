@@ -48,7 +48,8 @@ corrida fallida.
     ├── browser.mjs                      Chrome por CDP: lanzar, evaluar, esperar, click, capturar
     ├── config.mjs                       configuración: entorno -> secrets.env -> settings del repo
     ├── manual.mjs                       copia al manual con validaciones
-    └── profile.mjs                      localiza el perfil del proyecto actual
+    ├── profile.mjs                      localiza el perfil del proyecto actual
+    └── seed.mjs                         aplica el seed.sql de un flujo en la base local
 
 ~/.claude/brain/projects/<proyecto>/manual/   PERFIL DEL PROYECTO
 ├── profile.mjs                          qué manual, qué carpeta de imágenes, cómo se llaman sus variables
@@ -107,6 +108,26 @@ node copy-to-manual.mjs --origen <scratchpad>/capturas --vista <vista> [--sobres
 Una corrida completa toma entre 2 y 4 minutos. `copy-to-manual.mjs --vista <cualquier cosa>` lista
 las vistas disponibles.
 
+**Comprueba por API que el módulo tiene datos antes de capturar.** Una corrida cuesta minutos;
+consultar el endpoint del listado cuesta segundos. Una pantalla vacía no se documenta, y
+descubrirlo al final significa haber gastado la corrida entera para nada.
+
+### Los datos de la captura no pueden ser los de trabajo
+
+Un plan llamado `sadf sadf s`, una placa `ABC123` o un descargue de 12 kg convierten una página
+de manual en algo que nadie se cree. Cada flujo guarda su escenario presentable en un `seed.sql`
+al lado de su `capture.mjs`, y `lib/seed.mjs` lo aplica antes de capturar:
+
+```bash
+node ~/.claude/skills/update-manual/lib/seed.mjs modules/<modulo>/seed.sql
+node ~/.claude/skills/update-manual/lib/seed.mjs modules/<modulo>/seed.sql --dry-run
+```
+
+El SQL corre **dentro** del contenedor de Postgres, así que no hace falta cliente de psql en la
+máquina. El contenedor, la base y el usuario salen de `db` en el perfil del proyecto, no del
+código. **El `seed.sql` debe ser idempotente** —`update` repetibles e `insert` con
+`where not exists`—, para poder aplicarlo antes de cada tanda sin duplicar nada.
+
 **Node 22 o superior**: el driver usa el `WebSocket` nativo, que existe sin flags desde Node 22.
 Con Node 20 o 21 hay que correr los scripts con `node --experimental-websocket`; si falta, el
 script lo dice al arrancar.
@@ -154,6 +175,13 @@ ortografía**.
 Si el documento que estás tocando tiene el defecto, corrige lo que escribes y **ofrécele al
 usuario normalizar el resto del archivo**; no lo hagas por tu cuenta, porque ensucia el diff del
 cambio que sí te pidieron.
+
+### Esperar un diálogo: no sirve esperar `.v-dialog`
+
+`waitForSelector` comprueba `offsetParent !== null`, y un diálogo es `position: fixed`, así que su
+`offsetParent` **siempre** es `null`: la espera se agota aunque el modal esté abierto y visible.
+Hay que esperar **algo de adentro** —su título, un campo, el botón de guardar—. Vale para cualquier
+framework que monte los modales con posición fija, Vuetify incluido.
 
 ## 6. Cuando algo falla
 
