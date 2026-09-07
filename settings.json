@@ -62,5 +62,5 @@
     "command": "node \"$HOME/.claude/statusline.mjs\"",
     "padding": 0
   },
-  "model": "sonnet"
+  "model": "opus[1m]"
 }

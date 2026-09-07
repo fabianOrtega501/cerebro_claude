@@ -54,6 +54,67 @@ git aparte, local.
 - Esa lista de directorios **no se escribe a mano**: sale de `projects.json` y la genera
   `brain/lib/sync-directories.mjs`, que `plug.mjs` ya corre. Una sola fuente de verdad.
 
+## Reparto de modelos: lo caro solo donde se nota
+
+El modelo mas capaz no mejora una tarea mecanica: correr un build, actualizar ramas o contar
+coincidencias de un grep dan el mismo resultado en Sonnet, y ahi la diferencia es solo lo que
+cuesta. Al reves, ahorrar en el diseno de un contrato entre dos repos sale carisimo, porque el
+error se paga en trabajo rehecho.
+
+**La regla, por tipo de trabajo:**
+
+| Trabajo | Modelo | Como se ejecuta |
+|---|---|---|
+| Mecanico y repetitivo: correr scripts, builds, migraciones, tests, leer logs largos, buscar archivos, capturas del manual | **Sonnet** | Delegado a un subagente con `model: sonnet` en su frontmatter, o `Agent(model: "sonnet")` |
+| Lo normal: entender un ticket, leer codigo, escribir la feature, revisar un diff | **Opus** | La sesion principal, que es lo que fija `settings.json` |
+| Genuinamente complejo: arquitectura de un modulo nuevo, contrato entre repos, un bug que ya resistio dos intentos, decidir entre dos disenos con consecuencias largas | **Fable** | `Agent(model: "fable")` para esa pieza concreta, o `/model` si toda la sesion va de eso |
+
+**Lo que mas ahorra no es bajar de modelo, es no meter la salida en la sesion.** Un `npm run
+production` son miles de tokens de listado de chunks que no le sirven a nadie; el subagente los
+lee y devuelve tres lineas. Ese ahorro se mantiene aunque el subagente corriera en Opus.
+
+**Como se decide, en una linea:** si la tarea tiene un procedimiento fijo y se sabe de antemano
+como se ve el exito, va a Sonnet. Si hay que decidir algo que cambia el resto del ticket, se
+queda arriba.
+
+**Fable no es el modo "esfuerzate mas".** Se usa cuando el problema de verdad lo pide, y se dice
+por que se subio. Usarlo por defecto es el mismo error que Sonnet para todo, con la factura al
+otro lado.
+
+**Subagentes disponibles hoy** (`~/.claude/agents/`): `branch-starter` crea la rama del
+desarrollo; `build-runner` corre builds, tests, migraciones y seeders y devuelve solo el
+veredicto. Los dos en Sonnet. Cuando aparezca otra tarea mecanica que se repita, **proponer un
+agente nuevo** en vez de seguir gastando la sesion principal en ella.
+
+## Credenciales de pruebas: una pareja por proyecto
+
+Ninguna credencial vive en un repo de trabajo, ni siquiera en un archivo ignorado. Todas estan en
+`~/.claude/secrets.env` (permisos 600, fuera de la lista blanca del `.gitignore`), con el nombre
+del proyecto de prefijo:
+
+```
+<PROYECTO>_TEST_EMAIL=usuario@dominio
+<PROYECTO>_TEST_PASSWORD=...
+```
+
+El prefijo es la clave del proyecto en `brain/projects.json` en mayusculas: `AIO_`, `AMI_`,
+`STATUS_`, `EPSILON_`… Asi cada proyecto tiene su usuario y **nunca se prueba con el del
+proyecto equivocado**, que en un sistema multiempresa significa mirar datos de otro cliente.
+
+Se leen con `credentialsFor()` de `brain/lib/credentials.mjs`, que deduce el proyecto del
+directorio actual cuando no se le dice cual:
+
+```js
+import { credentialsFor } from "~/.claude/brain/lib/credentials.mjs";
+
+const { email, password } = credentialsFor();          // por el repo actual
+const { email, password } = credentialsFor("status");   // explicito
+```
+
+Si faltan, el helper dice exactamente que linea agregar y donde, en vez de fallar con un
+"usuario o contrasena incorrectos" que manda a depurar el sitio equivocado. Y **si falta una
+credencial, se pide; no se inventa ni se reutiliza la de otro proyecto**.
+
 ## Que se aprende, y donde va
 
 El cerebro no se alimenta solo, pero **tampoco espera a que lo pidan**. Cuando en una sesion
