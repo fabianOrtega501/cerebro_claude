@@ -310,6 +310,19 @@ git diff --numstat components.d.ts
   y deja que decida si lo commitea aparte. Es regenerable pero no es tuyo y no deberia colarse en
   el MR de la documentacion.
 
+### El destino de un mapeo tiene que ser un nombre que el documento ya use
+
+`copy-to-manual.mjs` copia a donde diga el `mappings.mjs`, sin comprobar que alguien muestre esa
+imagen. Un destino inventado deja el archivo huérfano en el manual **y la página sigue enseñando
+la imagen vieja**, sin que nada falle. Le pasó a `dispatch-movements`, que apuntaba a
+`desplazamientos-tabla.png` cuando `Desplazamientos.md` referencia `desplazamientos_01.png`.
+
+Antes de escribir un mapeo, mirar qué nombre usa el `.md`:
+
+```bash
+grep -o "[a-z0-9_-]*\.png" docs/AIO/<ruta>/<Documento>.md | sort -u
+```
+
 ## Módulos con flujo ya escrito
 
 | Módulo | Script | Vistas |
@@ -318,6 +331,9 @@ git diff --numstat components.d.ts
 | AVL | `modules/avl/capture-map-tools.mjs` | `map-tools-gps-history`, `map-tools-vehicle-tracking` (controles flotantes, medición, coordenadas y pantalla completa; no necesita datos de negocio) |
 | Operaciones > Despachos | `modules/operations/dispatches/capture-movements.mjs` | `dispatch-movements` (gestión del despacho, pestaña Desplazamientos: `Despachos.md`) |
 | Operaciones > Despachos | `modules/operations/dispatches/capture-log.mjs` | `dispatch-log` (Log de Despacho, el historial de cambios: `Despachos.md`). Imprime al final los campos que salieron sin traducir, así que sirve de comprobación del i18n. El despacho se pasa con `--despacho` y **tiene que estar en la primera página** de la tabla: el flujo no pagina. En Empresa Demo sirven el 34 y el 42, que mezclan altas y modificaciones |
+| Operaciones > Despachos | `modules/operations/dispatches/capture-change-vehicle.mjs` | `dispatch-change-vehicle` (cambio de vehiculo del despacho, la accion con permiso propio). Absorbido del `.claude/` del repo |
+| Respel > Clientes | `modules/respel/clients/capture.mjs` | `clients-map` (mapa geografico de clientes). Absorbido del repo; trae su `seed.sql` |
+| AVL | `modules/avl/capture-route-search.mjs` | `route-search` (buscador de rutas). Absorbido del repo; trae su `seed-route-search.sql` |
 | Operaciones > Rutas | `modules/operations/routes/capture-geometry.mjs` | `route-geometry` (consulta geográfica: `rutas.md` y `routesGeometries.md`) |
 | Operaciones > Rutas | `modules/operations/routes/capture-read-only.mjs` | `route-read-only` (wizard en modo consulta: `rutas.md`) |
 | Móvil > Censo | `modules/mobile/visits/capture.mjs` | `census` (tabla de visitas y pestaña Información Visitas: `Censo.md`) |

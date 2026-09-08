@@ -602,6 +602,113 @@ export async function moveMouseTo(cdp, x, y) {
 }
 
 /**
+ * Instala en la página un contador de peticiones en vuelo, envolviendo `window.fetch`.
+ *
+ * Es la alternativa a las esperas fijas: en vez de suponer cuánto tarda una consulta, se espera a
+ * que **termine**. Sirve porque toda llamada al backend del AIO pasa por `ofetch`, que usa
+ * `window.fetch`; lo que no vaya por ahí (una imagen, los tiles de un mapa) no lo ve.
+ *
+ * Se engancha también con `injectOnLoad`, así que sobrevive a las navegaciones posteriores.
+ * Es idempotente: llamarlo dos veces no anida el parche.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @returns {Promise<void>}
+ */
+export async function trackRequests(cdp) {
+	const patch = `(() => {
+    if (window.__requestTracker) return true;
+    const tracker = { inFlight: 0, total: 0, settledAt: Date.now() };
+    const original = window.fetch.bind(window);
+    window.__requestTracker = tracker;
+    window.fetch = async (...args) => {
+      tracker.inFlight++;
+      try {
+        return await original(...args);
+      }
+      finally {
+        tracker.inFlight--;
+        tracker.total++;
+        if (tracker.inFlight === 0) tracker.settledAt = Date.now();
+      }
+    };
+    return true;
+  })()`;
+
+	// Para las navegaciones que vengan, y para la página que ya está cargada.
+	await injectOnLoad(cdp, patch);
+	await evaluate(cdp, patch);
+}
+
+/**
+ * Cuántas peticiones ha completado la página desde que se instaló el contador.
+ *
+ * Se toma **antes** de la acción que dispara la consulta, y se le pasa a `waitForRequestsIdle`
+ * como `minRequests`. Sin eso, la espera se cumple de inmediato: justo después del click la
+ * petición todavía no ha salido, así que `inFlight` sigue en cero.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @returns {Promise<number|null>} `null` si `trackRequests` no está instalado
+ */
+export const requestCount = (cdp) => evaluate(cdp, `window.__requestTracker ? window.__requestTracker.total : null`);
+
+/**
+ * Espera a que no queden peticiones en vuelo.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @param {object} [options]
+ * @param {number} [options.timeout=30000] - Tiempo máximo en milisegundos
+ * @param {number} [options.settleMs=400] - Cuánto debe sostenerse el silencio antes de darlo por
+ *        bueno. Cubre el hueco entre que `fetch` resuelve y la vista pinta el resultado, y evita
+ *        cortar en medio de una cadena de consultas que se disparan una tras otra
+ * @param {number} [options.minRequests=0] - Total mínimo de peticiones completadas. Se le pasa
+ *        `(await requestCount(cdp)) + 1` para exigir que la acción haya disparado al menos una
+ * @returns {Promise<boolean>} `false` si se agotó el tiempo con peticiones todavía en vuelo, o sin
+ *          alcanzar `minRequests`. **Hay que comprobarlo**
+ * @throws {Error} Si `trackRequests` no está instalado
+ */
+export async function waitForRequestsIdle(cdp, { timeout = 30000, settleMs = 400, minRequests = 0 } = {}) {
+	const deadline = Date.now() + timeout;
+
+	while (Date.now() < deadline) {
+		const state = await evaluate(
+			cdp,
+			`(() => { const t = window.__requestTracker;
+        if (!t) return null;
+        return { inFlight: t.inFlight, total: t.total, idleFor: Date.now() - t.settledAt }; })()`,
+		);
+
+		if (!state) throw new Error("waitForRequestsIdle necesita trackRequests instalado en la página");
+
+		if (state.inFlight === 0 && state.total >= minRequests && state.idleFor >= settleMs) return true;
+
+		await wait(150);
+	}
+
+	return false;
+}
+
+/**
+ * Gira la rueda del raton sobre un punto de la pantalla. `deltaY` negativo acerca, positivo aleja.
+ * Los mapas y los contenedores con scroll propio solo reaccionan a la rueda **real**, no a un
+ * `WheelEvent` sintetico; y Leaflet acerca hacia el cursor, asi que el punto decide el encuadre.
+ *
+ * @param {object} cdp Conexion devuelta por `connectPage`.
+ * @param {number} x Coordenada horizontal de pantalla.
+ * @param {number} y Coordenada vertical de pantalla.
+ * @param {number} deltaY Pixeles de desplazamiento; negativo acerca.
+ * @returns {Promise<void>} No espera a que termine la animacion: el que llama decide cuanto esperar.
+ */
+export async function scrollWheel(cdp, x, y, deltaY = -120) {
+	await cdp.send("Input.dispatchMouseEvent", {
+		type: "mouseWheel",
+		x: Math.round(x),
+		y: Math.round(y),
+		deltaX: 0,
+		deltaY,
+	});
+}
+
+/**
  * Teclea `text` en el elemento con foco, anexandolo a lo que ya haya. Sin foco se pierde, sin error.
  * Hace falta en los buscadores de N caracteres: escuchan el evento de busqueda de Vuetify, que
  * no se dispara asignando `input.value`. `Input.insertText` entra por el camino del teclado real.

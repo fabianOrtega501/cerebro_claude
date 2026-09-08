@@ -17,8 +17,11 @@ import {
 	injectOnLoad,
 	launchChrome,
 	pressEscape,
+	requestCount,
 	setViewport,
+	trackRequests,
 	wait,
+	waitForRequestsIdle,
 	waitForSelector,
 	waitForText,
 } from "./browser.mjs";
@@ -99,9 +102,11 @@ export async function type(cdp, selector, value) {
  *
  * Se resetea al llegar a 5 porque `generateCaptcha()` redibuja en cada intento fallido y en
  * cada refresco: siempre queda el código vigente.
- *
+ */
+/*
  * Acepta dos clases de canvas: `captcha__canvas` es la del rediseño (ticket 10898) y
  * `captcha-canvas` la anterior, que sigue viva en las ramas que no lo tienen mezclado.
+ * Las tres apariciones —este hook, la detección y el campo— tienen que aceptar ambas.
  */
 const CAPTCHA_HOOK = `
 (() => {
@@ -154,32 +159,330 @@ export const appField = (id) => `[id^="app-select-${id}-"], [id^="app-autocomple
  * @throws {Error} Si no encuentra el campo, o si tras todos los intentos el menú sigue vacío
  */
 export async function openSelect(cdp, inputSelector, { attempts = 6 } = {}) {
-	const rect = await evaluate(
-		cdp,
-		`(() => { const i = document.querySelector(${JSON.stringify(inputSelector)});
+	/** Posición del `.v-field` del select, medida en el momento de usarla. */
+	const fieldRect = () =>
+		evaluate(
+			cdp,
+			`(() => { const i = document.querySelector(${JSON.stringify(inputSelector)});
       const field = i && i.closest('.v-field'); if (!field) return null;
       const r = field.getBoundingClientRect();
+      if (!r.width || !r.height) return null;
       return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`,
-	);
-	if (!rect) throw new Error(`No se encontró el select ${inputSelector}`);
+		);
 
-	// Las opciones llegan por API. Si el menú se abre antes de que responda, Vuetify pinta
-	// "No data available" y ahí se queda: hay que cerrarlo y volver a abrirlo.
+	if (!(await fieldRect())) throw new Error(`No se encontró el select ${inputSelector}`);
+
+	let lastFailure = "no abrió el menú";
+
+	// Dos fallos distintos, y los dos hay que reintentar:
+	//  - El menú abre pero **vacío**: las opciones llegan por API y Vuetify ya pintó
+	//    "No data available", que se queda fijo aunque después lleguen los datos.
+	//  - El menú **no abre**: si el click cae mientras la vista termina de montar (skeletons,
+	//    un campo que todavía se está reposicionando), no pasa nada. La posición se vuelve a
+	//    medir en cada intento justo por eso.
 	for (let attempt = 1; attempt <= attempts; attempt++) {
+		const rect = await fieldRect();
+
+		if (!rect) {
+			await wait(1500);
+			continue;
+		}
+
 		await clickAt(cdp, rect.x, rect.y);
-		await waitForSelector(cdp, ".v-list-item", { timeout: 20000 });
 
-		const options = await evaluate(cdp, `[...document.querySelectorAll('.v-list-item')].map(e => e.textContent.trim())`);
-		const empty = options.every((option) => /no data available|sin datos|no hay datos/i.test(option));
+		const opened = await waitForSelector(cdp, ".v-list-item", { timeout: 8000 })
+			.then(() => true)
+			.catch(() => false);
 
-		if (!empty) return options;
+		if (opened) {
+			const options = await evaluate(
+				cdp,
+				`[...document.querySelectorAll('.v-list-item')].map(e => e.textContent.trim())`,
+			);
+			const empty = options.every((option) => /no data available|sin datos|no hay datos/i.test(option));
+
+			if (!empty) return options;
+
+			lastFailure = "el menú abrió vacío";
+		}
+		else {
+			lastFailure = "no abrió el menú";
+		}
 
 		await pressEscape(cdp);
 		await wait(1500);
 	}
 
-	throw new Error(`El select ${inputSelector} nunca cargó opciones`);
+	throw new Error(`El select ${inputSelector} nunca cargó opciones tras ${attempts} intentos (${lastFailure})`);
 }
+
+/**
+ * Marca varias opciones de un `AppAutocomplete` o `AppSelect` **múltiple**.
+ *
+ * No sirve medir las opciones una vez y hacer los clicks seguidos: cada opción marcada agrega su
+ * chip al campo, el campo crece y **el menú se recoloca**, así que a partir del segundo click las
+ * coordenadas guardadas apuntan a otra fila —o afuera del menú, que además lo cierra—. Aquí se
+ * remide en cada vuelta y, si el menú se cerró, se vuelve a abrir.
+ *
+ * Al terminar cierra el menú con la tecla real: un `.v-list` abierto tapa los botones del diálogo.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @param {string} inputSelector - Selector del input; usar `appField(id)`
+ * @param {number} count - Cuántas opciones marcar, en el orden en que las pinta el menú
+ * @returns {Promise<string[]>} Los textos de las opciones marcadas. **Puede devolver menos de
+ *          `count`** si el menú no tenía tantas: hay que comprobar la longitud
+ * @throws {Error} Si el menú nunca abre con opciones
+ */
+export async function pickOptions(cdp, inputSelector, count) {
+	const chosen = [];
+
+	await openSelect(cdp, inputSelector);
+
+	for (let picked = 0; picked < count; picked++) {
+		// El menú puede haberse cerrado al marcar la opción anterior.
+		const open = await evaluate(cdp, `!!document.querySelector('.v-overlay--active .v-list-item')`);
+		if (!open) await openSelect(cdp, inputSelector);
+
+		// Las ya marcadas se excluyen **por su texto**, no por el DOM: en un multi-select de
+		// Vuetify el item elegido no queda con `aria-selected`, así que buscar "el primero no
+		// seleccionado" devuelve siempre el mismo y termina marcándolo y desmarcándolo.
+		const option = await evaluate(
+			cdp,
+			`(() => {
+        const taken = ${JSON.stringify(chosen)};
+        const items = [...document.querySelectorAll('.v-overlay--active .v-list-item')]
+          .filter(e => !/no data available|sin datos|no hay datos/i.test(e.textContent))
+          .filter(e => !taken.includes(e.textContent.trim()));
+        const item = items[0];
+        if (!item) return null;
+        const r = item.getBoundingClientRect();
+        if (!r.width || !r.height) return null;
+        return { text: item.textContent.trim(), x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
+      })()`,
+		);
+
+		if (!option) break;
+
+		await clickAt(cdp, option.x, option.y);
+		await wait(400);
+
+		// Se confirma que la opción quedó marcada de verdad: si el click cayó fuera del menú, el
+		// bucle seguiría creyendo que avanza y el fallo saldría mucho después.
+		//
+		// Los múltiples se comprueban por la cantidad de chips; los simples no tienen chips, así
+		// que en ellos se mira que el campo haya quedado con texto.
+		const applied = await evaluate(
+			cdp,
+			`(() => { const i = document.querySelector(${JSON.stringify(inputSelector)});
+        const field = i && i.closest('.v-input');
+        if (!field) return null;
+        return { chips: field.querySelectorAll('.v-chip').length, value: (i.value || '').trim() }; })()`,
+		);
+
+		const ok = applied && (applied.chips > picked || (picked === 0 && applied.value !== ""));
+
+		if (!ok) {
+			throw new Error(
+				`La opción "${option.text}" de ${inputSelector} no quedó marcada ` +
+					`(${JSON.stringify(applied)} tras ${picked + 1} intento(s)): el click no llegó al menú`,
+			);
+		}
+
+		chosen.push(option.text);
+	}
+
+	await pressEscape(cdp);
+	await wait(500);
+
+	return chosen;
+}
+
+/**
+ * Ejecuta una acción y espera a que terminen las peticiones que dispare.
+ *
+ * Es la forma correcta de esperar en esta skill: en vez de suponer cuánto tarda una consulta con un
+ * `wait(2500)` —que o se queda corto en una máquina lenta o regala segundos en cada corrida—, se
+ * espera a que la red se calle. `openSession` deja el contador puesto, así que no hay que
+ * instalar nada.
+ *
+ * Toma el conteo **antes** de la acción, que es el detalle fácil de olvidar: justo después de un
+ * click la petición todavía no salió, así que `inFlight` sigue en cero y una espera ingenua se
+ * cumple de inmediato.
+ *
+ * **No sirve para acciones que no consultan** —elegir un vehículo del lote es local—: ahí la espera
+ * se agota sin que nada esté mal. Para esas, `required: false` o un `wait` corto y explícito.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @param {Function} action - Lo que dispara la consulta; se espera su promesa
+ * @param {object} [options]
+ * @param {string} [options.what] - Nombre de la acción para el aviso si se agota el tiempo
+ * @param {number} [options.timeout=45000] - Tiempo máximo en milisegundos
+ * @param {number} [options.settleMs=400] - Cuánto debe sostenerse el silencio de red
+ * @param {boolean} [options.required=true] - Exigir que la acción haya disparado al menos una
+ *        petición. Con `false` solo espera a que no quede ninguna en vuelo
+ * @returns {Promise<boolean>} `false` si se agotó el tiempo. Si se pasó `what`, además lo avisa por
+ *          consola, de modo que el llamador puede ignorar el retorno sin que el fallo pase callado
+ */
+export async function settleRequests(cdp, action, { what = null, timeout = 45000, settleMs = 400, required = true } = {}) {
+	const before = (await requestCount(cdp)) ?? 0;
+
+	await action();
+
+	const idle = await waitForRequestsIdle(cdp, {
+		minRequests: required ? before + 1 : 0,
+		timeout,
+		settleMs,
+	});
+
+	if (!idle && what) console.log(`  AVISO: se agotó la espera de las peticiones de ${what}`);
+
+	return idle;
+}
+
+/**
+ * Marca una opción concreta de un `AppSelect` o `AppAutocomplete`, por su texto exacto.
+ *
+ * `pickOptions` solo sabe tomar las **primeras** N del menú, y muchas veces eso no sirve: en el
+ * despacho masivo, los primeros centros y servicios que ofrece el menú forman una combinación sin
+ * rutas con frecuencia vigente para hoy, así que la búsqueda vuelve vacía y el flujo muere varios
+ * pasos después. Cuando el escenario exige valores determinados, se eligen por nombre.
+ *
+ * La posición se mide en el momento de clickear: en un múltiple, cada opción marcada agrega su
+ * chip, el campo crece y el menú se recoloca.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @param {string} inputSelector - Selector del input; usar `appField(id)`
+ * @param {string} name - Texto exacto de la opción, tal como lo pinta el menú
+ * @param {object} [options]
+ * @param {boolean} [options.closeAfter=true] - Cierra el menú al terminar. En un múltiple el
+ *        `.v-list` abierto tapa los botones del diálogo, así que conviene dejarlo en `true`
+ * @returns {Promise<void>}
+ * @throws {Error} Si la opción no está; el mensaje lista las disponibles, que es lo que hace falta
+ *         para corregir el parámetro sin volver a correr a ciegas
+ */
+export async function pickOptionByName(cdp, inputSelector, name, { closeAfter = true } = {}) {
+	const options = await openSelect(cdp, inputSelector);
+
+	const point = await evaluate(
+		cdp,
+		`(() => { const item = [...document.querySelectorAll('.v-overlay--active .v-list-item')]
+        .find(e => e.textContent.trim() === ${JSON.stringify(name)});
+      if (!item) return null;
+      const r = item.getBoundingClientRect();
+      if (!r.width || !r.height) return null;
+      return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; })()`,
+	);
+
+	if (!point) {
+		throw new Error(
+			`La opción "${name}" no está en ${inputSelector}. Disponibles: ${JSON.stringify(options.slice(0, 20))}`,
+		);
+	}
+
+	await clickAt(cdp, point.x, point.y);
+	await wait(500);
+
+	if (closeAfter) {
+		await pressEscape(cdp);
+		await wait(400);
+	}
+}
+
+/**
+ * Busca un término en un `AioDataFetcherSelect` y espera sus opciones.
+ *
+ * No es un `AppAutocomplete` y `pickOptions` **no sirve** con él: no trae las opciones cargadas,
+ * las pide al backend desde su `@update:search` con un debounce de 500 ms, y con menos de 3
+ * caracteres ni siquiera pregunta —el menú se queda en "Mín. 3 caracteres"—. De ahí las dos
+ * particularidades:
+ *
+ * - El menú se abre con el ratón real sobre el `.v-field`; enfocar el `input` por JS no lo
+ *   despliega, y sin menú abierto no hay opciones que leer por más que se teclee.
+ * - Solo se emite `input`. El `type` de `browser.mjs` dispara además `blur`, y el `blur` cierra
+ *   el menú justo antes de que lleguen los datos.
+ *
+ * Deja el menú **abierto**, que es lo que hace falta para capturarlo o para elegir una opción.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @param {string} inputSelector - Selector del `input` del campo
+ * @param {string} term - Término a buscar; con menos de 3 caracteres el componente no consulta
+ * @param {object} [options]
+ * @param {number} [options.timeout=20000] - Milisegundos de espera por las opciones
+ * @returns {Promise<string[]>} Los textos de las opciones. **Vacío si no llegó ninguna**: puede
+ *          ser que el término no exista o que no alcanzara los 3 caracteres, así que el llamador
+ *          tiene que comprobar la longitud (el mensaje del menú lo distingue)
+ * @throws {Error} Si el campo no está en el DOM o no tiene tamaño
+ */
+export async function searchFetcherSelect(cdp, inputSelector, term, { timeout = 20000 } = {}) {
+	const fieldRect = () =>
+		evaluate(
+			cdp,
+			`(() => { const i = document.querySelector(${JSON.stringify(inputSelector)});
+      const field = i && i.closest('.v-field'); if (!field) return null;
+      const r = field.getBoundingClientRect();
+      if (!r.width || !r.height) return null;
+      return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`,
+		);
+
+	const rect = await fieldRect();
+
+	if (!rect) throw new Error(`No se encontró el buscador ${inputSelector}`);
+
+	await clickAt(cdp, rect.x, rect.y);
+	await wait(400);
+
+	const typed = await evaluate(
+		cdp,
+		`(() => { const i = document.querySelector(${JSON.stringify(inputSelector)});
+      if (!i) return false;
+      i.focus();
+      i.value = ${JSON.stringify(term)};
+      i.dispatchEvent(new Event('input', { bubbles: true }));
+      return true; })()`,
+	);
+
+	if (!typed) throw new Error(`No se pudo teclear en el buscador ${inputSelector}`);
+
+	const options = () =>
+		evaluate(
+			cdp,
+			`[...document.querySelectorAll('.v-overlay--active .v-list-item')]
+        .map(e => e.textContent.trim())
+        .filter(t => !/no data available|sin datos|no hay datos|caracteres|cargando|loading/i.test(t))`,
+		);
+
+	const deadline = Date.now() + timeout;
+
+	while (Date.now() < deadline) {
+		const found = await options();
+
+		if (found.length) {
+			// La lista sigue creciendo mientras Vuetify pinta: se deja asentar antes de devolverla.
+			await wait(800);
+
+			return options();
+		}
+
+		await wait(600);
+	}
+
+	return [];
+}
+
+/**
+ * Lo que el menú de un select tenga escrito ahora mismo.
+ *
+ * Es el diagnóstico de un buscador que no devolvió nada: "Mín. 3 caracteres" es que el término no
+ * llegó al componente, y "No se encontraron datos" es que el término no existe.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @returns {Promise<string[]>} Los textos del menú abierto, vacío si no hay menú
+ */
+export const menuMessages = (cdp) =>
+	evaluate(
+		cdp,
+		`[...document.querySelectorAll('.v-overlay--active .v-list-item')].map(e => e.textContent.trim()).slice(0, 5)`,
+	);
 
 /**
  * Elige una opción del menú abierto de un select, por su texto.
@@ -240,14 +543,17 @@ export async function openSession({
 	await injectOnLoad(cdp, CAPTCHA_HOOK);
 	await injectOnLoad(cdp, HIDE_DEVTOOLS);
 
+	// El contador de peticiones queda puesto desde el arranque y sobrevive a las navegaciones, para
+	// que cualquier flujo pueda esperar a que **terminen** las consultas en vez de a un reloj.
+	await trackRequests(cdp);
+
 	await cdp.send("Page.navigate", { url: `${base}/login` });
 	await waitForSelector(cdp, 'input[type="email"]', { timeout: 90000 });
 
 	await type(cdp, 'input[type="email"]', email);
 	await type(cdp, 'input[type="password"]', password);
 
-	// El captcha solo se muestra cuando VITE_APP_ENV no es 'QA'. Se aceptan las clases del
-	// rediseño (`captcha__*`) y las anteriores, porque conviven según la rama que esté activa.
+	// El captcha solo se muestra cuando VITE_APP_ENV no es 'QA'.
 	const hasCaptcha = await evaluate(cdp, `!!document.querySelector('.captcha__canvas, .captcha-canvas')`);
 	if (hasCaptcha) {
 		const code = await readCaptcha(cdp);
@@ -326,7 +632,6 @@ export async function openPublicPage({
 	port = 9222,
 	width = VIEWPORT.width,
 	height = VIEWPORT.height,
-	captchaHook = false,
 }) {
 	const chrome = await launchChrome({ port });
 	const cdp = await connectPage(port);
@@ -335,10 +640,7 @@ export async function openPublicPage({
 	await cdp.send("Runtime.enable");
 	await setViewport(cdp, { width, height });
 	await injectOnLoad(cdp, HIDE_DEVTOOLS);
-
-	// Hay vistas publicas con captcha —el registro de asistencia—: con esto `readCaptcha`
-	// funciona igual que en las de sesion. Se inyecta antes de navegar o no engancha.
-	if (captchaHook) await injectOnLoad(cdp, CAPTCHA_HOOK);
+	await trackRequests(cdp);
 
 	await cdp.send("Page.navigate", { url: `${base}${path}` });
 	if (selector) await waitForSelector(cdp, selector, { timeout: 90000 });
