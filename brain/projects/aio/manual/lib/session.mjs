@@ -246,12 +246,13 @@ export async function openSession({
 	await type(cdp, 'input[type="email"]', email);
 	await type(cdp, 'input[type="password"]', password);
 
-	// El captcha solo se muestra cuando VITE_APP_ENV no es 'QA'.
-	const hasCaptcha = await evaluate(cdp, `!!document.querySelector('.captcha-canvas')`);
+	// El captcha solo se muestra cuando VITE_APP_ENV no es 'QA'. Se aceptan las clases del
+	// rediseño (`captcha__*`) y las anteriores, porque conviven según la rama que esté activa.
+	const hasCaptcha = await evaluate(cdp, `!!document.querySelector('.captcha__canvas, .captcha-canvas')`);
 	if (hasCaptcha) {
 		const code = await readCaptcha(cdp);
 		if (!code || code.length !== 5) throw new Error(`No se pudo leer el captcha (leído: "${code}")`);
-		await type(cdp, ".captcha-input-col input", code);
+		await type(cdp, ".captcha__field input, .captcha-input-col input", code);
 	}
 
 	await click(cdp, 'button[type="submit"]');

@@ -14,4 +14,8 @@ export const MAPPINGS = {
 		"despacho_movimientos.png": "Operaciones/Despachos/desplazamientos-tabla.png",
 		"despacho_movimiento_form.png": "Operaciones/Despachos/desplazamientos-formulario.png",
 	},
+	"dispatch-log": {
+		// Imagen histórica: conserva el nombre numerado con el que ya está publicada.
+		"despacho_log.png": "Operaciones/Despachos/despachos_08.png",
+	},
 };

@@ -119,6 +119,19 @@ Cada uno de estos puntos costó una corrida fallida:
   ese ticket mezclado siguen con la vieja. Si algun dia se retira la antigua, ese hook es el unico
   sitio a tocar; si se olvida, **el login automatizado deja de funcionar en todos los modulos**,
   con un timeout que parece de red.
+- **El captcha se rompió dos veces por el mismo rediseño, y en dos sitios distintos.** No basta
+  con que `CAPTCHA_HOOK` acepte las dos clases del canvas: `openSession` **decide si hay captcha**
+  con su propio selector, y **escribe el código** en otro. Los tres tienen que aceptar las dos
+  variantes. Quedó así tras el ticket 9357, con las clases nuevas primero:
+
+  | Qué | Nuevo (rediseño) | Anterior |
+  | --- | --- | --- |
+  | Canvas (hook y detección) | `.captcha__canvas` | `.captcha-canvas` |
+  | Campo donde se escribe | `.captcha__field input` | `.captcha-input-col input` |
+
+  El síntoma cuando falla es engañoso: el login llega hasta el final y la pantalla dice **"Este
+  campo es requerido"** bajo la verificación. No es que el código se leyera mal — es que nunca se
+  escribió, porque la detección dio `false` y el bloque entero se saltó.
 - **`openPublicPage` acepta `captchaHook: true`.** Hay vistas publicas con captcha —el registro de
   asistencia a capacitaciones— y ahi `readCaptcha` no funcionaba: el hook solo lo inyectaba
   `openSession`. Se inyecta antes de navegar; despues no engancha.
@@ -181,6 +194,9 @@ Cada uno de estos puntos costó una corrida fallida:
   Movimiento". Antes de redactar, leer el texto real de la pantalla capturada; y antes de
   afirmar una regla de negocio (qué filas se pueden editar, por ejemplo), confirmarla en el
   código: en esa tabla depende de `is_editable`, no de la posición de la fila.
+- **En Despachos hay dos botones con la clase `v-log` en cada fila**: el del historial y el de
+  Novedades. Se distinguen por el ícono — `tabler-file-description` es el del log. Tomar "el
+  primero `.v-log`" abre la pantalla equivocada.
 - **El Histórico GPS monta la vista dos veces.** `gpsHistory.vue` renderiza `GpsHistoryView` en
   la página y otra vez dentro del diálogo de pantalla completa. Hay dos mapas en el DOM: los
   selectores globales pueden agarrar el que está oculto.
@@ -204,6 +220,12 @@ Cada uno de estos puntos costó una corrida fallida:
 - **`waitForSelector` no sirve para `.v-dialog`.** Comprueba `offsetParent !== null` y el diálogo
   es `position: fixed`, así que su `offsetParent` siempre es `null`: la espera se agota aunque el
   modal esté abierto. Hay que esperar algo de adentro, como `.v-dialog .v-card`.
+- **Y tampoco sirve para lo que tenga `display: contents`.** Ese valor no genera caja, así que su
+  `offsetParent` también es `null` — el elemento existe, `querySelectorAll` lo encuentra, y la
+  espera se agota igual. Le pasa a **`.v-timeline-item`**, que Vuetify declara así
+  (`VTimeline.sass`), y es lo que usa el Log de Despacho. Para esos casos hay que esperar
+  **contando** los elementos con `evaluate`, no con `waitForSelector` (`waitForCount` en
+  `modules/operations/dispatches/capture-log.mjs`).
 - **No todos los mapas son de canvas.** El de la consulta geográfica de la ruta se crea sin
   `preferCanvas`, así que las geometrías sí son `<path>` y sirve `pointOnPath`. Aun así el click
   tiene que ser del ratón real, porque Leaflet ubica el popup con el `clientX/clientY`.
@@ -295,6 +317,7 @@ git diff --numstat components.d.ts
 | AVL | `modules/avl/capture.mjs` | `gps-history` (Histórico GPS), `vehicle-tracking` (Seguimiento Vehicular) |
 | AVL | `modules/avl/capture-map-tools.mjs` | `map-tools-gps-history`, `map-tools-vehicle-tracking` (controles flotantes, medición, coordenadas y pantalla completa; no necesita datos de negocio) |
 | Operaciones > Despachos | `modules/operations/dispatches/capture-movements.mjs` | `dispatch-movements` (gestión del despacho, pestaña Desplazamientos: `Despachos.md`) |
+| Operaciones > Despachos | `modules/operations/dispatches/capture-log.mjs` | `dispatch-log` (Log de Despacho, el historial de cambios: `Despachos.md`). Imprime al final los campos que salieron sin traducir, así que sirve de comprobación del i18n. El despacho se pasa con `--despacho` y **tiene que estar en la primera página** de la tabla: el flujo no pagina. En Empresa Demo sirven el 34 y el 42, que mezclan altas y modificaciones |
 | Operaciones > Rutas | `modules/operations/routes/capture-geometry.mjs` | `route-geometry` (consulta geográfica: `rutas.md` y `routesGeometries.md`) |
 | Operaciones > Rutas | `modules/operations/routes/capture-read-only.mjs` | `route-read-only` (wizard en modo consulta: `rutas.md`) |
 | Móvil > Censo | `modules/mobile/visits/capture.mjs` | `census` (tabla de visitas y pestaña Información Visitas: `Censo.md`) |
