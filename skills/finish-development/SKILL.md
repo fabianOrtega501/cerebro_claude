@@ -145,15 +145,16 @@ este paso se pushea roto con la conciencia tranquila, que es peor que pushear ro
 
 Si el merge no trajo nada (`merged: false`, ya al día), se puede saltar.
 
-## Fase 7 — Documentación: manuales y control de cambios
+## Fase 7 — Documentación: manuales, control de cambios y set de pruebas
 
-Tres cosas que se ofrecen, **ninguna se ejecuta sin permiso**:
+Cuatro cosas que se ofrecen, **ninguna se ejecuta sin permiso**:
 
 | Si el desarrollo cambió | Ofrecer |
 |---|---|
 | **Lo que el usuario ve**: vistas, tablas, modales, textos, flujos | `update-manual` |
 | Una **regla de negocio, máquina de estados o integración** | `update-tech-docs` |
 | Cualquier cosa que vaya a un despliegue | `gen-changes-controls` |
+| Cualquier cosa que haya que probar en el ambiente de desarrollo | `gen-test-set` |
 
 El manual vive en otro repo, en su propia rama nacida de `qa` (mismo nombre que esta, por
 defecto), lleva su propio commit y las capturas hay que revisarlas a ojo. No es automático y no
@@ -167,6 +168,21 @@ reconstruirlo una semana después sale peor y más lento.
 
 Ofrecerlo en una línea, con el ticket y el nombre de la rama. Si el usuario dice que no, no
 insistir.
+
+**El set de pruebas se ofrece aquí, pero lo normal es que se genere después.** Las pruebas se
+ejecutan cuando el desarrollo ya está desplegado en el ambiente de desarrollo, y eso puede tardar
+uno o dos días. Preguntar en una línea si se genera ahora con `gen-test-set` o más adelante.
+
+Si la respuesta es "después", **apuntarlo antes de seguir**, una línea en
+`~/.claude/brain/testing/pending.md`:
+
+```
+| fecha | proyecto | ticket | rama | base | sha de la base |
+```
+
+La sha es la parte que importa. Dos días más tarde la rama ya se mezcló y la base se movió, así que
+sin ella el diff del desarrollo no se puede reconstruir y el set se acaba armando de memoria, que es
+justo lo que la skill viene a evitar. Sale del preflight y de `git rev-parse origin/<base>`.
 
 ## Fase 8 — Push
 
