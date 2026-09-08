@@ -39,3 +39,9 @@
 **/node_modules/
 **/.DS_Store
 **/*.log
+
+# 3b) Capturas de pantalla de una corrida del manual. Son el resultado intermedio, no el
+#     cerebro: lo que se conserva es la imagen ya copiada al repo del manual. La carpeta de
+#     salida por omision de los flujos es `capturas/`, y aparece en cuanto uno se ejecuta
+#     desde su propio directorio.
+**/capturas/
