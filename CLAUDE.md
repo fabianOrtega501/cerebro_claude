@@ -44,6 +44,10 @@ git aparte, local.
   conflictos cuando dos ramas agregan claves en la misma zona; al final, cada clave es una linea
   agregada limpia. Aplica a todos los locales del proyecto por igual, para que no se desincronice
   su orden.
+- **Los commits no llevan trailer de coautoria.** Nada de `Co-Authored-By: Claude...` ni ninguna
+  otra firma de la herramienta, en ningun repo: ni los de trabajo ni el cerebro. El historial es
+  del equipo y una atribucion a la herramienta ahi no le sirve a nadie; ademas ensucia el
+  `git log` y los MR. El mensaje termina en su ultima linea util. Lo pidio Fabian el 2026-09-07.
 - Nombres de codigo (funciones, variables, archivos) en ingles; comentarios y documentacion en espanol.
 - **Credenciales: en ningun archivo versionado, nunca.** Van a `~/.claude/secrets.env`, que la
   lista blanca del `.gitignore` deja fuera del repo. Los scripts las leen de ahi.
