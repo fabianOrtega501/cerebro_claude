@@ -62,5 +62,8 @@
     "command": "node \"$HOME/.claude/statusline.mjs\"",
     "padding": 0
   },
-  "model": "opus[1m]"
+  "model": "opus[1m]",
+  "env": {
+    "STATUS_MANUAL_WEB": "/datos/proyectos/manua-web"
+  }
 }
