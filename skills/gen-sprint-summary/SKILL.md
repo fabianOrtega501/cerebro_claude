@@ -2,7 +2,8 @@
 name: gen-sprint-summary
 description: >-
   Arma el RESUMEN DEL SPRINT en una sola diapositiva: lista los desarrollos que se iniciaron en los
-  últimos días hábiles barriendo todos los repos del cerebro, y por cada uno responde las cinco
+  últimos días hábiles barriendo los repos de producto del cerebro (los manuales quedan fuera:
+  documentan un desarrollo, no son uno), y por cada uno responde las cinco
   preguntas del formato del equipo (Problema abordado, Valor generado, Decisión técnica relevante,
   Aprendizaje clave, Mejora futura). El borrador sale del diff real de las ramas; el usuario corrige.
   Entrega el texto para copiar y un PNG de 1920x1080 listo para insertar como imagen en Google
@@ -37,21 +38,40 @@ Por cada desarrollo se responden siempre las mismas cinco preguntas:
 - **No inventa desarrollos.** Lo que no esté en una rama o no lo aporte el usuario, no entra.
 - **No decide qué es relevante.** Propone un recorte; elige el usuario.
 
+## Fase 0 — De qué sprint es el slide
+
+**Lo primero, antes de listar nada.** El número del sprint da nombre a la carpeta y a los archivos,
+y es como el equipo se refiere al trabajo; sin él, el PNG llega a la presentación sin decir de qué
+periodo habla.
+
+Para proponer el siguiente:
+
+```bash
+ls -1 ~/.claude/brain/sprints 2>/dev/null | grep -oE '[0-9]+$' | sort -n | tail -1
+```
+
+Se propone ese número **más uno** y se espera confirmación. Si no hay ninguna carpeta todavía, se
+pregunta sin proponer: la numeración la lleva el equipo, no el disco.
+
 ## Fase 1 — Listar los desarrollos del periodo
 
 ```bash
 node ~/.claude/skills/gen-sprint-summary/lib/collect-developments.mjs                  # 10 días hábiles
 node ~/.claude/skills/gen-sprint-summary/lib/collect-developments.mjs --dias-habiles 15
 node ~/.claude/skills/gen-sprint-summary/lib/collect-developments.mjs --desde 2026-08-26 --hasta 2026-09-09
+node ~/.claude/skills/gen-sprint-summary/lib/collect-developments.mjs --incluir-manuales
 node ~/.claude/skills/gen-sprint-summary/lib/collect-developments.mjs --json
 ```
 
-Barre **todos** los proyectos de `brain/projects.json`. La fecha de inicio es la de creación de la
-rama según su reflog, no la del último commit: lo que se pregunta es qué se **empezó** en el
-periodo.
+Barre los proyectos de `brain/projects.json` **menos `manuales`**: el manual documenta un desarrollo
+que ya se cuenta en su propio proyecto, y contarlo aparte infla la lista con trabajo que no es un
+desarrollo. Si alguna vez hacen falta, `--incluir-manuales`, o pedirlos con `--proyecto manuales`.
 
-Un ticket es **un solo desarrollo** aunque tenga rama en el front, en el back, en la app móvil y en
-el manual; el recolector ya las agrupa y muestra los repos involucrados.
+La fecha de inicio es la de creación de la rama según su reflog, no la del último commit: lo que se
+pregunta es qué se **empezó** en el periodo.
+
+Un ticket es **un solo desarrollo** aunque tenga rama en el front, en el back y en la app móvil; el
+recolector ya las agrupa y muestra los repos involucrados.
 
 **Mostrar la lista al usuario y esperar.** Se le pide que:
 
@@ -99,6 +119,11 @@ Reglas duras, porque el destino es una caja de una diapositiva:
   ticket —lo que costó, lo que se rehízo, lo que quedó pendiente—, y se presentan marcados como
   *propuesta*. Si no hay base real para uno, **decirlo y preguntar**, en vez de rellenar con una
   frase de manual.
+- **Español de Colombia, de presentación**, según la regla del `CLAUDE.md` del cerebro: pretérito
+  simple (*se implementó*, no *se ha implementado*), palabras de aquí, y anglicismo solo si el
+  equipo ya lo usa. Lo propio del slide: **lo que el usuario ve en pantalla se nombra como está en
+  el aplicativo** —cargue, tanqueo, novedad, despacho—, aunque suene informal, porque así lo
+  reconoce quien lee.
 - `Mejora futura: No requiere` es una respuesta válida.
 - Ni números de ticket ni nombres de rama dentro del texto: el ticket va aparte si se quiere
   mostrar.
@@ -115,15 +140,18 @@ Con el texto ya aprobado se escribe el JSON y se renderiza:
 
 ```bash
 node ~/.claude/skills/gen-sprint-summary/lib/render-slide.mjs \
-  --entrada ~/.claude/brain/sprints/<AAAA-MM-DD>/desarrollos.json \
-  --salida  ~/.claude/brain/sprints/<AAAA-MM-DD>
+  --entrada ~/.claude/brain/sprints/Sprint_<n>/Retrospectiva_Sprint_<n>.json \
+  --sprint <n>
 ```
+
+Sin `--salida` escribe en `~/.claude/brain/sprints/Sprint_<n>`, que es lo que se usa siempre.
 
 Formato del JSON:
 
 ```json
 {
   "author": "Fabian",
+  "sprint": "18",
   "showTickets": false,
   "developments": [
     { "project": "AIO", "ticket": "9357",
@@ -144,14 +172,16 @@ importa HTML, por eso se entrega el PNG. Corregir una frase es editar el JSON y 
 
 ## Dónde queda todo
 
-`~/.claude/brain/sprints/<AAAA-MM-DD>/`:
+`~/.claude/brain/sprints/Sprint_<n>/`, con el número que se acordó en la Fase 0:
 
 | Archivo | Qué es | ¿Se versiona? |
 |---|---|---|
-| `resumen.md` | El texto de los cinco campos por desarrollo | Sí: es la memoria del sprint |
-| `desarrollos.json` | La entrada del renderizador | No |
-| `slide.html` | La maqueta intermedia | No |
-| `slide.png` | Lo que se sube a Slides | No |
+| `Retrospectiva_Sprint_<n>.md` | El texto de los cinco campos por desarrollo | Sí: es la memoria del sprint |
+| `Retrospectiva_Sprint_<n>.json` | La entrada del renderizador | No |
+| `Retrospectiva_Sprint_<n>.html` | La maqueta intermedia | No |
+| `Retrospectiva_Sprint_<n>.png` | Lo que se sube a Slides | No |
+
+El PNG llega a la presentación con el nombre puesto, sin depender de la carpeta que lo ubicaba.
 
 El `.gitignore` del cerebro ya está configurado así. Al terminar, si el cerebro quedó con cambios
 sin commitear, ofrecerlo en una línea.

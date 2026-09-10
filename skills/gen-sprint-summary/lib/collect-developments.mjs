@@ -1,5 +1,6 @@
 /**
- * Lista los desarrollos iniciados en una ventana de tiempo, barriendo todos los repos del cerebro.
+ * Lista los desarrollos iniciados en una ventana de tiempo, barriendo los repos del cerebro salvo
+ * los de `EXCLUDED`.
  *
  * Uso:
  *   node collect-developments.mjs                          ultimos 10 dias habiles
@@ -7,10 +8,15 @@
  *   node collect-developments.mjs --desde 2026-08-26 --hasta 2026-09-09
  *   node collect-developments.mjs --autor fabian --json
  *   node collect-developments.mjs --proyecto aio --proyecto status
+ *   node collect-developments.mjs --incluir-manuales
  */
 
 import { execFileSync } from "node:child_process";
 import { readProjects } from "../../../brain/lib/projects.mjs";
+
+// El manual no es un desarrollo: documenta uno que ya se cuenta en su propio proyecto. Se recupera
+// con `--incluir-manuales` o pidiendolo con `--proyecto`.
+const EXCLUDED = new Set(["manuales"]);
 
 /** Corre git en un repo. `ok` dice si tuvo exito; nunca lanza. */
 function git(repo, args) {
@@ -180,10 +186,10 @@ function groupDevelopments(branches) {
 		groups.set(key, group);
 	}
 
-	// El proyecto que encabeza la caja es el del producto, no el del manual: el manual acompana al
-	// desarrollo, no es el desarrollo.
+	// El proyecto que encabeza la caja es el del producto: si el manual entro por bandera, acompana
+	// al desarrollo pero no lo encabeza.
 	for (const group of groups.values()) {
-		const main = group.projects.find(p => p.key !== "manuales") ?? group.projects[0];
+		const main = group.projects.find(p => !EXCLUDED.has(p.key)) ?? group.projects[0];
 
 		group.project = main.key;
 		group.projectLabel = main.label;
@@ -201,7 +207,7 @@ function groupDevelopments(branches) {
 
 /** Argumentos de linea de comando; las opciones repetibles se acumulan. */
 function parseArgs(argv) {
-	const options = { proyectos: [], autor: "fabian", diasHabiles: 10, desde: null, hasta: null, json: false, todo: false };
+	const options = { proyectos: [], autor: "fabian", diasHabiles: 10, desde: null, hasta: null, json: false, todo: false, incluirManuales: false };
 
 	for (let i = 0; i < argv.length; i++) {
 		const [flag, inline] = argv[i].split("=");
@@ -215,6 +221,7 @@ function parseArgs(argv) {
 		else if (flag === "--hasta") options.hasta = take();
 		else if (flag === "--json") options.json = true;
 		else if (flag === "--todo") options.todo = true;
+		else if (flag === "--incluir-manuales") options.incluirManuales = true;
 	}
 
 	return options;
@@ -223,7 +230,10 @@ function parseArgs(argv) {
 function main() {
 	const options = parseArgs(process.argv.slice(2));
 	const projects = readProjects();
-	const keys = options.proyectos.length ? options.proyectos : Object.keys(projects);
+	// Pedir un proyecto a mano manda sobre la exclusion por omision.
+	const keys = options.proyectos.length
+		? options.proyectos
+		: Object.keys(projects).filter(key => options.incluirManuales || !EXCLUDED.has(key));
 	const from = options.desde ?? businessDaysAgo(options.diasHabiles);
 	const to = options.hasta ?? isoDate();
 

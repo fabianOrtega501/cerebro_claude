@@ -1,13 +1,18 @@
 /**
- * Maqueta el slide del sprint: de un JSON de desarrollos a `slide.html` y `slide.png` de 1920x1080.
+ * Maqueta el slide del sprint: de un JSON de desarrollos a `Retrospectiva_Sprint_<n>.html` y su
+ * PNG de 1920x1080.
  *
  * Uso:
- *   node render-slide.mjs --entrada desarrollos.json --salida ~/.claude/brain/sprints/2026-09-09
- *   node render-slide.mjs --entrada d.json --salida <dir> --solo-html    sin abrir Chrome
+ *   node render-slide.mjs --entrada desarrollos.json --sprint 18
+ *   node render-slide.mjs --entrada d.json --sprint 18 --salida <otro-dir>
+ *   node render-slide.mjs --entrada d.json --sprint 18 --solo-html    sin abrir Chrome
+ *
+ * Sin `--salida` escribe en `~/.claude/brain/sprints/Sprint_<n>`.
  *
  * El JSON de entrada:
  *   {
  *     "author": "Fabian",
+ *     "sprint": "18",
  *     "showTickets": false,
  *     "developments": [
  *       { "project": "AIO", "ticket": "9357", "problem": "...", "value": "...",
@@ -155,8 +160,18 @@ async function renderPng(htmlPath, pngPath, scale) {
 	}
 }
 
+/**
+ * Deja el numero del sprint utilizable como nombre de archivo.
+ *
+ * @param {string} value - Lo que escribio el usuario
+ * @returns {string} Solo letras, digitos, guion y guion bajo. Vacio si no queda nada aprovechable
+ */
+function cleanSprint(value) {
+	return String(value ?? "").trim().replace(/[^A-Za-z0-9_-]/g, "");
+}
+
 function parseArgs(argv) {
-	const options = { entrada: null, salida: null, soloHtml: false };
+	const options = { entrada: null, salida: null, sprint: null, soloHtml: false };
 
 	for (let i = 0; i < argv.length; i++) {
 		const [flag, inline] = argv[i].split("=");
@@ -164,6 +179,7 @@ function parseArgs(argv) {
 
 		if (flag === "--entrada") options.entrada = take();
 		else if (flag === "--salida") options.salida = take();
+		else if (flag === "--sprint") options.sprint = take();
 		else if (flag === "--solo-html") options.soloHtml = true;
 	}
 
@@ -173,15 +189,26 @@ function parseArgs(argv) {
 async function main() {
 	const options = parseArgs(process.argv.slice(2));
 
-	if (!options.entrada || !options.salida) {
-		console.error("Faltan argumentos: --entrada <json> --salida <directorio>");
+	if (!options.entrada) {
+		console.error("Falta --entrada <json>.");
 		process.exit(1);
 	}
 
 	const data = JSON.parse(readFileSync(resolve(options.entrada), "utf8"));
+	const sprint = cleanSprint(options.sprint ?? data.sprint);
+
+	// Sin numero de sprint el archivo no se identifica solo, que es justo para lo que sirve el
+	// nombre: el PNG viaja a la presentacion sin la carpeta que lo ubicaba.
+	if (!sprint) {
+		console.error("Falta --sprint <numero>. Es lo que da nombre a los archivos: Retrospectiva_Sprint_18.png");
+		process.exit(1);
+	}
+
+	if (!/^\d+$/.test(sprint)) console.warn(`Aviso: "${sprint}" no es un número de sprint; se usa igual en el nombre.`);
+
 	const { html, warn, scale } = buildHtml(data);
-	const outDir = resolve(options.salida.replace(/^~/, process.env.HOME));
-	const htmlPath = join(outDir, "slide.html");
+	const outDir = resolve((options.salida ?? join(process.env.HOME, ".claude", "brain", "sprints", `Sprint_${sprint}`)).replace(/^~/, process.env.HOME));
+	const htmlPath = join(outDir, `Retrospectiva_Sprint_${sprint}.html`);
 
 	mkdirSync(outDir, { recursive: true });
 	writeFileSync(htmlPath, html);
@@ -191,7 +218,7 @@ async function main() {
 
 	if (options.soloHtml) return;
 
-	const png = await renderPng(htmlPath, join(outDir, "slide.png"), scale);
+	const png = await renderPng(htmlPath, join(outDir, `Retrospectiva_Sprint_${sprint}.png`), scale);
 
 	// El HTML se reescribe con la escala que de verdad se uso, para que abrirlo a mano muestre lo
 	// mismo que el PNG.
