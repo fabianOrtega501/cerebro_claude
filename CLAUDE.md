@@ -33,6 +33,23 @@ git aparte, local.
 ## Preferencias de trabajo
 
 - Explicaciones en espanol, directas y sin relleno.
+- **Espanol de Colombia, en todo lo que se escriba**: las respuestas de la sesion y, sobre todo, el
+  texto que producen las skills y que leen otras personas —el slide del sprint, el control de
+  cambios, el set de pruebas—. Es correccion de dialecto, no de tono: directo y sin relleno se
+  queda igual. Un texto con giros de otro pais suena prestado en una reunion del equipo y distrae
+  de lo que se esta contando. Lo pidio Fabian el 2026-09-09.
+  - **Preterito simple, no compuesto**: `se implemento el filtro`, no `se ha implementado el
+    filtro`. Es lo que mas delata el dialecto y lo que mas aparece.
+  - **Palabras de aqui**: computador (no ordenador), celular (no movil), archivo (no fichero),
+    hacer clic o dar clic (no pulsar), listo o de acuerdo (no vale), tomar (no coger).
+  - **Anglicismo solo si el equipo ya lo usa.** Se quedan `upfile`, `endpoint`, `AVL`, `APS`,
+    `log`, `dashboard`: traducirlos confunde a quien conoce el sistema. Se traducen los que no
+    aportan nada: deployar → desplegar, feature → funcionalidad, fix → correccion, release →
+    version, bug → falla, performance → rendimiento.
+  - **Tecnicismo medio en lo que sale a presentacion.** Un slide o un control de cambios lo lee
+    gente que no programa: se cuenta que cambia para el usuario, no como quedo el codigo.
+  - **Lenguaje de presentacion**: sin regionalismos cerrados ("parce", "berraco"), sin diminutivos,
+    y nunca en segunda persona del plural ("vosotros", "os").
 - **Todo desarrollo arranca en modo plan.** Antes de editar un archivo hay que contar que se
   analizo, que se encontro en el codigo y como se piensa resolver, y esperar el si. Una
   implementacion hecha antes de tiempo obliga a deshacer trabajo y esconde el razonamiento que el
