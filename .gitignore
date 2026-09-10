@@ -45,3 +45,9 @@
 #     salida por omision de los flujos es `capturas/`, y aparece en cuanto uno se ejecuta
 #     desde su propio directorio.
 **/capturas/
+
+# 3c) Del resumen de sprint solo se conserva el texto: el JSON, el HTML y el PNG se regeneran
+#     corriendo `render-slide.mjs` otra vez, y el PNG ademas pesa.
+/brain/sprints/*/*.json
+/brain/sprints/*/*.html
+/brain/sprints/*/*.png
