@@ -183,14 +183,56 @@ Estado: Exitoso
 
 Qué va en cada campo:
 
-- **Funcionalidad a Probar** — la pantalla o acción concreta, con su ruta en el menú. `Operaciones >
-  Despachos > Log de despachos` sirve; `Módulo de despachos` no ubica a nadie.
+- **Funcionalidad a Probar** — **la ruta de navegación completa, separada por `->`**, empezando por
+  el sistema:
+
+  ```
+  Sistema -> Modulo -> Menu -> Submenu si lo requiere
+  ```
+
+  ```
+  AIO -> AVL -> Categorías -> Acciones de la lista de categorías
+  ```
+
+  **El sistema va siempre**, aunque el desarrollo sea obvio en la conversación: quien lee el caso en
+  el aplicativo de pruebas no sabe de qué proyecto salió, y ahí conviven AIO, Epsilon, Status y los
+  demás. El último nivel es la pantalla, la sección o la acción concreta que se prueba; se omite
+  cuando el menú ya la identifica sin ambigüedad.
+
+  **La ruta técnica no va en este campo.** Nada de `(/avl/categories)` ni nombres de archivo: el
+  campo es la ruta que el usuario recorre en el menú. Si el endpoint o el menú de permisos aporta
+  precisión, va en el **Objetivo** (`…sobre el menú /avl/categories`).
+
+  `Módulo de despachos` no ubica a nadie, y `AVL > Categorías` tampoco cumple: le falta el sistema
+  y el separador no es el del estándar.
 - **Objetivo** — qué se comprueba, con qué datos y **con qué usuario**. El rol importa: la mitad de
   los casos de rotura dependen de él.
 - **Resultado Esperado** — observable **en la pantalla**. Qué se ve, qué mensaje sale, qué queda
   registrado. En los casos de rotura, el rechazo esperado.
 - **Estado** — se entrega `Exitoso`, que es la expectativa; el usuario lo cambia a `Fallido` si la
   ejecución no coincide.
+
+### Cómo se redacta cada caso: quien lo ejecuta no conoce el código
+
+**La prueba de fuego: el caso lo tiene que poder ejecutar alguien que no participó en el desarrollo,
+sin preguntar nada.** Si para saber dónde pulsar hay que reconstruir el flujo mentalmente, el caso
+está mal escrito, y el que lo ejecuta acaba probando lo que cree que decía.
+
+- **Nombrar cada elemento como se lee en pantalla**, con su texto literal: el botón `Siguiente`, la
+  sección `Campos de Categoría`, la columna `ES REQUERIDO`. Si el texto de la pantalla está sin
+  tilde o abreviado, se escribe así.
+- **Los iconos sin texto se describen por su forma y su tooltip**: «el icono de lápiz (*Editar
+  Categoría*)». Decir solo «la acción Editar» obliga a buscarla.
+- **Nada de jerga interna.** Está prohibido *el paso 2*, *el modo show*, *el subject*, *el
+  componente tal*, *el wizard*: son nombres del código, no de la interfaz. Se dice qué se pulsa y
+  qué sección aparece.
+- **El rol se enumera, no se abrevia.** «El rol de los cuatro permisos» no le dice nada a quien
+  configura: se escriben los permisos activos y los inactivos sobre qué menú.
+- **Un caso, un recorrido.** Si el objetivo necesita dos recorridos distintos, son dos casos.
+
+El campo `Objetivo` dice **qué se comprueba y con qué usuario**; el `Resultado Esperado`, **qué se ve
+en la pantalla**. Los pasos detallados no caben en el estándar de cuatro campos y por eso existe el
+anexo: la referencia a la pantalla tiene que ser inequívoca en los dos, pero el paso a paso va abajo.
 
 ### Anexo de ejecución (aparte del bloque que se pega)
 
