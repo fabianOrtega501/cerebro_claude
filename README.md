@@ -15,9 +15,13 @@ nunca al reves, y nada se absorbe sin aprobacion.
 |---|---|
 | Arrancar un desarrollo | `/start-development` (o con datos: `/start-development aio feature desa 10842 Descripcion`) |
 | Trabajar un ticket que toca front y back | `/fullstack-ticket aio` |
+| Hacer el ticket como ejercicio, con clase primero | `/practice-ticket` |
+| Cerrar el desarrollo y subirlo | `/finish-development` |
 | Documentar una regla de negocio del back | `/update-tech-docs` |
 | Actualizar el manual de usuario | `/update-manual` |
 | Redactar un control de cambios | `/gen-changes-controls` |
+| Armar el set de pruebas | `/gen-test-set` |
+| Armar la diapositiva del sprint | `/gen-sprint-summary` |
 | Ver que trajo el equipo en su `.claude/` | `/sync-brain` |
 
 Nada mas hay que configurar. Todo lo de abajo es para cuando quieras **cambiar** como funciona.
@@ -51,11 +55,18 @@ escribe codigo ni documentacion; avisa y se aparta.
 | Skill | Para que | Perfil por proyecto |
 |---|---|---|
 | `start-development` | Checklist de arranque: proyecto, ramas al dia, crear rama, enunciado | usa `projects.json` |
+| `practice-ticket` | El ticket como ejercicio: clase primero, despues el usuario teclea y Claude guia | `brain/learning/` |
 | `fullstack-ticket` | Ticket que cruza front y back, con contrato fijado antes de codificar | `<proy>/stack/` |
+| `finish-development` | Cierre: limpiar, verificar, commitear, integrar la base y hacer push | usa `projects.json` |
 | `update-manual` | Manual de usuario: capturas reales con Chrome y copia al repo del manual | `<proy>/manual/` |
-| `update-tech-docs` | Reglas de negocio en el `docs/` del backend | `<proy>/docs/` |
+| `update-tech-docs` | Docblocks de las funciones tocadas y reglas de negocio en el `docs/` del backend | `<proy>/docs/` |
 | `gen-changes-controls` | Texto del control de cambios de un desarrollo ya hecho | — |
+| `gen-test-set` | Set de pruebas manual, sacado del diff de la rama | — |
+| `gen-sprint-summary` | La diapositiva del sprint: texto y PNG, desde las ramas de los ultimos dias | — |
 | `sync-brain` | Contrastar el `.claude/` de un repo contra el cerebro y decidir que absorber | — |
+
+`start-development` y `finish-development` son pareja: abren y cierran el mismo desarrollo. Las
+tres `gen-*` son **manuales**: no se disparan solas nunca.
 
 ### Hooks
 
@@ -73,6 +84,7 @@ estado: mientras no cambie lo pendiente, no repite.
 | Agente | Modelo | Para que |
 |---|---|---|
 | `branch-starter` | Sonnet | La parte mecanica del arranque: actualizar ramas y crear la rama |
+| `build-runner` | Sonnet | Builds, tests, migraciones y seeders: devuelve solo el veredicto, no el listado |
 
 Una skill **no puede** cambiar el modelo de la sesion; solo `/model` lo hace. Un subagente si corre
 en el modelo que se le indique, y de ahi sale el reparto: lo mecanico en Sonnet, el analisis en la
@@ -91,6 +103,7 @@ Muestra **modelo │ proyecto │ rama**. Opus sale en amarillo y Sonnet en verd
 |---|---|
 | `CLAUDE.md` | Reglas y preferencias. **Se carga en todas las sesiones, de todos los proyectos** |
 | `settings.json` | Permisos, hooks y statusline |
+| `statusline.mjs` | La barra de estado: modelo, proyecto y rama. La invoca `settings.json` |
 | `secrets.env` | Credenciales. Permisos 600 y **fuera del control de versiones** |
 | `skills/` | Skills transversales |
 | `agents/` | Subagentes |
@@ -99,6 +112,9 @@ Muestra **modelo │ proyecto │ rama**. Opus sale en amarillo y Sonnet en verd
 | `brain/lib/` | Motores compartidos: proyectos, secretos, upstream, enchufe |
 | `brain/projects/<proy>/` | Perfiles: `manual/`, `stack/`, `docs/`, `skills/local-*` |
 | `brain/upstream/` | Foto del `.claude/` de cada repo en su ultima revision |
+| `brain/learning/` | Modo practica: lecciones, temario y bitacoras |
+| `brain/sprints/` | El texto de la retrospectiva de cada sprint |
+| `brain/testing/pending.md` | Cola de desarrollos cerrados con el set de pruebas pendiente |
 | `projects/<repo>/memory/` | Conocimiento por repo, que Claude recuerda solo |
 
 Lo demas que hay en `~/.claude` lo escribe Claude Code y **no se versiona**.

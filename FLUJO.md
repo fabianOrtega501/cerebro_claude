@@ -45,10 +45,14 @@ flowchart TD
     FT -.->|"si esta en rama protegida"| SD
 
     FT ==> DEV["Desarrollo<br/><i>codigo en los dos repos</i>"]
-    DEVF --> PUSH
-    DEVB --> PUSH
 
-    DEV --> PUSH[["git push"]]
+    DEV ==> FD["<b>finish-development</b><br/>limpiar, verificar, commitear,<br/>integrar la base y subir"]
+    DEVF ==> FD
+    DEVB ==> FD
+    FD -.->|"si el set de pruebas se deja para despues"| PEND[("brain/testing/pending.md")]
+    PEND -.->|"lo consume"| GTS["<b>gen-test-set</b><br/>set de pruebas del diff"]
+
+    FD --> PUSH[["git push"]]
     DEV --> PULL[["git pull / merge"]]
 
     PUSH -->|"hook<br/>docs-on-push"| H1{{"Quedo documentacion<br/>sin actualizar?"}}
@@ -73,7 +77,7 @@ flowchart TD
     classDef agent fill:#8250df,stroke:#8250df,color:#fff
     classDef hook fill:#bf8700,stroke:#bf8700,color:#fff
     classDef user fill:#1a7f37,stroke:#1a7f37,color:#fff
-    class SD,FT,UM,UTD,SB,GC,PT skill
+    class SD,FT,UM,UTD,SB,GC,PT,FD,GTS skill
     class BS agent
     class H1,H2,Q,M hook
     class U user
@@ -130,6 +134,11 @@ flowchart TD
    │                              │                        │
    │                              ▼                        │
    │                        DESARROLLO                     │
+   │                              │                        │
+   ├── /finish-development ◄──────┘                        │
+   │        limpiar, verificar que compila y arranca,      │
+   │        revisar que se sube, commitear, integrar       │
+   │        la base, manual si cambio la interfaz, push    │
    │                         /        \                    │
    │                 git push          git pull            │
    │                    │                  │               │
@@ -174,7 +183,10 @@ Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra r
 | Cambio una regla de negocio del back | `update-tech-docs` | Hook del push, o la pides |
 | Cambio algo que el usuario ve | `update-manual` | Hook del push, o al cerrar `fullstack-ticket` |
 | Un pull trajo cambios en `.claude/` | `sync-brain` | Hook del pull |
+| El codigo ya funciona y toca subirlo | `finish-development` | La pides tu. Es la pareja de `start-development` |
 | Hay que entregar el control de cambios | `gen-changes-controls` | Solo manual |
+| Hay que entregar el set de pruebas | `gen-test-set` | Solo manual. Lee la cola de `brain/testing/pending.md` |
+| Se cierra el sprint | `gen-sprint-summary` | Solo manual |
 
 ---
 

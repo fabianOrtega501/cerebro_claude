@@ -17,6 +17,9 @@
 !/FLUJO.md
 !/settings.json
 !/CLAUDE.md
+# `settings.json` invoca la statusline por ruta: si no viaja en el repo, restaurar el
+# cerebro desde un respaldo deja la sesion sin barra de estado y sin senal de que falta.
+!/statusline.mjs
 !/skills/
 !/agents/
 !/hooks/

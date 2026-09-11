@@ -4,7 +4,7 @@ Reglas y preferencias personales que aplican en **todos** los proyectos. Lo que 
 de un repo va en el `CLAUDE.md` de ese repo, no aqui.
 
 Este cerebro es **compartido por todos los proyectos**: AIO, Epsilon, Status, SIPA, Ruta+,
-manuales. El mapa completo y el modo de uso estan en `~/.claude/brain/README.md`.
+manuales. El mapa completo y el modo de uso estan en `~/.claude/README.md`.
 
 ## Skills: transversales o de proyecto
 
@@ -289,6 +289,11 @@ forma de una respuesta que alguien ya consume.
 trabajo. No hay excepcion por repo ni por lenguaje. Si el `CLAUDE.md` de un repo pide PHPDoc con
 prosa de que hace, como lo hace y por que, esa parte esta desactualizada y manda esta regla; lo
 corrigio Fabian el 2026-09-04 en Status, tras dos revisiones en que se escribieron bloques largos.
+
+**El limite es del docblock, no de la documentacion.** Aplica a lo que va pegado a la funcion: el
+PHPDoc, el JSDoc, la cabecera del metodo. La documentacion tecnica en `.md` —el `docs/` del
+backend, el README de un modulo— **no tiene este limite**, y es justamente donde va el porque de
+una regla de negocio. Son dos cosas distintas, y la skill `update-tech-docs` escribe las dos.
 
 **Que va y que no va:**
 

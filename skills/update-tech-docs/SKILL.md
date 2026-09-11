@@ -1,6 +1,6 @@
 ---
 name: update-tech-docs
-description: Usar cuando un cambio altera una regla de negocio, una máquina de estados, un efecto secundario o una integración, y hay que reflejarlo en la documentación técnica del repo (`docs/`). También documenta las funciones nuevas o sin docblock de los archivos que toca la rama, con qué hacen, cómo lo hacen y por qué. También cuando el hook del push avisa de módulos sin documentar, o al crear un módulo nuevo. Sirve para cualquier proyecto con perfil de docs. No confundir con `update-manual`, que es el manual de usuario y va del front.
+description: Usar cuando un cambio altera una regla de negocio, una máquina de estados, un efecto secundario o una integración, y hay que reflejarlo en la documentación técnica del repo (`docs/`). También documenta las funciones nuevas o sin docblock de los archivos que toca la rama, con qué hacen y sus entradas y salidas. También cuando el hook del push avisa de módulos sin documentar, o al crear un módulo nuevo. Sirve para cualquier proyecto con perfil de docs. No confundir con `update-manual`, que es el manual de usuario y va del front.
 ---
 
 # Documentación técnica del repositorio
@@ -58,31 +58,45 @@ quien abre el archivo dentro de seis meses.
 archivos que el ticket no toca. Reescribir documentación ajena infla el MR y entierra el cambio
 real entre ruido.
 
-**Qué va dentro**, en este orden: **qué hace**, **cómo lo hace** y **por qué**. El *por qué* es el
-que de verdad falta: el qué se intuye del nombre y el cómo se lee en el cuerpo, pero la razón de
-que algo esté resuelto así solo la sabe quien lo escribió.
+**Qué va dentro: máximo 3 renglones de prosa, más `@param` y `@return`.** Qué hace la pieza,
+concreto —qué devuelve o qué cambia—, y sus entradas y salidas cuando la firma no las explique
+sola. Nada interno: ni el porqué de una condición, ni cómo funciona un operador, ni el orden de
+dos instrucciones.
+
+La regla completa está en la sección *"Documentar funciones"* del `CLAUDE.md` del cerebro y
+**rige en todos los repos**, no solo en `~/.claude`. Si el `CLAUDE.md` de un repo pide prosa con
+qué hace, cómo lo hace y por qué, esa parte quedó desactualizada y manda esta.
 
 ```php
 /**
  * Dirección cercana a la visita, o 'Sin dirección' si PostGIS no resuelve el punto.
  *
- * Consulta la función `osm.fun_get_nearby_directions` dentro de una transacción anidada, para
- * que un fallo suyo no aborte la transacción del envío: en PostgreSQL una consulta que falla
- * invalida la transacción entera, y se perdería la visita completa por no poder calcular una
- * dirección.
- *
  * @param object $visit Visita con `latitude` y `longitude`.
  *
  * @return string
  */
+public function nearbyAddress($visit)
+{
+    // Transaccion anidada a proposito: en PostgreSQL una consulta que falla invalida la
+    // transaccion entera, y un fallo de PostGIS se llevaria por delante la visita completa.
+    return DB::transaction(fn () => ...);
+}
 ```
 
-**Formato: el del repo, no el del cerebro.** Prosa más `@param`, `@return` y `@throws`, como los
-métodos que ya existen. La regla de los tres renglones del `CLAUDE.md` del cerebro **no aplica
-aquí**: rige para el código propio de `~/.claude`. En un repo del equipo manda su estándar.
+**Dónde va el porqué: en el docblock no.** Si la razón de que algo esté resuelto así importa, va
+como comentario suelto junto a la línea que lo necesita —como arriba—, o en el `.md` de `docs/`
+cuando es una regla de negocio y no un detalle de implementación.
+
+**Esa es la frontera entre los dos pasos de esta skill.** El docblock son 3 renglones y dice *qué
+hace*. El `.md` de `docs/` no tiene ese límite y es justamente donde va el *por qué*: para eso
+existen las fases 4 y 5. Confundirlos es lo que produce docblocks de ocho renglones que tapan el
+código y `docs/` vacíos.
+
+**Formato: `@param` y `@return` como los usa el repo.** El límite de renglones es del cerebro y no
+se negocia; el estilo de las anotaciones sí lo pone el estándar del repo.
 
 **Sentido común con lo trivial.** Un constructor que solo inyecta dependencias, o un getter de una
-línea, no necesitan tres párrafos: una frase basta, o ninguna. El script los lista porque no sabe
+línea, no gastan los tres renglones: una frase basta, o ninguna. El script los lista porque no sabe
 distinguir; distinguir es tu trabajo. Documentar lo obvio es tan dañino como no documentar lo
 importante: enseña a saltarse los docblocks.
 

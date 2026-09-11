@@ -1,1 +1,4 @@
-- [Docs de funciones: 3 líneas](docs-funciones-3-lineas.md) — máximo 3 líneas de descripción más @param y @returns; el porqué va como comentario suelto
+# Memory Index
+
+(Sin memorias propias todavia. La regla de los 3 renglones para docblocks estaba aqui duplicada
+del `CLAUDE.md` del cerebro, que rige en todos los proyectos; se borro el 2026-09-11.)
