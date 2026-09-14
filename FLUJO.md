@@ -182,6 +182,7 @@ Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra r
 | Momento | Skill | Como llega |
 |---|---|---|
 | Antes de escribir codigo | `start-development` | La pides tu |
+| Hay que ubicarse en un modulo | `exploration-memory` | Se consulta al empezar; se actualiza al cerrar |
 | El ticket se hace como ejercicio (clase + desarrollo tuyo) | `practice-ticket` | Encadenada si elegiste modo practica |
 | El ticket cruza front y back | `fullstack-ticket` | Encadenada, o la pides |
 | A mitad del desarrollo aparece el otro lado | `fullstack-ticket` | Reclasificacion: se avisa, se crea la rama que falta y se entra por la Fase 3 |

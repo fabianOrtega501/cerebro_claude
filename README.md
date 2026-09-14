@@ -63,6 +63,7 @@ escribe codigo ni documentacion; avisa y se aparta.
 | `gen-changes-controls` | Texto del control de cambios de un desarrollo ya hecho | — |
 | `gen-test-set` | Set de pruebas manual, sacado del diff de la rama | — |
 | `gen-sprint-summary` | La diapositiva del sprint: texto y PNG, desde las ramas de los ultimos dias | — |
+| `exploration-memory` | El mapa tecnico de un modulo, para no releer el mismo codigo cada ticket | `<proy>/exploration/` |
 | `sync-brain` | Contrastar el `.claude/` de un repo contra el cerebro y decidir que absorber | — |
 
 `start-development` y `finish-development` son pareja: abren y cierran el mismo desarrollo. Las
@@ -117,6 +118,7 @@ Muestra **modelo │ proyecto │ rama**. Opus sale en amarillo y Sonnet en verd
 | `brain/lib/` | Motores compartidos: proyectos, secretos, upstream, enchufe |
 | `brain/projects/<proy>/` | Perfiles: `manual/`, `stack/`, `docs/`, `skills/local-*` |
 | `brain/upstream/` | Foto del `.claude/` de cada repo en su ultima revision |
+| `brain/projects/<proy>/exploration/` | Mapa tecnico por modulo: donde esta cada endpoint, permiso y servicio |
 | `brain/learning/` | Modo practica: lecciones, temario y bitacoras |
 | `brain/sprints/` | El texto de la retrospectiva de cada sprint |
 | `brain/testing/pending.md` | Cola de desarrollos cerrados con el set de pruebas pendiente |

@@ -16,6 +16,7 @@ vive un nivel mas arriba.
 | `projects/<proy>/manual/` | Perfil del manual de usuario. Lo carga `update-manual` |
 | `projects/<proy>/stack/` | Perfil full-stack: repos, comandos, verificador. Lo carga `fullstack-ticket` |
 | `projects/<proy>/docs/` | Perfil de documentacion tecnica. Lo carga `update-tech-docs` |
+| `projects/<proy>/exploration/` | Mapa tecnico por modulo. Lo carga `exploration-memory` |
 | `projects/<proy>/skills/local-*` | Skills de un solo proyecto. Se enchufan con `plug.mjs` |
 | `projects/_template/` | Plantillas para agregar un proyecto |
 | `learning/` | Modo practica: lecciones, temario y bitacoras. Lo carga `practice-ticket` |
