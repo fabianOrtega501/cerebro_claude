@@ -64,6 +64,7 @@ escribe codigo ni documentacion; avisa y se aparta.
 | `gen-test-set` | Set de pruebas manual, sacado del diff de la rama | — |
 | `gen-sprint-summary` | La diapositiva del sprint: texto y PNG, desde las ramas de los ultimos dias | — |
 | `exploration-memory` | El mapa tecnico de un modulo, para no releer el mismo codigo cada ticket | `<proy>/exploration/` |
+| `explore-module` | Decide si vale la pena mapear un modulo y coordina al explorador | `<proy>/exploration/` |
 | `sync-brain` | Contrastar el `.claude/` de un repo contra el cerebro y decidir que absorber | — |
 
 `start-development` y `finish-development` son pareja: abren y cierran el mismo desarrollo. Las
@@ -90,6 +91,7 @@ estado: mientras no cambie lo pendiente, no repite.
 |---|---|---|
 | `branch-starter` | Sonnet | La parte mecanica del arranque: actualizar ramas y crear la rama |
 | `build-runner` | Sonnet | Builds, tests, migraciones y seeders: devuelve solo el veredicto, no el listado |
+| `module-explorer` | Sonnet | Mapea un modulo leyendo los dos repos, en solo lectura. Devuelve el veredicto; el mapa queda en el archivo |
 
 Una skill **no puede** cambiar el modelo de la sesion; solo `/model` lo hace. Un subagente si corre
 en el modelo que se le indique, y de ahi sale el reparto: lo mecanico en Sonnet, el analisis en la

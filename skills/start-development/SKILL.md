@@ -172,6 +172,17 @@ Con la rama ya creada, pedir al usuario, en una sola interacción:
 3. **Módulo o pantalla de referencia**, si conoce alguno parecido. Copiar el patrón que ya existe
    vale más que inventar.
 
+**Con el módulo ya identificado, mirar si el cerebro lo tiene mapeado**:
+`brain/projects/<proy>/exploration/index.md`.
+
+- Si está `explorado`, **leer su archivo antes de abrir el código**: ahí está qué endpoint atiende
+  cada acción, qué permiso la exige y qué servicio la resuelve. Eso ahorra media exploración.
+- Si está `importado, sin verificar`, sirve de punto de partida pero **hay que verificar lo que se
+  vaya a tocar**.
+- Si no está y el ticket va a recorrer el módulo entero, **proponer `explore-module`** antes de
+  escribir código. Proponer, no arrancar sola: para un ajuste puntual no compensa, y ahí se hace
+  el ticket y se guarda lo aprendido al cerrar.
+
 ## Paso 5 — El plan lleva diagrama de flujo. Siempre
 
 Antes de tocar un archivo hay que exponer el plan y esperar el sí —eso ya lo exige el `CLAUDE.md`—,

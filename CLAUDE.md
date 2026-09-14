@@ -106,7 +106,8 @@ otro lado.
 
 **Subagentes disponibles hoy** (`~/.claude/agents/`): `branch-starter` crea la rama del
 desarrollo; `build-runner` corre builds, tests, migraciones y seeders y devuelve solo el
-veredicto. Los dos en Sonnet. Cuando aparezca otra tarea mecanica que se repita, **proponer un
+veredicto; `module-explorer` mapea un modulo leyendo los dos repos en solo lectura. Los tres en
+Sonnet. Cuando aparezca otra tarea mecanica que se repita, **proponer un
 agente nuevo** en vez de seguir gastando la sesion principal en ella.
 
 ## Credenciales de pruebas: una pareja por proyecto
