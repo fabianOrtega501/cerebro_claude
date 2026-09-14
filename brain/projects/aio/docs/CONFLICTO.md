@@ -1,63 +1,44 @@
-# Conflicto: dos arboles de documentacion en aio-backend
+# Los dos arboles de documentacion de aio-backend — RESUELTO
 
-> Inventario levantado el 2026-08-27. **No se ha tocado nada**: unificar toca archivos de
-> Neiron y Sergio y es una conversacion con ellos, no una decision propia.
+> **Resuelto el 2026-09-14.** Se unifico todo en `docs/modules/` y se reescribio el estandar.
+> Lo que sigue se conserva porque explica por que el arbol que quedo NO es el que mandaba el
+> estandar viejo: si alguien encuentra un enlace muerto a `docs/modulos/`, esta es la razon.
 
-## Que pasa
+## Que pasaba
 
-El estandar del propio repo (`docs/README.md` §2.3) dice que los modulos van en
-`docs/modulos/`. Existe ademas un arbol paralelo `docs/modules/` en ingles que lo contradice.
+El repo tenia dos arboles: `docs/modulos/` (espanol, 18 archivos, lo que pedia el estandar en su
+§2.3) y `docs/modules/` (ingles, 8 archivos, alimentado por el agente `backend-logic-doc` del
+`.claude/` de un companero). `AVL/gps-history/README.md` estaba en los dos, con contenido y
+fechas distintas — justo el caso que el §2.7 del propio estandar advierte: *documentacion
+equivocada es peor que no tener documentacion*.
 
-| Arbol | Archivos | Idioma | Ultimo cambio |
-|---|---|---|---|
-| `docs/modulos/` | 7 | espanol | 2026-08-27 por neiron.osorio |
-| `docs/modules/` | 5 | ingles | 2026-08-26 por sergio.cifuentes |
+El inventario del 2026-08-27 conto 7 contra 5. Al resolverlo, el 2026-09-14, iban 18 contra 8:
+los dos crecian.
 
-## Lo grave: AVL esta documentado dos veces
+## Como se resolvio
 
-`docs/modulos/AVL/gps-history/README.md` y `docs/modules/avl/gps-history/README.md` describen
-lo mismo con **contenido y fechas distintas**. Es justo el caso que el propio estandar advierte
-en §2.7: *documentacion equivocada es peor que no tener documentacion*.
+Fabian decidio **ingles**, para que las rutas de `docs/` espejen las de `app/`, que ya lo estan.
+Se hizo en su rama del ticket 10987:
 
-## Inventario
+- Los 17 archivos de `docs/modulos/` se movieron con `git mv` (conserva el historial) a
+  `docs/modules/`, con el nombre traducido a kebab-case en ingles.
+- De `AVL/gps-history/README.md` se conservo **la version del arbol ingles**, que era la mas
+  reciente (2026-08-14 contra 2026-08-11) y la mas completa.
+- `docs/modulos/` se elimino.
+- Se actualizaron las 8 referencias del repo: el estandar `docs/README.md` (§2.3, la tabla de
+  indice y la regla de nombres, que ahora pide ingles en la **ruta** y espanol en el
+  **contenido**), el `CLAUDE.md` del repo con sus diez `@docs/modulos/...`,
+  `docs/arquitectura/capas.md`, la skill `crear-hu` del equipo y cuatro archivos PHP de `app/`
+  que citaban un documento en su docblock.
+- De paso, los 8 documentos del arbol ingles entraron al indice del `docs/README.md`, donde
+  nunca habian estado.
 
-### En `docs/modulos/` (lo que manda el estandar)
-```
-  AVL/gps-history/README.md
-  maintenance/movimientos-de-suministros.md
-  mobile/marca-de-agua-censo.md
-  mobile/README.md
-  operation/impresion-qr-elementos.md
-  operation/pdf-novedades.md
-  operation/README.md
-```
+## Que cambio en el cerebro
 
-### En `docs/modules/` (arbol paralelo)
-```
-  avl/gps-history/README.md
-  mobile/work-order/README.md
-  operation/dispatches/README.md
-  operation/movement-types/README.md
-  settings/dynamic-form/README.md
-```
+`profile.json` apunta a `docs/modules` y mapea `Avl -> avl` (el arbol ingles usa minuscula).
+La skill `update-tech-docs` escribe ahi.
 
-## Otra divergencia menor
+## Lo que hay que saber de aqui en adelante
 
-El estandar (§2.3) define `modulos/<modulo>/<flujo>.md` plano. Los dos arboles usan ademas un
-nivel de entidad: `<modulo>/<entidad>/README.md`. No es grave, pero conviene decidirlo.
-
-Tambien hay inconsistencia de mayusculas: `docs/modulos/AVL/` frente a `operation`, `mobile`,
-`maintenance` en minuscula.
-
-## Que hace la skill mientras tanto
-
-`update-tech-docs` escribe **siempre en `docs/modulos/`**, que es lo que manda el estandar y el
-arbol con mas contenido. El mapeo de nombres de carpeta esta en `profile.json`, respetando las
-grafias que hoy existen en el repo.
-
-## Propuesta para el equipo
-
-1. Mover los 5 archivos de `docs/modules/` a `docs/modulos/`, traduciendo los nombres de carpeta.
-2. Resolver el duplicado de AVL: quedarse con uno y borrar el otro.
-3. Normalizar `AVL` a minuscula.
-4. Decidir si el nivel de entidad se queda, y actualizar §2.3 si asi es.
+El estandar que manda es el **nuevo**: rutas en ingles. Si aparece un `docs/modulos/` en una
+rama vieja sin mezclar, es de antes de esta unificacion y hay que moverlo, no recrear la carpeta.

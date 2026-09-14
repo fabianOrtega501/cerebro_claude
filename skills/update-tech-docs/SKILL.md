@@ -128,8 +128,10 @@ cambió; solo él sabe por qué se pidió.
 
 Según el estándar del repo. En el AIO:
 
-- Regla de un flujo concreto → `docs/modulos/<modulo>/<flujo-kebab>.md`
-- Algo del módulo entero → `docs/modulos/<modulo>/README.md`
+- Regla de un flujo concreto → `docs/modules/<module>/<flow-kebab>.md`
+- Algo del módulo entero → `docs/modules/<module>/README.md`
+
+Las **rutas** van en inglés, para que espejen `app/`. El **contenido** sigue en español.
 - Transversal al sistema → `docs/arquitectura/`
 
 Tres cosas que se olvidan siempre:

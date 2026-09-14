@@ -9,7 +9,7 @@
   "standard": "docs/README.md",
 
   "docsRoot": "docs",
-  "modulesDir": "docs/modulos",
+  "modulesDir": "docs/modules",
   "architectureDir": "docs/arquitectura",
 
   "//sourceGlobs": "Carpetas de app/ cuyo cambio puede alterar una regla de negocio. Controllers quedan fuera a proposito: su contrato lo documenta Swagger, no el markdown.",
@@ -25,9 +25,9 @@
   "//moduleFrom": "Como sacar el modulo de una ruta de codigo: el segmento que sigue a Modules/.",
   "moduleFrom": "Modules/([^/]+)/",
 
-  "//modules": "Nombre en el codigo -> carpeta en docs/modulos. Las que no coinciden estan asi en el repo; no se normalizan desde aqui.",
+  "//modules": "Nombre en el codigo -> carpeta en docs/modules. Las rutas van en ingles y espejan app/; el contenido sigue en espanol.",
   "modules": {
-    "Avl": "AVL",
+    "Avl": "avl",
     "CustomerZone": "customer-zone",
     "DocumentaryFilm": "documentary-film",
     "Maintenance": "maintenance",
@@ -42,5 +42,5 @@
   "//ignoreModules": "Modulos sin reglas de negocio propias que documentar.",
   "ignoreModules": ["Standard", "Osm"],
 
-  "//conflicto": "docs/modules/ (ingles) es un arbol paralelo que contradice el estandar §2.3. Se escribe SIEMPRE en docs/modulos/. Ver CONFLICTO.md."
+  "//resuelto": "El doble arbol de documentacion se unifico el 2026-09-14: todo vive en docs/modules/ y el estandar se reescribio para que las rutas vayan en ingles y espejen app/. El contenido sigue en espanol. Ver CONFLICTO.md."
 }
