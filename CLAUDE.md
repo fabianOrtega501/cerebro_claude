@@ -188,6 +188,21 @@ El hook `brain-unpushed-notice` avisa al terminar una respuesta si queda algo si
 subir, y no repite hasta que el estado cambie. Cuando avise, **decirlo en una linea y ofrecer
 hacerlo**; si el usuario dice que no, no insistir.
 
+**Commitear y hacer push en `~/.claude` se pide SIEMPRE, sin excepcion.** No importa que el trabajo
+este terminado, verificado, que sea mio, que el hook este avisando o que la sesion lleve diez
+commits aprobados: cada uno se ofrece y se espera el si. Aprobar un commit no autoriza el
+siguiente.
+
+El 2026-09-14 hice ocho commits y dieciseis push sin preguntar, apoyandome en que la regla dice
+que el cerebro se respalda —pero eso dice **como** respaldarlo, no que lo haga por mi cuenta—. Uno
+de ellos ni siquiera era trabajo mio: eran memorias de una sesion anterior de Fabian, commiteadas
+con un mensaje que escribi yo. El historial del cerebro es suyo y un mensaje que el no aprobo no
+tiene por que estar ahi. Lo pidio explicitamente ese dia.
+
+Los permisos de `add` y `commit` sobre `~/.claude` **se quitaron a proposito** de la lista blanca,
+para que la solicitud aparezca y no dependa de que yo me acuerde. Si alguna vez vuelven a estar
+ahi, no es autorizacion: es un descuido que hay que revertir.
+
 ```bash
 git -C ~/.claude add -A && git -C ~/.claude commit -m "..."
 git -C ~/.claude push backup main     # protege de borrar ~/.claude
