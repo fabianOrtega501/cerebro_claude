@@ -107,6 +107,55 @@ function linkSkill(repo, project, skill) {
   return "linked";
 }
 
+/**
+ * Enlaza las memorias que el repo publica para su equipo en la carpeta que lee el mecanismo nativo.
+ *
+ * La fuente de verdad es el repo: ahi las ve el equipo y viajan en el MR. El cerebro no copia, solo
+ * apunta, para que no existan dos versiones del mismo hecho. Las memorias personales y las que solo
+ * valen en esta maquina conviven al lado como archivos reales y no se tocan.
+ *
+ * @param {string} repo Ruta del repo
+ * @returns {{linked:number, removed:number, conflicts:string[]}} Que se enlazo, limpio o choca
+ */
+function linkMemories(repo) {
+  const source = join(repo, ".claude", "memory");
+  const dest = join(BRAIN_DIR, "..", "projects", repo.split("/").join("-"), "memory");
+  const out = { linked: 0, removed: 0, conflicts: [] };
+
+  if (!existsSync(dest)) mkdirSync(dest, { recursive: true });
+
+  for (const entry of readdirSync(dest)) {
+    const link = join(dest, entry);
+    if (!isBrokenLink(link) || !lstatSync(link).isSymbolicLink()) continue;
+    if (existsSync(link)) continue;
+    rmSync(link);
+    out.removed++;
+  }
+
+  if (!existsSync(source)) return out;
+
+  for (const file of readdirSync(source)) {
+    if (!file.endsWith(".md") || file === "MEMORY.md") continue;
+
+    const target = join(source, file);
+    const link = join(dest, file);
+
+    if (existsSync(link) || isBrokenLink(link)) {
+      if (!lstatSync(link).isSymbolicLink()) {
+        out.conflicts.push(file);
+        continue;
+      }
+      if (readlinkSync(link) === target) continue;
+      rmSync(link);
+    }
+
+    symlinkSync(target, link);
+    out.linked++;
+  }
+
+  return out;
+}
+
 /** `existsSync` devuelve false en un symlink roto, y ese caso tambien hay que limpiarlo. */
 function isBrokenLink(path) {
   try {
@@ -161,6 +210,14 @@ for (const [project, config] of entries) {
     if (!statusOnly && currentTree(repo) && inspect(repo).status === "unwatched") {
       markReviewed(repo);
       notes.push("linea base de upstream fijada");
+    }
+
+    if (!statusOnly) {
+      const mem = linkMemories(repo);
+      if (mem.linked) notes.push(`${mem.linked} memoria(s) del repo enlazadas`);
+      if (mem.removed) notes.push(`${mem.removed} enlace(s) de memoria rotos, limpiados`);
+      for (const c of mem.conflicts)
+        notes.push(`memoria ${c}: CONFLICTO, hay un archivo propio con ese nombre; resuelvelo a mano`);
     }
 
     const watched = currentTree(repo) ? inspect(repo).status : "sin .claude versionado";

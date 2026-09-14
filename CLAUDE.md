@@ -24,8 +24,12 @@ propio `.claude/` versionado (skills y hooks del equipo); eso es una fuente de i
 autoridad.
 
 Cuando un pull trae cambios en el `.claude/` de un repo, el hook `claude-upstream-notice` lo
-detecta y hay que revisarlo con la skill `sync-brain`. Nunca se absorbe nada sin aprobacion, y
-nunca se escribe desde aqui hacia el `.claude/` de un repo de trabajo.
+detecta y hay que revisarlo con la skill `sync-brain`. Nunca se absorbe nada sin aprobacion.
+
+**No se escribe desde aqui hacia el `.claude/` de un repo de trabajo, con una excepcion:
+`memory/`.** Las memorias del equipo viven en el repo a proposito, para que las consuman todos y
+viajen en el MR; el cerebro solo las enlaza, no las copia. Lo decidio Fabian el 2026-09-14. Todo lo
+demas del `.claude/` de un repo sigue siendo del equipo y no se toca desde aqui.
 
 Los cambios del cerebro **no se commitean jamas al repo de trabajo**. Este directorio es un repo
 git aparte, local.
@@ -149,8 +153,9 @@ Proponer cuesta una linea; no proponer significa volver a explicar lo mismo dent
 
 | Aparece | Va a |
 |---|---|
-| Una correccion tuya sobre como trabajar (*"no hagas X"*, *"prefiero Y"*) | `projects/<repo>/memory/` con tipo `feedback` |
-| Una restriccion del entorno que costo descubrir (un comando que falla, un contenedor que hay que usar) | `projects/<repo>/memory/` con tipo `project` |
+| Un hecho del repo que sigue siendo cierto en la maquina de cualquiera | **`<repo>/.claude/memory/`**: se publica para el equipo |
+| Una correccion tuya sobre como trabajar (*"no hagas X"*, *"prefiero Y"*) | `projects/<repo>/memory/` con tipo `feedback`, **propia** |
+| Algo que solo vale en esta maquina o en este clon | `projects/<repo>/memory/` con tipo `project`, **propia**. Publicarlo seria mentirle al equipo |
 | Una convencion del equipo que se repite en varios tickets | `CLAUDE.md` del cerebro, si aplica a todos los proyectos |
 | Un procedimiento con pasos, que se va a repetir | Una **skill** (transversal o `local-`, segun la regla de arriba) |
 | Algo que llego en el `.claude/` de un repo | `sync-brain` decide; nunca se absorbe a mano |
@@ -162,6 +167,9 @@ se nota meses despues cuando ensucia todas las sesiones:
 - Decisiones de un ticket concreto, que no se repetiran.
 - Lo que se puede volver a averiguar en diez segundos.
 - Un detalle que solo valia dentro de esta conversacion.
+
+El procedimiento completo —como decidir donde va, el formato, como se indexa y como se enlaza—
+esta en la skill **`manage-memory`**.
 
 **Antes de escribir, buscar.** Si ya hay una memoria del mismo tema se actualiza esa, no se crea
 otra. Dos memorias que dicen casi lo mismo son peores que una desactualizada: no se sabe cual

@@ -1,11 +1,20 @@
 # Memory Index
 
-- [Ejecutar artisan con Sail](run-artisan-via-sail.md) — `./vendor/bin/sail artisan`; el PHP del host no tiene driver pgsql
-- [Commit sin número de ticket](commit-sin-numero-de-ticket.md) — usar `SOFTWARE - AIO: <descripción>` cuando no hay GLPI
-- [.env.testing con skip-worktree](env-testing-skip-worktree.md) — está versionado pese al .gitignore; la marca local mantiene sus cambios fuera de los commits
-- [El lint del AIO reformatea todo](lint-del-aio-reformatea-todo.md) — en aio-app `pnpm lint` es `eslint --fix` sobre todo el repo: verificar con `--no-fix` y `build`
-- [Los conflictos los resuelve el usuario](conflictos-los-resuelve-el-usuario.md) — parar el merge y esperar su orden antes de commitear
-- [El navegador para CDP es Brave](navegador-para-cdp-es-brave.md) — `CHROME_PATH=/snap/bin/brave` y `TMPDIR=~/aio-shots/tmp`; sin eso no arranca
-- [Pint solo sobre los archivos del ticket](pint-solo-archivos-del-ticket.md) — `php vendor/bin/pint`, y el repo entero ya incumple su estilo
-- [El registro de errores rompe el aislamiento de los tests](error-logging-rompe-aislamiento-tests.md) — su `DB::commit()` confirma la transaccion de `RefreshDatabase`
-- [No usar git stash para comparar con la base](no-usar-stash-para-comparar-con-la-base.md) — aplica stashes de otras ramas; usar `git show <ref>:<archivo>`
+Dos origenes, y la diferencia importa al escribir uno nuevo.
+
+**Del equipo** — viven en `/datos/proyectos/AIO/aio-backend/.claude/memory/`, versionadas y visibles para todos. Aqui solo
+hay un enlace: **no se editan desde el cerebro, se editan en el repo**. Las mantiene `plug.mjs`.
+
+- [commit-sin-numero-de-ticket](commit-sin-numero-de-ticket.md) — Formato del mensaje de commit en AIO cuando el desarrollo no tiene número de ticket GLPI
+- [error-logging-rompe-aislamiento-tests](error-logging-rompe-aislamiento-tests.md) — En aio-backend un test que provoque un error manejado confirma la transaccion de RefreshDatabase y contamina los siguientes
+- [pint-solo-archivos-del-ticket](pint-solo-archivos-del-ticket.md) — En aio-backend pint se invoca con `php vendor/bin/pint` y solo sobre los archivos de la rama; el repo entero no cumple su estilo
+- [run-artisan-via-sail](run-artisan-via-sail.md) — En los repos del AIO, ejecutar comandos artisan con sail, no con php artisan del host ni docker exec
+
+**Propias** — se quedan aqui porque no le sirven a nadie mas: preferencias de como quiero que se
+trabaje, o hechos que solo valen en esta maquina o en este clon.
+
+- [conflictos-los-resuelve-el-usuario](conflictos-los-resuelve-el-usuario.md) — Los conflictos del merge con la rama origen los resuelve el usuario; hay que parar y esperar su orden para seguir
+- [env-testing-skip-worktree](env-testing-skip-worktree.md) — .env.testing está marcado con skip-worktree en este clon; sus cambios locales no entran a commits
+- [lint-del-aio-reformatea-todo](lint-del-aio-reformatea-todo.md) — En aio-app `pnpm lint` lleva --fix y reformatea todo el repo; nunca usarlo para verificar
+- [navegador-para-cdp-es-brave](navegador-para-cdp-es-brave.md) — Manejar el navegador por CDP en esta maquina exige CHROME_PATH=/snap/bin/brave; no hay Chrome ni Chromium instalados
+- [no-usar-stash-para-comparar-con-la-base](no-usar-stash-para-comparar-con-la-base.md) — No usar git stash para comparar la rama contra su base; aplica stashes ajenos y deja conflictos en archivos de otros tickets

@@ -65,6 +65,7 @@ escribe codigo ni documentacion; avisa y se aparta.
 | `gen-sprint-summary` | La diapositiva del sprint: texto y PNG, desde las ramas de los ultimos dias | — |
 | `exploration-memory` | El mapa tecnico de un modulo, para no releer el mismo codigo cada ticket | `<proy>/exploration/` |
 | `explore-module` | Decide si vale la pena mapear un modulo y coordina al explorador | `<proy>/exploration/` |
+| `manage-memory` | Decide si un hecho se guarda, si es del equipo o propio, y donde | — |
 | `sync-brain` | Contrastar el `.claude/` de un repo contra el cerebro y decidir que absorber | — |
 
 `start-development` y `finish-development` son pareja: abren y cierran el mismo desarrollo. Las
@@ -125,7 +126,8 @@ Muestra **modelo │ proyecto │ rama**. Opus sale en amarillo y Sonnet en verd
 | `brain/learning/` | Modo practica: lecciones, temario y bitacoras |
 | `brain/sprints/` | El texto de la retrospectiva de cada sprint |
 | `brain/testing/pending.md` | Cola de desarrollos cerrados con el set de pruebas pendiente |
-| `projects/<repo>/memory/` | Conocimiento por repo, que Claude recuerda solo |
+| `projects/<repo>/memory/` | Memorias **propias** del repo, mas enlaces a las del equipo. Las enlaza `plug.mjs` |
+| `<repo>/.claude/memory/` | Memorias **del equipo**: viven en el repo, versionadas. Unica cosa que el cerebro escribe ahi |
 
 Lo demas que hay en `~/.claude` lo escribe Claude Code y **no se versiona**.
 
