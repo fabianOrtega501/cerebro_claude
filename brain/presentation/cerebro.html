@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1920px;height:1080px;font-family:Inter,system-ui,sans-serif;
+       background:linear-gradient(160deg,#fbfcfe 0%,#f2f5f9 100%);color:#16202e;overflow:hidden}
+  .slide{padding:44px 60px;height:100%;display:flex;flex-direction:column;gap:26px}
+
+  header{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:3px solid #e3e9f2;padding-bottom:18px}
+  h1{font-size:50px;font-weight:800;letter-spacing:-1.2px}
+  h1 span{color:#1f6feb}
+  .sub{font-size:21px;color:#5b6b80;margin-top:6px;font-weight:500}
+  .stamp{text-align:right;font-size:15px;color:#8595a8;line-height:1.7}
+  .stamp b{display:block;font-size:30px;color:#16202e;font-weight:800}
+
+  .band-title{font-size:15px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;color:#8595a8;margin-bottom:12px}
+
+  .pieces{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .piece{background:#fff;border-radius:14px;padding:20px 24px;border:1px solid #e3e9f2;
+         box-shadow:0 2px 10px rgba(22,32,46,.05);border-left:6px solid var(--c)}
+  .piece h3{font-size:25px;font-weight:700;color:var(--c);margin-bottom:6px}
+  .piece p{font-size:18px;color:#48586b;line-height:1.45}
+  .piece p b{color:#16202e}
+
+  .journey{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:18px;align-items:stretch}
+  .stage{background:#fff;border-radius:16px;border:1px solid #e3e9f2;box-shadow:0 3px 14px rgba(22,32,46,.06);
+         padding:22px 22px 18px;display:flex;flex-direction:column;position:relative}
+  .stage::after{content:"";position:absolute;right:-22px;top:50%;transform:translateY(-50%);
+       border-left:13px solid #c8d4e3;border-top:10px solid transparent;border-bottom:10px solid transparent;z-index:2}
+  .stage:last-child::after{display:none}
+  .num{width:38px;height:38px;border-radius:50%;background:var(--c);color:#fff;font-weight:800;font-size:19px;
+       display:grid;place-items:center;margin-bottom:12px}
+  .stage h2{font-size:27px;font-weight:700;margin-bottom:4px}
+  .stage .lead{font-size:17px;color:#5b6b80;margin-bottom:16px;line-height:1.4}
+  .cmd{display:inline-block;background:#eef4fd;color:#1f6feb;font-weight:600;font-size:17px;
+       padding:6px 12px;border-radius:8px;margin:0 6px 8px 0;font-family:ui-monospace,monospace}
+  .auto{margin-top:auto;padding-top:14px;border-top:1px dashed #dfe6f0}
+  .auto .lbl{font-size:13px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#bf8700;margin-bottom:7px}
+  .auto p{font-size:16px;color:#5b6b80;line-height:1.45}
+  .auto p b{color:#16202e}
+
+  .memory{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .mem{background:#16202e;color:#fff;border-radius:14px;padding:18px 24px;display:flex;align-items:center;gap:18px}
+  .mem .ico{font-size:32px}
+  .mem h4{font-size:21px;font-weight:700;margin-bottom:3px}
+  .mem p{font-size:16px;color:#aebccd;line-height:1.4}
+
+  footer{text-align:center;font-size:19px;color:#5b6b80;font-weight:500}
+  footer b{color:#16202e}
+</style></head><body><div class="slide">
+
+  <header>
+    <div>
+      <h1>El <span>cerebro</span>: la configuración que aprende</h1>
+      <div class="sub">Vive en <code>~/.claude</code>, es un repo git propio y lo comparten todos los proyectos: AIO · AMI · Epsilon · Status · SIPA · Ruta+ · manuales</div>
+    </div>
+    <div class="stamp">piezas activas hoy<b>13 skills · 5 hooks · 3 agentes</b></div>
+  </header>
+
+  <div>
+    <div class="band-title">De qué está hecho</div>
+    <div class="pieces">
+      <div class="piece" style="--c:#1f6feb"><h3>Skill · qué hacer</h3><p>Una receta con pasos. <b>La invoco yo</b>, o Claude la reconoce cuando la situación encaja.</p></div>
+      <div class="piece" style="--c:#bf8700"><h3>Hook · cuándo</h3><p>Salta solo, sin que nadie se acuerde. <b>Cuatro avisan; uno bloquea</b> lo que no tiene vuelta atrás.</p></div>
+      <div class="piece" style="--c:#8250df"><h3>Agente · quién aparte</h3><p>Otro Claude, más barato, que hace lo mecánico y devuelve <b>tres líneas en vez de tres mil</b>.</p></div>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column">
+    <div class="band-title">El recorrido de un ticket</div>
+    <div class="journey">
+
+      <div class="stage"><div class="num" style="--c:#1a7f37">1</div>
+        <h2>Arrancar</h2><div class="lead">Ramas al día y la rama del ticket, con el nombre del equipo.</div>
+        <div><span class="cmd">start-development</span><span class="cmd">explore-module</span></div>
+        <div class="auto"><div class="lbl">automático</div><p>Si el módulo ya está mapeado, <b>no se vuelve a leer el código</b>.</p></div>
+      </div>
+
+      <div class="stage"><div class="num" style="--c:#1f6feb">2</div>
+        <h2>Desarrollar</h2><div class="lead">El plan primero, siempre. Si el ticket cruza front y back, se fija el contrato antes de escribir.</div>
+        <div><span class="cmd">fullstack-ticket</span><span class="cmd">practice-ticket</span></div>
+        <div class="auto"><div class="lbl">automático</div><p>Una clave de traducción mal puesta <b>se deniega en el acto</b>.</p></div>
+      </div>
+
+      <div class="stage"><div class="num" style="--c:#1f6feb">3</div>
+        <h2>Cerrar</h2><div class="lead">Limpiar, verificar que compila y arranca, commitear con el formato del equipo e integrar.</div>
+        <div><span class="cmd">finish-development</span></div>
+        <div class="auto"><div class="lbl">automático</div><p>Al hacer push avisa si <b>quedó documentación atrás</b>.</p></div>
+      </div>
+
+      <div class="stage"><div class="num" style="--c:#bf8700">4</div>
+        <h2>Entregar</h2><div class="lead">Los textos que pide el proceso, sacados del diff real de la rama. Nunca inventados.</div>
+        <div><span class="cmd">gen-changes-controls</span><span class="cmd">gen-test-set</span><span class="cmd">update-manual</span></div>
+        <div class="auto"><div class="lbl">automático</div><p>Nada de esto corre solo: <b>se pide</b>.</p></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div>
+    <div class="band-title">Y lo que va quedando</div>
+    <div class="memory">
+      <div class="mem"><div class="ico">🧠</div><div><h4>Memoria del equipo</h4><p>Lo que cuesta descubrir dos veces vive en el repo, versionado, para todos</p></div></div>
+      <div class="mem"><div class="ico">🗺️</div><div><h4>Mapa de módulos</h4><p>Qué endpoint, qué permiso y qué servicio hay detrás de cada pantalla</p></div></div>
+      <div class="mem"><div class="ico">📘</div><div><h4>Temario</h4><p>Qué temas se practicaron, con cuánta ayuda y qué falta por dominar</p></div></div>
+    </div>
+  </div>
+
+  <footer>La idea de fondo: <b>una regla que solo vive escrita, no se cumple.</b> Por eso lo que se repite se vuelve skill, hook o agente.</footer>
+
+</div></body></html>

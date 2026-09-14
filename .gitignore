@@ -55,6 +55,9 @@
 
 # 3c) Del resumen de sprint solo se conserva el texto: el JSON, el HTML y el PNG se regeneran
 #     corriendo `render-slide.mjs` otra vez, y el PNG ademas pesa.
+# La lamina se versiona; su PNG se regenera con render.mjs y pesa.
+/brain/presentation/*.png
+
 /brain/sprints/*/*.json
 /brain/sprints/*/*.html
 /brain/sprints/*/*.png

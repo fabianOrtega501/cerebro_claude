@@ -4,8 +4,10 @@ Configuracion propia de Claude Code. Vive en `~/.claude`, es un **repo git local
 la comparten **todos los proyectos**: AIO, AMI, Epsilon, Status, SIPA, Ruta+, manuales.
 
 **Principio unico: el cerebro manda.** Los repos de trabajo traen su propio `.claude/` con skills
-del equipo. Eso es una fuente de ideas, no una autoridad. El flujo va siempre **repo -> cerebro**,
-nunca al reves, y nada se absorbe sin aprobacion.
+del equipo. Eso es una fuente de ideas, no una autoridad. El flujo va **repo -> cerebro** y nada se
+absorbe sin aprobacion. **Con una excepcion, y es a proposito**: las memorias del equipo se
+escriben en `<repo>/.claude/memory/`, para que las consuma todo el mundo y viajen en el MR. Ahi el
+cerebro solo enlaza, no copia.
 
 ---
 
@@ -22,6 +24,8 @@ nunca al reves, y nada se absorbe sin aprobacion.
 | Redactar un control de cambios | `/gen-changes-controls` |
 | Armar el set de pruebas | `/gen-test-set` |
 | Armar la diapositiva del sprint | `/gen-sprint-summary` |
+| Entender un modulo antes de tocarlo | `/explore-module` |
+| Guardar algo que no quiero repetir | `/manage-memory` |
 | Ver que trajo el equipo en su `.claude/` | `/sync-brain` |
 
 Nada mas hay que configurar. Todo lo de abajo es para cuando quieras **cambiar** como funciona.
@@ -123,7 +127,7 @@ Muestra **modelo │ proyecto │ rama**. Opus sale en amarillo y Sonnet en verd
 | `brain/projects/<proy>/` | Perfiles: `manual/`, `stack/`, `docs/`, `skills/local-*` |
 | `brain/upstream/` | Foto del `.claude/` de cada repo en su ultima revision |
 | `brain/projects/<proy>/exploration/` | Mapa tecnico por modulo: donde esta cada endpoint, permiso y servicio |
-| `brain/learning/` | Modo practica: lecciones, temario y bitacoras |
+| `brain/learning/` | Modo practica: lecciones, temario, bitacoras y la marca de la practica en curso |
 | `brain/sprints/` | El texto de la retrospectiva de cada sprint |
 | `brain/testing/pending.md` | Cola de desarrollos cerrados con el set de pruebas pendiente |
 | `projects/<repo>/memory/` | Memorias **propias** del repo, mas enlaces a las del equipo. Las enlaza `plug.mjs` |
@@ -240,7 +244,8 @@ Las rutas y puertos si siguen en el `settings.local.json` de cada repo, que es d
 
 El hook `claude-upstream-notice` lo detecta y arranca `sync-brain`, que clasifica cada cambio en
 **Aporta / Mejora / Choca / Del repo / Ruido** y recomienda. Absorber es siempre decision tuya, y
-va en una sola direccion: repo -> cerebro.
+va en una sola direccion: repo -> cerebro. La unica cosa que viaja al reves son las memorias del
+equipo, y para eso esta `manage-memory`.
 
 Al terminar hay que cerrar la revision, o el aviso se repite:
 
