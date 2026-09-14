@@ -36,6 +36,21 @@ ticket, prefijo de commit, checks del proyecto y gestor de paquetes **realmente 
 Si `base` viene `null`, la rama no codifica su origen: **preguntar contra qué rama se integra**.
 No adivinarlo.
 
+**¿Este ticket se hizo en modo práctica?**
+
+```bash
+node ~/.claude/brain/learning/lib/practice-session.mjs status
+```
+
+Si hay una marca abierta y es de esta rama, **el temario todavía no sabe nada de este ticket** y
+este es el momento de registrarlo: cerrando el desarrollo ya se sabe cómo fue. Se hace la Fase 7
+de `practice-ticket` —bitácora, lecciones, un `--record` por tema y `close`— antes de seguir.
+
+Los números del registro **los da el usuario**: hay que preguntarle cómo le fue en cada tema. Un
+`--hint` inventado corrompe el temario, que es justo lo que este registro existe para evitar.
+
+Si la marca es de otra rama, se deja como está y se sigue: pertenece a otro ticket.
+
 **Si `siblings` trae algo, el ticket toca los dos lados.** Son los demás repos del proyecto que
 están en la **misma rama** y tienen cambios sin commitear o commits sin subir. No es un bloqueante
 —cerrar este repo es válido— pero hay que **decirlo antes de empezar, no después del push**:

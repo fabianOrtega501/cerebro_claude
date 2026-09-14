@@ -83,6 +83,19 @@ archivos tocar **no se suelta**: es lo que se le va a preguntar en la Fase 3.
 
 ## Fase 2 — La clase
 
+**Antes de la primera clase, abrir la marca de la práctica.** Es lo que hace que el cierre no
+dependa de acordarse: `finish-development` la ve en su preflight y el hook
+`practice-unrecorded-notice` avisa si el ticket se cierra sin registrar.
+
+```bash
+node ~/.claude/brain/learning/lib/practice-session.mjs open \
+     --project <clave> --ticket <n> --repo <ruta del repo> --branch <rama> \
+     --topics <slug1,slug2>
+```
+
+Los `--topics` son los temas que sacó la Fase 1. Si después aparece otro, se vuelve a correr
+`open` con la lista completa: sobrescribe, no duplica.
+
 Un tema a la vez, **clase completa siempre**, aunque el tema ya haya salido antes. Lo que cambia
 con la repetición no es la extensión, es la calidad: la clase **se dicta desde
 `brain/learning/lessons/<tema>.md`**, y cada ticket la corrige y la amplía. Improvisarla de cero
@@ -243,9 +256,18 @@ peldaño 3.
 
    `--hint` es el peldaño **más alto** que hizo falta en ese tema. `--blocking`, los bloqueantes
    del review, incluidos los que él corrigió después: se cuentan por haber salido.
-4. **Decir en voz alta qué se movió**: `permisos-y-gates: pendiente -> practicado`. El progreso
+
+   **Los números los da él, no se deducen.** Preguntarle cómo le fue en cada tema antes de
+   registrar: un `--hint` inventado corrompe el temario, que es justo lo que este registro existe
+   para evitar.
+4. **Cerrar la marca**, ya con los temas registrados:
+
+   ```bash
+   node ~/.claude/brain/learning/lib/practice-session.mjs close
+   ```
+5. **Decir en voz alta qué se movió**: `permisos-y-gates: pendiente -> practicado`. El progreso
    invisible no motiva.
-5. **Encadenar a `finish-development`**, que va exactamente igual que en modo entrega.
+6. **Encadenar a `finish-development`**, que va exactamente igual que en modo entrega.
 
 ---
 

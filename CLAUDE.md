@@ -253,7 +253,10 @@ como ejercicio: **lo escribe Fabian, yo guio**. El procedimiento completo esta e
   ejercicio.
 - **Al cerrar se registra** en `~/.claude/brain/learning/`: una bitacora del ticket y el temario
   actualizado con `lib/syllabus.mjs`. Sin registro, a la tercera sesion se repiten los mismos
-  errores sin que nadie lo note.
+  errores sin que nadie lo note. **Esto ya no depende de acordarse**: la clase abre una marca con
+  `lib/practice-session.mjs`, el preflight de `finish-development` la revisa, y el hook
+  `practice-unrecorded-notice` avisa si el ticket se cerro sin registrar. Los numeros del registro
+  —el peldano de pista y los bloqueantes— **los da Fabian**: inventarlos corrompe el temario.
 - **Se explica como a un principiante**: analogias para lo abstracto, ningun termino dado por
   sabido, el porque antes que el nombre. Lo pidio el 2026-09-03; el detalle esta en la skill.
 - **Profesor que construye**: el escribe el borrador del plan, yo lo corrijo, dibujo el Mermaid y

@@ -47,6 +47,10 @@
 #     cerebro: lo que se conserva es la imagen ya copiada al repo del manual. La carpeta de
 #     salida por omision de los flujos es `capturas/`, y aparece en cuanto uno se ejecuta
 #     desde su propio directorio.
+# La marca de la practica en curso es estado de una sesion, no conocimiento: nace al dar la
+# clase y muere al registrar el temario. Lo que se conserva es la bitacora y el temario.
+/brain/learning/.active-practice.json
+
 **/capturas/
 
 # 3c) Del resumen de sprint solo se conserva el texto: el JSON, el HTML y el PNG se regeneran

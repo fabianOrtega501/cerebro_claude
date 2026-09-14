@@ -19,7 +19,7 @@ vive un nivel mas arriba.
 | `projects/<proy>/exploration/` | Mapa tecnico por modulo. Lo carga `exploration-memory` |
 | `projects/<proy>/skills/local-*` | Skills de un solo proyecto. Se enchufan con `plug.mjs` |
 | `projects/_template/` | Plantillas para agregar un proyecto |
-| `learning/` | Modo practica: lecciones, temario y bitacoras. Lo carga `practice-ticket` |
+| `learning/` | Modo practica: lecciones, temario, bitacoras y la marca de la practica en curso. Lo carga `practice-ticket` |
 | `sprints/` | El texto de la retrospectiva de cada sprint, que escribe `gen-sprint-summary` |
 | `testing/pending.md` | Cola de desarrollos cerrados con el set de pruebas pendiente |
 | `upstream/` | Foto del `.claude/` de cada repo en su ultima revision. **No se versiona** |

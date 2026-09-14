@@ -78,8 +78,9 @@ tres `gen-*` son **manuales**: no se disparan solas nunca.
 | `docs-on-push` | Despues de `git push` | Avisa si quedo documentacion sin actualizar, tecnica o de manual |
 | `brain-unpushed-notice` | Al terminar una respuesta | Avisa si el cerebro tiene algo sin commitear o sin subir a `backup`/`github` |
 | `i18n-keys-guard` | Antes y despues de editar un locale | **Deniega** la clave intercalada y la que repite un texto que ya existe; avisa de JSON roto y de paridad |
+| `practice-unrecorded-notice` | Al terminar una respuesta | Avisa si un ticket de practica se cerro sin registrar sus temas en el temario |
 
-Los tres primeros no bloquean: detectan y se apartan. **`i18n-keys-guard` si deniega**, y es la
+Todos menos uno no bloquean: detectan y se apartan. **`i18n-keys-guard` si deniega**, y es la
 excepcion a proposito: una clave intercalada o un texto duplicado no se arreglan avisando, porque
 para cuando el aviso se lee ya entraron al archivo. Solo deniega lo mecanico —donde quedo la clave
 y si su texto ya existia—; la paridad entre idiomas avisa y nunca bloquea. Los dos primeros avisan una sola vez por version; el tercero, una sola vez por
