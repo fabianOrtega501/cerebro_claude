@@ -60,7 +60,9 @@ git aparte, local.
   a las del mismo tema. Insertar en medio cambia el contexto de lineas que nadie toco y provoca
   conflictos cuando dos ramas agregan claves en la misma zona; al final, cada clave es una linea
   agregada limpia. Aplica a todos los locales del proyecto por igual, para que no se desincronice
-  su orden.
+  su orden. **Esto ya no depende de acordarse**: el hook `i18n-keys-guard` deniega la edicion que
+  deja una clave intercalada, y tambien la que crea una clave con un texto que ya existe bajo otra.
+  Si de verdad hacen falta dos claves con el mismo texto porque van a divergir, se pide y se agrega.
 - **Los commits no llevan trailer de coautoria.** Nada de `Co-Authored-By: Claude...` ni ninguna
   otra firma de la herramienta, en ningun repo: ni los de trabajo ni el cerebro. El historial es
   del equipo y una atribucion a la herramienta ahi no le sirve a nadie; ademas ensucia el

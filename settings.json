@@ -44,6 +44,16 @@
             "timeout": 30
           }
         ]
+      },
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/i18n-keys-guard.mjs\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "Stop": [
@@ -52,6 +62,18 @@
           {
             "type": "command",
             "command": "node \"$HOME/.claude/hooks/brain-unpushed-notice.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/i18n-keys-guard.mjs\"",
             "timeout": 10
           }
         ]

@@ -10,12 +10,15 @@
 | Mecanismo | Quien decide | Ejemplo |
 |---|---|---|
 | **Automatico** | El programa | Un hook salta con `git pull` o `git push`, sin que nadie lo pida |
+| **Bloqueante** | El programa | `i18n-keys-guard` **deniega** la edicion de un locale que rompe la regla, antes de que se escriba |
 | **Encadenado** | Claude, leyendo el `SKILL.md` | `start-development` termina y dice "sigue con `fullstack-ticket`" |
 | **Delegado** | Claude, dentro de una skill | Los pasos mecanicos se van a un subagente en Sonnet |
 | **Manual** | Tu | `/gen-changes-controls` solo corre si lo pides |
 
 Un encadenamiento **no es automatico**: se propone y tu puedes decir que no. La unica pieza que
-actua sin preguntar es el hook, y ninguno de los tres escribe nada: solo avisan.
+actua sin preguntar es el hook, y ninguno escribe nada por su cuenta: tres avisan, y
+`i18n-keys-guard` deniega la edicion que incumple la regla de los locales —tampoco la corrige, la
+devuelve para que se haga bien—.
 
 ---
 
@@ -54,6 +57,8 @@ flowchart TD
 
     FD --> PUSH[["git push"]]
     DEV --> PULL[["git pull / merge"]]
+    DEV -->|"al editar un locale"| H0{{"clave intercalada<br/>o texto duplicado?"}}
+    H0 ==>|"hook i18n-keys-guard: DENIEGA"| DEV
 
     PUSH -->|"hook<br/>docs-on-push"| H1{{"Quedo documentacion<br/>sin actualizar?"}}
     H1 ==>|"cambio regla de negocio"| UTD["<b>update-tech-docs</b><br/>docs/ del backend"]
@@ -79,7 +84,7 @@ flowchart TD
     classDef user fill:#1a7f37,stroke:#1a7f37,color:#fff
     class SD,FT,UM,UTD,SB,GC,PT,FD,GTS skill
     class BS agent
-    class H1,H2,Q,M hook
+    class H1,H2,H0,Q,M hook
     class U user
 ```
 

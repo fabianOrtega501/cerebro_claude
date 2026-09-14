@@ -75,8 +75,12 @@ tres `gen-*` son **manuales**: no se disparan solas nunca.
 | `claude-upstream-notice` | Despues de `git pull`/`merge`/`rebase` | Si el `.claude/` del repo cambio, lo avisa y arranca `sync-brain` |
 | `docs-on-push` | Despues de `git push` | Avisa si quedo documentacion sin actualizar, tecnica o de manual |
 | `brain-unpushed-notice` | Al terminar una respuesta | Avisa si el cerebro tiene algo sin commitear o sin subir a `backup`/`github` |
+| `i18n-keys-guard` | Antes y despues de editar un locale | **Deniega** la clave intercalada y la que repite un texto que ya existe; avisa de JSON roto y de paridad |
 
-Ninguno bloquea. Los dos primeros avisan una sola vez por version; el tercero, una sola vez por
+Los tres primeros no bloquean: detectan y se apartan. **`i18n-keys-guard` si deniega**, y es la
+excepcion a proposito: una clave intercalada o un texto duplicado no se arreglan avisando, porque
+para cuando el aviso se lee ya entraron al archivo. Solo deniega lo mecanico —donde quedo la clave
+y si su texto ya existia—; la paridad entre idiomas avisa y nunca bloquea. Los dos primeros avisan una sola vez por version; el tercero, una sola vez por
 estado: mientras no cambie lo pendiente, no repite.
 
 ### Agentes
@@ -104,6 +108,7 @@ Muestra **modelo │ proyecto │ rama**. Opus sale en amarillo y Sonnet en verd
 | `CLAUDE.md` | Reglas y preferencias. **Se carga en todas las sesiones, de todos los proyectos** |
 | `settings.json` | Permisos, hooks y statusline |
 | `statusline.mjs` | La barra de estado: modelo, proyecto y rama. La invoca `settings.json` |
+| `hooks/i18n-keys-guard.mjs` | Guarda de traducciones. Transversal: no necesita perfil por proyecto |
 | `secrets.env` | Credenciales. Permisos 600 y **fuera del control de versiones** |
 | `skills/` | Skills transversales |
 | `agents/` | Subagentes |
