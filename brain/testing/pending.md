@@ -12,3 +12,4 @@ Al generar el set, borrar la línea.
 
 | Fecha | Proyecto | Ticket | Rama | Base | Sha de la base |
 |---|---|---|---|---|---|
+| 2026-09-15 | aio | 11118 | feature/11118-fabian-originDesa-TramasGps | desa | 5b8e525a39c5a09c7edc5f954acb1c254419481b |

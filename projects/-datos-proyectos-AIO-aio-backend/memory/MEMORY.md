@@ -17,4 +17,5 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [env-testing-skip-worktree](env-testing-skip-worktree.md) — .env.testing está marcado con skip-worktree en este clon; sus cambios locales no entran a commits
 - [lint-del-aio-reformatea-todo](lint-del-aio-reformatea-todo.md) — En aio-app `pnpm lint` lleva --fix y reformatea todo el repo; nunca usarlo para verificar
 - [navegador-para-cdp-es-brave](navegador-para-cdp-es-brave.md) — Manejar el navegador por CDP en esta maquina exige CHROME_PATH=/snap/bin/brave; no hay Chrome ni Chromium instalados
+- [no-usar-pint-en-aio](no-usar-pint-en-aio.md) — No correr pint en aio-backend: el formato lo pone Intelephense y sus defaults contradicen el CLAUDE.md
 - [no-usar-stash-para-comparar-con-la-base](no-usar-stash-para-comparar-con-la-base.md) — No usar git stash para comparar la rama contra su base; aplica stashes ajenos y deja conflictos en archivos de otros tickets
