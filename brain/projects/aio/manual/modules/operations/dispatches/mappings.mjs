@@ -43,4 +43,19 @@ export const MAPPINGS = {
 		"despacho_acciones.png": "Operaciones/Despachos/despachos_11.png",
 		"cambio_vehiculo_formulario.png": "Operaciones/Despachos/cambio-vehiculo-formulario.png",
 	},
+	/*
+	 * Criterios de la Gestion Diaria. `despachos_03.png` ya esta publicada y es de antes de la
+	 * cascada de limpieza entre campos, asi que se regenera con `--sobrescribir`.
+	 */
+	"dispatch-daily-filters": {
+		"gestion_diaria_filtros.png": "Operaciones/Despachos/despachos_03.png",
+	},
+
+	/*
+	 * Tarjeta del despacho encontrado, ya con Servicio y Vehiculo. Es nueva: el documento no
+	 * mostraba la tarjeta por separado.
+	 */
+	"dispatch-daily-card": {
+		"gestion_diaria_tarjeta.png": "Operaciones/Despachos/gestion-diaria-tarjeta.png",
+	},
 };

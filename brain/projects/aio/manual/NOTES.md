@@ -293,6 +293,51 @@ Cada uno de estos puntos costó una corrida fallida:
   con `z-index: 999`: se lleva el click de cualquier botón que caiga en esa franja, y el
   síntoma es que no pasa nada. Bajar el scroll del diálogo sube los botones por encima.
 
+### La tabla estandar: sus campos de filtro y su desborde horizontal
+
+Tres cosas que cuestan una corrida cada una si no se saben:
+
+- **El buscador de una tabla estandar es un dialogo aparte**, que se abre con el boton `Buscar`.
+  Hace falta cuando el registro no cae en la primera pagina: el listado de clientes tiene 126.
+- **Sus campos no tienen `label` con texto ni `placeholder`**, asi que no se pueden localizar por
+  su rotulo. Lo que si traen es un `id` con el patron **`app-text-field-<campo>-<hash>`**, de modo
+  que el selector estable es `[id^="app-text-field-name-"]`. Para los selectores y autocompletados
+  el prefijo es `app-select-` y `app-autocomplete-`, que es lo que ya resuelve el helper
+  `appField()`.
+- **Las tablas anchas desbordan y su columna de acciones queda fuera de vista.** Capturar con
+  `{ selector: "table" }` produce una imagen con el encabezado y sin los botones. Hay que empujar
+  `.v-table__wrapper` con `scrollLeft = scrollWidth` antes de la captura, y fotografiar la vista
+  completa en vez del elemento.
+
+### Autorizacion de fidelizacion: dos condiciones para que exista el boton
+
+El candado solo se pinta si `is_active && isCommercialDirector && allows_authorization`. Es decir:
+
+- El usuario de pruebas (`AIO_TEST_EMAIL`) **tiene que ser Director Comercial**. Hoy lo es: su
+  cargo trae `is_commercial_director` en verdadero, comprobable con
+  `getClassificationsByUserId()`. Si alguien cambia esa clasificacion, el flujo deja de encontrar
+  el boton y lo dice con un mensaje propio en vez de morir en un timeout.
+- Tiene que haber un acuerdo en **"Pendiente de Autorización"**. Los del cliente `Prueba Catastro`
+  (id 1076155) estan en la empresa **Empresa Demo**, no en PROMOCALI.
+
+El flujo **no confirma la decision**: abre la ventana y la fotografia en sus dos estados. Guardar
+cambiaria el estado del acuerdo y la siguiente corrida ya no encontraria nada pendiente.
+
+### Gestion Diaria de despachos: el orden de turno y fecha
+
+Dos trampas del buscador de la Gestion Diaria, documentadas por el equipo en su copia de la skill
+y absorbidas con el flujo:
+
+- **El turno se elige antes que la fecha.** Elegir el turno repinta el campo de fecha y lo
+  devuelve a hoy, asi que hacerlo al reves deja la busqueda vacia sin avisar.
+- **La fecha se fija en el modelo del formulario, no tecleandola.** flatpickr revierte el valor
+  escrito al salir del campo.
+
+Los tres flujos absorbidos el 2026-09-15 (`dispatch-daily-filters`, `dispatch-daily-card`,
+`logbook-search`) **no se han corrido desde el cerebro**: se comprobo que resuelven sus imports
+contra los helpers del perfil, nada mas. La primera corrida puede necesitar ajustes de datos
+(`--turno`, `--fecha`, `--vehiculo`).
+
 ## Al terminar, en este repo
 
 **Levantar el dev server reescribe `components.d.ts`**, que regenera `unplugin-vue-components` al
@@ -333,6 +378,10 @@ grep -o "[a-z0-9_-]*\.png" docs/AIO/<ruta>/<Documento>.md | sort -u
 | Operaciones > Despachos | `modules/operations/dispatches/capture-log.mjs` | `dispatch-log` (Log de Despacho, el historial de cambios: `Despachos.md`). Imprime al final los campos que salieron sin traducir, así que sirve de comprobación del i18n. El despacho se pasa con `--despacho` y **tiene que estar en la primera página** de la tabla: el flujo no pagina. En Empresa Demo sirven el 34 y el 42, que mezclan altas y modificaciones |
 | Operaciones > Despachos | `modules/operations/dispatches/capture-change-vehicle.mjs` | `dispatch-change-vehicle` (cambio de vehiculo del despacho, la accion con permiso propio). Absorbido del `.claude/` del repo |
 | Respel > Clientes | `modules/respel/clients/capture.mjs` | `clients-map` (mapa geografico de clientes). Absorbido del repo; trae su `seed.sql` |
+| Respel > Clientes | `modules/respel/client-loyalties/capture.mjs` | `client-loyalties-authorization` (ventana de Autorización de fidelización, dentro del asistente de Gestiones: `clients.md`). Trae su `seed.sql`. Hay que pasarle `--empresa "Empresa Demo"` |
+| Operaciones > Despachos | `modules/operations/dispatches/capture-daily-filters.mjs` | `dispatch-daily-filters` (criterios de la Gestión Diaria: `Despachos.md`). Con `--turno`, que debe tener rutas cuya frecuencia cubra hoy, y `--vehiculo` / `--otro-vehiculo`. Es sobre todo prueba de la cascada de limpieza. **La cascada del campo vaciado está en `qa` pero no en `prod`**: sobre una rama de `prod` esa comprobación falla y no es un fallo del flujo. Absorbido del repo |
+| Operaciones > Despachos | `modules/operations/dispatches/capture-daily-card.mjs` | `dispatch-daily-card` (la tarjeta del despacho encontrado, con **Servicio** y **Vehículo**: `Despachos.md`). Con `--fecha`, `--turno` y `--vehiculo`, que tienen que apuntar a un día con despachos. Absorbido del repo |
+| Mantenimiento > Bitácora | `modules/maintenance/logbook/capture-search.mjs` | `logbook-search` (formulario de búsqueda, ya sin el campo **Tipo de Equipo**: `BitacoraDeMantenimiento.md`). Con `--vehiculo`, la etiqueta del desplegable (código/placa), que debe apuntar a un vehículo **con** bitácoras. Absorbido del repo |
 | AVL | `modules/avl/capture-route-search.mjs` | `route-search` (buscador de rutas). Absorbido del repo; trae su `seed-route-search.sql` |
 | Operaciones > Rutas | `modules/operations/routes/capture-geometry.mjs` | `route-geometry` (consulta geográfica: `rutas.md` y `routesGeometries.md`) |
 | Operaciones > Rutas | `modules/operations/routes/capture-read-only.mjs` | `route-read-only` (wizard en modo consulta: `rutas.md`) |
