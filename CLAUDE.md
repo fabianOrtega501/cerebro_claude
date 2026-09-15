@@ -372,3 +372,19 @@ Un `pkill -f "laravel-mix/setup"` lanzado desde Bash tambien encaja con el coman
 el shell de la sesion muere con exit 143/144 sin salida ni error. Paso dos veces el 2026-09-03.
 Usar el truco del corchete, que no se empareja a si mismo: `pkill -f "[l]aravel-mix/setup"`.
 
+**El corchete protege a un patron de si mismo, pero no de otro patron de la misma linea.** Dos
+`pkill` encadenados vuelven a matar la sesion aunque los dos lleven corchete, porque cada uno ve la
+linea de comando **entera**, con el texto del otro dentro:
+
+```bash
+# Mata la sesion: el segundo patron busca "vite" y lo encuentra dentro del primero
+pkill -f "[a]io-app.*vite"; pkill -f "[v]ite.*5173"
+```
+
+El primer patron deja escrito el literal `vite` en la linea; el segundo, `[v]ite.*5173`, empareja
+ese `vite` con el `5173` que el mismo escribe despues. Paso el 2026-09-15 al bajar un dev server.
+
+**Un `pkill` por comando Bash, y revisar que ningun otro texto de esa linea —rutas, `echo`, el
+patron de al lado— contenga lo que el patron busca.** Si hay que matar dos cosas, son dos
+llamadas a la herramienta, no dos comandos separados por `;`.
+
