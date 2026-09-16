@@ -21,6 +21,10 @@
 # cerebro desde un respaldo deja la sesion sin barra de estado y sin senal de que falta.
 !/statusline.mjs
 !/skills/
+# `skills/synced/` es cache que escribe Claude Code para sincronizar skills de la
+# organizacion: un bucket con nombre aleatorio y un manifest de reclamos pendientes.
+# Es estado de esta maquina, no cerebro; en el repo solo generaria ruido y conflictos.
+/skills/synced/
 !/agents/
 !/hooks/
 !/brain/
