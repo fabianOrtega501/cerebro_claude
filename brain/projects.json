@@ -46,6 +46,13 @@
         "/datos/proyectos/manua-web",
         "/datos/proyectos/manual-tecnico"
       ]
+    },
+    "infra": {
+      "label": "Infraestructura — imagenes Docker y base de datos local",
+      "//": "No es un aplicativo: publica las imagenes base de PHP del CI y el stack de postgres local que usan todos los demas proyectos.",
+      "repos": [
+        "/datos/proyectos/imagenes_docker"
+      ]
     }
   }
 }

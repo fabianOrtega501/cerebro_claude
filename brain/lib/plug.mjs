@@ -92,7 +92,7 @@ function linkSkill(repo, project, skill) {
 
   mkdirSync(join(repo, ".claude", "skills"), { recursive: true });
 
-  if (existsSync(link) || isBrokenLink(link)) {
+  if (existsSync(link) || isSymlink(link)) {
     if (!lstatSync(link).isSymbolicLink())
       return "conflict";
 
@@ -115,21 +115,23 @@ function linkSkill(repo, project, skill) {
  * valen en esta maquina conviven al lado como archivos reales y no se tocan.
  *
  * @param {string} repo Ruta del repo
- * @returns {{linked:number, removed:number, conflicts:string[]}} Que se enlazo, limpio o choca
+ * @returns {{linked:number, broken:string[], conflicts:string[]}} Que se enlazo, que quedo roto y que choca
  */
 function linkMemories(repo) {
   const source = join(repo, ".claude", "memory");
   const dest = join(BRAIN_DIR, "..", "projects", repo.split("/").join("-"), "memory");
-  const out = { linked: 0, removed: 0, conflicts: [] };
+  const out = { linked: 0, broken: [], conflicts: [] };
 
   if (!existsSync(dest)) mkdirSync(dest, { recursive: true });
 
+  // Un enlace roto casi nunca significa que la memoria se elimino: lo normal es que el repo este
+  // parado en otra rama y su .claude/memory/ no exista ahi. Borrarlo destruiria el registro por una
+  // condicion temporal, asi que se reporta y se deja quieto.
   for (const entry of readdirSync(dest)) {
     const link = join(dest, entry);
-    if (!isBrokenLink(link) || !lstatSync(link).isSymbolicLink()) continue;
+    if (!isSymlink(link)) continue;
     if (existsSync(link)) continue;
-    rmSync(link);
-    out.removed++;
+    out.broken.push(entry);
   }
 
   if (!existsSync(source)) return out;
@@ -140,7 +142,7 @@ function linkMemories(repo) {
     const target = join(source, file);
     const link = join(dest, file);
 
-    if (existsSync(link) || isBrokenLink(link)) {
+    if (existsSync(link) || isSymlink(link)) {
       if (!lstatSync(link).isSymbolicLink()) {
         out.conflicts.push(file);
         continue;
@@ -156,8 +158,8 @@ function linkMemories(repo) {
   return out;
 }
 
-/** `existsSync` devuelve false en un symlink roto, y ese caso tambien hay que limpiarlo. */
-function isBrokenLink(path) {
+/** Si la ruta es un enlace simbolico, este o no roto. `existsSync` solo no basta: da false en los rotos. */
+function isSymlink(path) {
   try {
     return lstatSync(path).isSymbolicLink();
   }
@@ -193,7 +195,7 @@ for (const [project, config] of entries) {
       if (statusOnly) {
         const link = join(repo, ".claude", "skills", skill);
 
-        notes.push(`${skill}: ${isBrokenLink(link) ? "enchufada" : "SIN enchufar"}`);
+        notes.push(`${skill}: ${isSymlink(link) ? "enchufada" : "SIN enchufar"}`);
         continue;
       }
 
@@ -215,7 +217,8 @@ for (const [project, config] of entries) {
     if (!statusOnly) {
       const mem = linkMemories(repo);
       if (mem.linked) notes.push(`${mem.linked} memoria(s) del repo enlazadas`);
-      if (mem.removed) notes.push(`${mem.removed} enlace(s) de memoria rotos, limpiados`);
+      if (mem.broken.length)
+        notes.push(`OJO: ${mem.broken.length} enlace(s) de memoria apuntan a archivos que no existen (${mem.broken.join(", ")}). No se borraron: revisa en que rama esta el repo.`);
       for (const c of mem.conflicts)
         notes.push(`memoria ${c}: CONFLICTO, hay un archivo propio con ese nombre; resuelvelo a mano`);
     }
