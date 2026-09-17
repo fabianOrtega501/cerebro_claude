@@ -23,10 +23,12 @@
       ]
     },
     "status": {
-      "label": "Status",
+      "label": "Status — monolito y su backend separado",
       "repos": [
-        "/datos/proyectos/status"
-      ]
+        "/datos/proyectos/status",
+        "/datos/proyectos/status-full/status-api"
+      ],
+      "//": "status es el monolito, que sigue vivo. status-api es el backend que se le separo (ticket 7433) y que sirve a Status y a SIPA. El frontend separado aun no existe."
     },
     "sipa": {
       "label": "SIPA",
