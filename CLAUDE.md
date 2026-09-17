@@ -315,14 +315,36 @@ forma de una respuesta que alguien ya consume.
 ## Documentar funciones: maximo 3 renglones, en todas partes
 
 **Rige en todo lo que se escriba**: el codigo propio de `~/.claude` y tambien los repos de
-trabajo. No hay excepcion por repo ni por lenguaje. Si el `CLAUDE.md` de un repo pide PHPDoc con
-prosa de que hace, como lo hace y por que, esa parte esta desactualizada y manda esta regla; lo
+trabajo. No hay excepcion por repo ni por lenguaje, salvo la de Swagger que se explica abajo.
+Si el `CLAUDE.md` de un repo pide PHPDoc con prosa de que hace, como lo hace y por que, esa
+parte esta desactualizada y manda esta regla; lo
 corrigio Fabian el 2026-09-04 en Status, tras dos revisiones en que se escribieron bloques largos.
 
 **El limite es del docblock, no de la documentacion.** Aplica a lo que va pegado a la funcion: el
 PHPDoc, el JSDoc, la cabecera del metodo. La documentacion tecnica en `.md` —el `docs/` del
 backend, el README de un modulo— **no tiene este limite**, y es justamente donde va el porque de
 una regla de negocio. Son dos cosas distintas, y la skill `update-tech-docs` escribe las dos.
+
+**Excepcion: los controladores de un proyecto que documenta su API con Swagger.** En esos
+proyectos —AIO y status-api— el metodo que atiende una ruta no lleva PHPDoc: ni prosa, ni
+`@param`, ni `@return`. Su documentacion es el bloque `@OA`, que describe el contrato HTTP mejor
+de lo que lo haria un docblock, y la firma ya la declaran los tipos nativos. Ademas, dos bloques
+encima del mismo metodo se leen como documentacion duplicada, y si la prosa termina dentro del
+bloque de `@OA` el generador la publica como `description` de un campo del contrato: paso el
+2026-09-16 en status-api, con la explicacion de un archivo colandose como descripcion de la
+propiedad `status`.
+
+**Aplica desde que se escribe el metodo, no desde que se escribe la anotacion.** Un controlador
+nuevo nace sin PHPDoc en sus metodos de endpoint; si dependiera de tener ya el bloque `@OA`,
+habria que escribir PHPDoc para borrarlo despues.
+
+**No cubre al metodo que ninguna ruta alcanza.** Un ayudante privado, o uno publico que solo
+llaman otros metodos de la clase, nunca va a tener `@OA`, asi que sus tres renglones son su unica
+documentacion. No es un caso marginal: en status-api son 762 metodos, mas que los 723 que si
+atienden rutas. La pregunta para decidir no es "¿ya tiene `@OA`?" sino "¿llega aqui una ruta?".
+
+Un proyecto califica si su `CLAUDE.md` lo declara o si sus controladores ya traen bloques `@OA`.
+Lo decidio Fabian el 2026-09-16.
 
 **Que va y que no va:**
 
