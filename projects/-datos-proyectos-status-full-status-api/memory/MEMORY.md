@@ -1,1 +1,2 @@
 - [No commitear sin autorización](no-commitear-sin-autorizacion.md) — mostrar archivos y diff, y esperar el sí antes de cada commit.
+- [Swagger y estructura AIO en todo controlador tocado](swagger-en-controlador-tocado.md) — si lo tocamos, queda documentado y con la estructura de FormulariosTramitesController.
