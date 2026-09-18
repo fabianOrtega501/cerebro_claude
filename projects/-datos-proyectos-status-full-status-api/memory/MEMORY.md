@@ -2,3 +2,4 @@
 - [Swagger y estructura AIO en todo controlador tocado](swagger-en-controlador-tocado.md) — si lo tocamos, queda documentado y con la estructura de FormulariosTramitesController.
 - [Los servicios del front espejan al back](servicios-front-espejan-al-back.md) — misma estructura de carpetas que app/Services, trasladando de a poco.
 - [Selectores sin opciones en español](selectores-sin-opciones-en-espanol.md) — el mensaje ya sale traducido desde main.js, no hay que tocar cada vista.
+- [Buscar consumidores en status-frontend](buscar-consumidores-en-status-frontend.md) — por fragmento de ruta, no por la URL completa: casi todas se concatenan.

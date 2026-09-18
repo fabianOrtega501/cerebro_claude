@@ -227,29 +227,30 @@ previo.
 La misma cautela vale para las banderas que prometen simular: hay proyectos donde
 `migrate --pretend` **ejecuta** los cambios.
 
-## La VPN es excluyente, pero solo hace falta desde fuera
+## La VPN solo hace falta desde fuera, y ya no tumba las bases locales
 
 **Primero: en que red esta el usuario.** En la **red corporativa** el GitLab interno
-(192.168.100.34) se alcanza directo y **la VPN no hace falta para nada**: se trabaja con ella
-apagada de principio a fin, bases locales incluidas. La VPN existe para las **redes externas**
-(casa, datos moviles), y solo ahi entra en juego lo de abajo.
+(192.168.100.34) se alcanza directo y **la VPN no hace falta para nada**. La VPN existe para las
+**redes externas** (casa, datos moviles).
 
-Cuando si se necesita, no se puede tener a medias: encendida da acceso a la red interna y quita
-las bases locales; apagada, al contrario.
+**Encendida, la VPN ya NO quita las bases locales.** Se comprobo el 2026-09-18 en status-api con
+la VPN activa: las cinco conexiones por esquema responden y la suite completa pasa (124 pruebas),
+al tiempo que `git fetch` y `git push` contra el GitLab interno funcionan. Se puede trabajar con
+la VPN encendida de principio a fin.
 
 | VPN (desde red externa) | Bases locales (postgres en docker) | GitLab interno (192.168.100.34) |
 |---|---|---|
-| **Encendida** | inalcanzables: los comandos que necesitan base se cuelgan hasta el timeout | funciona: `git push`, `fetch` |
-| **Apagada** | funcionan sin tocar nada | `ssh: connect to host ... port 22: Connection timed out` |
+| **Encendida** | funcionan | funciona: `git push`, `fetch` |
+| **Apagada** | funcionan | `ssh: connect to host ... port 22: Connection timed out` |
 
-Los dos sintomas se parecen a otra cosa —un firewall del host bloqueando docker, un problema de
-llaves de git— y diagnosticar por ahi lleva a pedir `sudo` y a conclusiones falsas.
+**Esto corrige lo que decia antes esta seccion**, que las dos cosas se excluian y que con la VPN
+encendida los comandos con base se colgaban hasta el timeout. Era cierto cuando se escribio; la
+configuracion de red cambio. **No pedir que apague la VPN para correr pruebas ni consultar la
+base**: es una peticion inutil que ademas le deja sin GitLab.
 
 **No pedir que encienda la VPN antes de un push por precaucion.** Si esta en la red corporativa,
-es una peticion inutil que ademas le tumba las bases locales; y la sesion no puede saber en que
-red esta. Lo correcto es **intentar el push** y, solo si da timeout de SSH, preguntar por la VPN.
-En el sentido contrario si conviene preguntar de entrada: si algo que necesita base de datos se
-cuelga, es que la VPN quedo encendida.
+es una peticion inutil; y la sesion no puede saber en que red esta. Lo correcto es **intentar el
+push** y, solo si da timeout de SSH, preguntar por la VPN.
 
 Pasó en el ticket 10812 (2026-09-01): se pidio encender la VPN para el push estando en la red
 corporativa, y el push funcionaba sin ella.
