@@ -4,3 +4,4 @@
 - [Selectores sin opciones en español](selectores-sin-opciones-en-espanol.md) — el mensaje ya sale traducido desde main.js, no hay que tocar cada vista.
 - [Buscar consumidores en status-frontend](buscar-consumidores-en-status-frontend.md) — por fragmento de ruta, no por la URL completa: casi todas se concatenan.
 - [Mensaje de commit: qué y dónde](mensaje-de-commit-que-y-donde.md) — qué se hizo y en qué módulo, sin mencionar AIO.
+- [Convenciones temporales del ticket 7433](convenciones-temporales-ticket-7433.md) — status al cerrar cada grupo y retoque visual de toda vista tocada; borrar al cerrar el ticket.
