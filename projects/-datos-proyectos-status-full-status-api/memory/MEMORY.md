@@ -3,3 +3,4 @@
 - [Los servicios del front espejan al back](servicios-front-espejan-al-back.md) — misma estructura de carpetas que app/Services, trasladando de a poco.
 - [Selectores sin opciones en español](selectores-sin-opciones-en-espanol.md) — el mensaje ya sale traducido desde main.js, no hay que tocar cada vista.
 - [Buscar consumidores en status-frontend](buscar-consumidores-en-status-frontend.md) — por fragmento de ruta, no por la URL completa: casi todas se concatenan.
+- [Mensaje de commit: qué y dónde](mensaje-de-commit-que-y-donde.md) — qué se hizo y en qué módulo, sin mencionar AIO.
