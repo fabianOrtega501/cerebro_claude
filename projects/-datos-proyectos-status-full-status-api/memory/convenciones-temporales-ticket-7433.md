@@ -18,11 +18,21 @@ falta**, medido contra el repositorio y no de memoria: endpoints documentados, c
 estilo de respuesta, entidades con servicio, vistas migradas.
 
 **2. La vista que se toca, se mejora de apariencia.** Si un cambio obliga a entrar a una vista
-del front, de una vez se le ajusta el aspecto buscando parecerse a **gestion de tramites**
-(`ListaTramites.vue` y `EditorTramite.vue`): cabecera flex con el titulo en versalitas sobre el
-color primario en vez de la rejilla `vs-row` 8-2-2 con columna vacia de espaciador, los iconos de
-la columna Accion dentro de un `.acciones` con `gap`, y las etiquetas unificadas con
-`.campo__label`. El bloque `<style scoped>` se copia tal cual de esas vistas.
+del front, de una vez se le aplica el estandar visual:
+
+- Cabecera: `<div class="encabezado">` con `<p class="encabezado__titulo">` y, si hay boton,
+  `<div class="encabezado__acciones">`. Reemplaza la rejilla `vs-row` de 8-2-2 con su columna
+  vacia de espaciador y el `<h3 class="text-primary">` en mayusculas escritas a mano.
+- Columna Accion de las tablas: los iconos dentro de `<div class="acciones">`.
+- Etiquetas de campo: `class="campo__label"` en vez de `vs-select--label`.
+- Pantallas de acceso (ingreso, recuperar y actualizar contrasena): `class="acceso__titulo"`,
+  que es la misma identidad a mayor tamano.
+
+**El CSS NO se copia en el `<style scoped>` de cada vista.** Vive en
+`src/assets/scss/status/_estandar-vistas.scss`, importado desde `main.scss`, asi que basta con
+poner la clase. Se centralizo el 2026-09-21 porque el mismo bloque estaba duplicado en diez
+archivos y cambiar el estandar obligaba a tocarlos uno por uno. La referencia de donde salieron
+las reglas es gestion de tramites, pero ya no se copia de ahi: se usa el archivo compartido.
 
 El alcance es el retoque, no el rediseno completo: extraer el popup a un componente editor y la
 validacion visual por campo se deciden aparte, porque cambian comportamiento.
