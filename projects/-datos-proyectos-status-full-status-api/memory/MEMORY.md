@@ -6,3 +6,4 @@
 - [Mensaje de commit: qué y dónde](mensaje-de-commit-que-y-donde.md) — qué se hizo y en qué módulo, sin mencionar AIO.
 - [Convenciones temporales del ticket 7433](convenciones-temporales-ticket-7433.md) — status al cerrar cada grupo y retoque visual de toda vista tocada; borrar al cerrar el ticket.
 - [SIPA roto por la migración](sipa-roto-por-la-migracion.md) — inventario con archivo, línea y corrección; mantenerlo al día al migrar.
+- [Vigilar en cada prueba exhaustiva](vigilar-en-cada-prueba-exhaustiva.md) — el dueño de /carguepdf y los valores con que se llama GenerateSHP.
