@@ -13,6 +13,7 @@ hay un enlace: **no se editan desde el cerebro, se editan en el repo**. Las mant
 **Propias** — se quedan aqui porque no le sirven a nadie mas: preferencias de como quiero que se
 trabaje, o hechos que solo valen en esta maquina o en este clon.
 
+- [docker-exec-rompe-el-log-del-dia](docker-exec-rompe-el-log-del-dia.md) — Correr artisan con docker exec crea el log del dia como root y deja el backend devolviendo 500 en toda peticion, sin rastro en ningun log
 - [conflictos-los-resuelve-el-usuario](conflictos-los-resuelve-el-usuario.md) — Los conflictos del merge con la rama origen los resuelve el usuario; hay que parar y esperar su orden para seguir
 - [env-testing-skip-worktree](env-testing-skip-worktree.md) — .env.testing está marcado con skip-worktree en este clon; sus cambios locales no entran a commits
 - [lint-del-aio-reformatea-todo](lint-del-aio-reformatea-todo.md) — En aio-app `pnpm lint` lleva --fix y reformatea todo el repo; nunca usarlo para verificar
