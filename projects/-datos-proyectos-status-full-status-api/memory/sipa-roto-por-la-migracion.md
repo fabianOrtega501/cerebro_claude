@@ -1,6 +1,6 @@
 ---
 name: sipa-roto-por-la-migracion
-description: "Inventario exacto de lo que quedo roto en el front de SIPA por migrar el contrato de status-api, con archivo, linea y correccion."
+description: "Inventario de lo que habra que ajustar en SIPA el dia que apunte a status-api. Hoy SIPA usa el monolito, asi que NO esta roto."
 metadata: 
   node_type: memory
   type: project
@@ -8,13 +8,27 @@ metadata:
   modified: 2026-09-22T01:38:40.404Z
 ---
 
-El front de SIPA (`/datos/proyectos/sipa`) consume `status-api` igual que `status-frontend`,
-pero **no entro en el ticket 7433**. Al migrar endpoints a `ApiResponse` sus pantallas quedaron
-rotas. Fabian decidio el 2026-09-21 **seguir migrando sin detenerse por SIPA** y arreglarlo
-despues en su propia rama, con su propio MR.
+## SIPA hoy NO esta roto
 
-**Este archivo es el listado de lo que hay que arreglar.** Mantenerlo al dia: cada vez que se
-migre un endpoint que SIPA consuma, agregar la fila aqui.
+Lo comprobo Fabian el 2026-09-22 y se verifico: **SIPA apunta al monolito, no a status-api**.
+
+```
+sipa/.env:  VUE_APP_API="http://localhost:8086/api"   <- el monolito
+status-api corre en el 8087
+```
+
+El monolito sirve desde `routes/ModulosApi/` los mismos endpoints que SIPA llama —`Roles/select`,
+`Usuarios/show`, `Permisos/store`, `Menu/showMenuExterior`, `cargue-archivos`,
+`Municipios/select`—, con su propia implementacion y el contrato viejo. Asi que **migrar
+`status-api` no afecta a SIPA**.
+
+**Entonces para que sirve este archivo:** es el inventario de lo que habra que ajustar **el dia
+que SIPA se apunte a status-api**. Ese dia, cada fila de abajo es un cambio pendiente. Mantenerlo
+al dia: cada vez que se migre un endpoint que SIPA consuma, agregar su fila.
+
+**El error que hay que no repetir:** se dio por roto a SIPA solo porque su codigo llamaba a esas
+rutas, sin mirar **a que backend apuntaba**. Antes de declarar roto a un consumidor, revisar su
+`baseURL`.
 
 ## Como cambio el contrato
 
@@ -29,7 +43,7 @@ En SIPA las llamadas usan `this.$http`, asi que `response` es la respuesta de ax
 es `response.data`. Con el contrato nuevo el arreglo queda en **`response.data.data`**. Lo limpio
 es pasar por un servicio, como se hizo en `status-frontend`.
 
-## Roto a 2026-09-21 (actualizado el mismo dia, tras el lote de Configuracion)
+## Endpoints a ajustar cuando SIPA apunte a status-api
 
 | Archivo de SIPA | Linea | Endpoint | Lee hoy | Debe leer |
 |---|---|---|---|---|
@@ -52,7 +66,7 @@ es pasar por un servicio, como se hizo en `status-frontend`.
   se va a revertir.
 - `Permisos/store` **ya no acepta `usuario`** en el cuerpo (linea 332): tambien sale del token.
 
-## Todavia sano, pero se rompera cuando se migre
+## Los que aun conservan el contrato viejo en status-api
 
 | Endpoint | Archivos de SIPA |
 |---|---|
@@ -64,10 +78,9 @@ es pasar por un servicio, como se hizo en `status-frontend`.
 `services/Funcionalidad/LogFuncionalidadService.js` hace `await axios.post(...)` y no lee la
 respuesta, asi que el envoltorio nuevo le da igual. Se deja anotado para no volver a revisarlo.
 
-**`Menu/showMenuExterior` es el login de SIPA.** Se dejo a proposito con el contrato viejo y con
-una prueba que lo fija —`PermisosTest::testShowMenuExteriorConservaLaFormaAntigua`—, porque
-migrarlo dejaria a SIPA sin acceso, no con un selector vacio. Al arreglar SIPA se migran los dos
-lados a la vez y se quita esa prueba.
+**`Menu/showMenuExterior`** se dejo con el contrato viejo y con una prueba que lo fija
+—`PermisosTest::testShowMenuExteriorConservaLaFormaAntigua`—. Esa decision se tomo creyendo que
+SIPA dependia de el; como no es asi, se puede migrar cuando convenga y quitar esa prueba.
 
 ## Al arreglarlo
 

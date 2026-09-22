@@ -1,6 +1,6 @@
 ---
 name: buscar-consumidores-de-un-endpoint
-description: "Antes de migrar un endpoint de status-api se buscan sus consumidores en los TRES repos y por fragmento de ruta, nunca por la URL completa."
+description: "Antes de migrar un endpoint: mirar a que backend apunta cada repo, y buscar por fragmento de ruta, nunca por la URL completa."
 metadata: 
   node_type: memory
   type: feedback
@@ -11,7 +11,30 @@ metadata:
 Antes de cambiar el contrato de un endpoint de `status-api` hay que encontrar **todos** sus
 consumidores. Dos reglas, y las dos se aprendieron rompiendo algo.
 
-## 1. En los TRES repos, no solo en status-frontend
+## 0. Primero: a que backend apunta ese repo
+
+Que un repo llame a `/Roles/select` **no significa que llame a esta API**. Hay que mirar su
+`baseURL` antes de darlo por consumidor:
+
+| Repo | Apunta a | Consume status-api? |
+|---|---|---|
+| `status-frontend` | status-api, puerto 8087 | **si** |
+| `sipa` | `VUE_APP_API=http://localhost:8086/api`, el monolito | **no**, hoy no |
+| monolito `status` | `MIX_PATH_API=http://localhost:8086/api`, el mismo | no, es su propio backend |
+
+El 2026-09-22 se dieron por rotas diez pantallas de SIPA por no mirar esto: su codigo llama a
+esas rutas, pero contra el monolito, que conserva el contrato viejo. El inventario sigue
+sirviendo —ver [[sipa-roto-por-la-migracion]]— pero como lista de lo que habra que ajustar el
+dia que SIPA se apunte a status-api, no como incendio.
+
+**Comando:**
+
+```bash
+grep -rn "baseURL" <repo>/src/**/*.js | head
+grep -riE "VUE_APP_API|MIX_PATH_API" <repo>/.env
+```
+
+## 1. Buscar en los repos que si apuntan aqui
 
 `status-api` **sirve a dos productos**, Status y SIPA. Sus consumidores viven en:
 
