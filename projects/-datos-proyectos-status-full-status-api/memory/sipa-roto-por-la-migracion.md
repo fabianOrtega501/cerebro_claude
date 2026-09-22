@@ -29,7 +29,7 @@ En SIPA las llamadas usan `this.$http`, asi que `response` es la respuesta de ax
 es `response.data`. Con el contrato nuevo el arreglo queda en **`response.data.data`**. Lo limpio
 es pasar por un servicio, como se hizo en `status-frontend`.
 
-## Roto a 2026-09-21
+## Roto a 2026-09-21 (actualizado el mismo dia, tras el lote de Configuracion)
 
 | Archivo de SIPA | Linea | Endpoint | Lee hoy | Debe leer |
 |---|---|---|---|---|
@@ -40,6 +40,9 @@ es pasar por un servicio, como se hizo en `status-frontend`.
 | `views/configuracion/permisos/main.vue` | 283 | `Permisos/show` | `response.data.ArrayPermisos` | `response.data.data` |
 | `views/configuracion/permisos/main.vue` | 215 y 223 | `Permisos/store` | `response.data.status == "ok"` | `=== "success"` |
 | `views/Paginas/authentication/ResetPassword.vue` | 178 | `Usuarios/updatePassword` | `response.data.status == "ok"` | `=== "success"` |
+| `views/aprovechamiento/prestadores/acciones.vue` | 781 | `Municipios/select` | `response.data` | `response.data.data` |
+| `views/aprovechamiento/actualizacionDatos/main.vue` | 258-260 | `Municipios/select` | `const { data } = ...` y luego `data.map()` | `data.data.map()` |
+| `views/configuracion/empresas/acciones.vue` | 262 | `Paises/show` | `response.data.ListaPaises` | `response.data.data` |
 
 **Dos avisos sobre las escrituras:**
 
@@ -54,11 +57,12 @@ es pasar por un servicio, como se hizo en `status-frontend`.
 | Endpoint | Archivos de SIPA |
 |---|---|
 | `Menu/showMenuExterior` | `views/Paginas/authentication/Login.vue`, `services/Configuracion/Menu/MenuService.js` |
-| `Municipios/select` | `views/aprovechamiento/actualizacionDatos/main.vue`, `views/aprovechamiento/prestadores/acciones.vue` |
-| `Paises/show` | `views/configuracion/empresas/acciones.vue` |
-| `v1/log/functionality` | `services/Funcionalidad/LogFuncionalidadService.js` |
 | `Empresas/selectEmpresas` | `views/configuracion/usuarios/acciones.vue`, `.../accionesUsuariosPrestadores.vue` |
 | `Empresas/index` | `views/configuracion/empresas/main.vue` |
+
+**`v1/log/functionality` cambio de contrato pero NO rompe SIPA.** Su
+`services/Funcionalidad/LogFuncionalidadService.js` hace `await axios.post(...)` y no lee la
+respuesta, asi que el envoltorio nuevo le da igual. Se deja anotado para no volver a revisarlo.
 
 **`Menu/showMenuExterior` es el login de SIPA.** Se dejo a proposito con el contrato viejo y con
 una prueba que lo fija —`PermisosTest::testShowMenuExteriorConservaLaFormaAntigua`—, porque
