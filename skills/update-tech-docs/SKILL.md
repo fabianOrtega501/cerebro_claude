@@ -12,6 +12,19 @@ estado, qué dispara una notificación, qué pasa si un tercero no responde.
 eso está `update-manual`. Y **no es el contrato HTTP**: eso lo publica Swagger desde las
 anotaciones del código.
 
+**La prueba para saber si un parrafo es del manual y no de aqui:** si se puede seguir con el
+aplicativo abierto y sin el codigo delante, va al manual. Si cambia cuando alguien toca el
+codigo —y no cuando rediseñan la pantalla—, va a `docs/`. El mismo flujo se documenta en los dos
+sitios y no es duplicacion: el manual cuenta *que hace el usuario*; `docs/` cuenta *que hace el
+sistema y por que*.
+
+Lo que mas se cuela por esa frontera **no son los pasos de pantalla** —esos se reconocen solos—
+sino la seccion que situa el flujo: explicar el negocio como para alguien que nunca uso el
+aplicativo. Dos frases bastan: que entidad es, donde vive y que resuelve en el sistema. Paso el
+2026-09-23 en el AIO, y venia de que el estandar del repo pedia literalmente "definicion en
+lenguaje de negocio"; **si el estandar del repo empuja a eso, el desactualizado es el estandar**,
+y se corrige ahi antes de escribir el documento.
+
 ## 1. Situarse
 
 ```bash
