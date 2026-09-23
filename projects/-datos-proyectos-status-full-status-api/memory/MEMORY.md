@@ -9,3 +9,5 @@
 - [Vigilar en cada prueba exhaustiva](vigilar-en-cada-prueba-exhaustiva.md) — el dueño de /carguepdf y los valores con que se llama GenerateSHP.
 - [SQL crudo en GestorTransaccional](sql-crudo-en-gestor-transaccional.md) — mapa de los 40 puntos: 11 cerrados, 29 sin riesgo externo.
 - [Reglas al escribir un Form Request](reglas-al-escribir-un-form-request.md) — las saca la tabla, no el controlador viejo; y boolean rompe lo que llega por FormData.
+- [Reemplazo masivo de un patrón](reemplazo-masivo-de-un-patron.md) — rompe lo que no debía tocar; revisar sitio por sitio después.
+- [Pruebas con datos que el front no envía](pruebas-con-datos-que-el-front-no-envia.md) — el payload se copia de la vista, no se inventa.

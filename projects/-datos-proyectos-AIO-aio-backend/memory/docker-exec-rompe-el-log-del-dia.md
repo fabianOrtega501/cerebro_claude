@@ -21,9 +21,19 @@ front solo muestra `Unknown error`. Paso el 2026-09-22: se perdio mas de media h
 causa en el codigo del ticket, en el merge y en las migraciones, y no estaba en ninguno.
 
 **How to apply:** usar `sail` para todo artisan. Si hace falta forzar una variable —el caso real
-fue `DB_DATABASE`, porque `phpunit.xml` fija `testing` y esa base no existe en local—, ponerla
-delante de sail (`DB_DATABASE=aio_testing ./vendor/bin/sail artisan test ...`), no recurrir a
-`docker exec -e`. Si ya ocurrio, el sintoma es 500 sin cuerpo y sin log; se arregla con
-`docker exec <contenedor> chown -R sail:sail /var/www/html/storage/logs`. Ver
+fue `DB_DATABASE`, porque `phpunit.xml` fija `testing` y esa base no existe en local—, va con
+`sail exec -e`, que la pasa por docker compose sin salirse de sail:
+
+```bash
+./vendor/bin/sail exec -e DB_DATABASE=aio_testing laravel.test php artisan test <ruta>
+```
+
+**Anteponerla al comando de sail no sirve** (`DB_DATABASE=aio_testing ./vendor/bin/sail artisan
+test`): sail es un script del host que lanza docker compose, y la variable del shell no llega al
+proceso PHP de dentro. Se comprobo el 2026-09-23: con el prefijo las 28 pruebas seguian fallando
+por `database "testing" does not exist`, y con `sail exec -e` pasaron las 28.
+
+**Si el dano ya ocurrio**, el sintoma es un 500 sin cuerpo y sin log, y se arregla devolviendo los
+logs a su dueño: `docker exec <contenedor> chown -R sail:sail /var/www/html/storage/logs`. Ver
 [[run-artisan-via-sail]], la memoria del equipo que dice que se use sail: esta le agrega por que
 `docker exec` no es un atajo inocuo.
