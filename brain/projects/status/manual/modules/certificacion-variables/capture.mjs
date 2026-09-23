@@ -52,9 +52,9 @@ try {
   await screenshot(cdp, `${salida}/tabla-rellenos-sanitarios.png`, { selector: "#captura-tabla" });
 
   await pulsar(cdp, "Agregar");
-  await esperarPopup(cdp, ".popup-variables-sd .vs-popup");
+  await esperarPopup(cdp, ".modal-variables-sd .vs-popup");
   await wait(1500);
-  await screenshot(cdp, `${salida}/registrar-variables-sd.png`, { selector: ".popup-variables-sd .vs-popup" });
+  await screenshot(cdp, `${salida}/registrar-variables-sd.png`, { selector: ".modal-variables-sd .vs-popup" });
 
   console.log("Capturas en", salida);
 } catch (error) {

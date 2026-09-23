@@ -18,8 +18,9 @@ import { setting } from "./lib/config.mjs";
 // Al agregar un modulo, importa su mappings.mjs y agregalo aqui. Es el unico punto que hay que
 // tocar fuera de la carpeta del modulo.
 import { MAPPINGS as certificacionVariables } from "./modules/certificacion-variables/mappings.mjs";
+import { MAPPINGS as gestionTramites } from "./modules/gestion-tramites/mappings.mjs";
 
-const MAPPINGS_BY_VIEW = { ...certificacionVariables };
+const MAPPINGS_BY_VIEW = { ...certificacionVariables, ...gestionTramites };
 
 const args = process.argv.slice(2);
 const arg = (nombre, pordefecto) => {

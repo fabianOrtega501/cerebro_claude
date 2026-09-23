@@ -98,6 +98,7 @@
   },
   "model": "opus[1m]",
   "env": {
-    "STATUS_MANUAL_WEB": "/datos/proyectos/manua-web"
+    "STATUS_MANUAL_WEB": "/datos/proyectos/manua-web",
+    "STATUS_DB_CONTAINER": "postgres_postgis_17"
   }
 }

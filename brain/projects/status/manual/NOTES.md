@@ -9,6 +9,7 @@ fallida que ya no hace falta repetir.
 |---|---|---|
 | `STATUS_MANUAL_WEB` | `env` de `~/.claude/settings.json` | Ruta al repo `manua-web`. Va en el cerebro, no en el repo de trabajo: ahi las rutas absolutas no tienen nada que hacer |
 | `STATUS_TEST_EMAIL` / `STATUS_TEST_PASSWORD` | `~/.claude/secrets.env` | Usuario de pruebas |
+| `STATUS_DB_CONTAINER` | `env` de `~/.claude/settings.json` | Contenedor de Postgres (`postgres_postgis_17`). Sin el, `lib/seed.mjs` falla con `No such container: undefined` |
 
 La app se sirve desde el contenedor `status` en `http://localhost:8086` (`APP_PORT` del `.env`).
 **No usar el puerto 3000 de BrowserSync**: es otro origen y las peticiones con `Authorization`
@@ -57,3 +58,24 @@ su selector de formularios sale vacio aunque el usuario sea superusuario.
 | Modulo | Que captura |
 |---|---|
 | `certificacion-variables` | Formulario *Registrar Variables SD* y tabla de informacion de rellenos sanitarios |
+| `gestion-tramites` | Listado, ventana de creacion, captura del formulario, formatos afectados, edicion y seguimiento |
+
+## Antes de capturar
+
+- **La app tiene que estar arriba**: `docker compose up -d` en el repo y esperar a que
+  `http://localhost:8086` devuelva 200. Tarda unos 30 segundos porque el entrypoint espera a
+  Postgres y corre migraciones.
+- **Recompilar el front si hay cambios de estilos sin desplegar**: `public/css/app.css` esta
+  versionado, asi que un `git checkout` de ese archivo —lo normal antes de commitear— deja el CSS
+  compilado sin los cambios de la rama. La captura saldria con los estilos viejos.
+
+## Trampas de los popups
+
+- **Se cierran de adentro hacia afuera.** El popup hijo (el de capturar un formulario) queda por
+  encima del padre; si se deja abierto, tapa todo lo que se capture despues y la captura sale con
+  las dos ventanas superpuestas.
+- **El alto de la ventana decide si el modal cabe.** Con 950 px de alto, el modal de creacion se
+  corta y el boton *Guardar* queda fuera. Con 1200 entra completo.
+- **La clase del popup de variables SD cambio** de `popup-variables-sd` a `modal-variables-sd` en
+  el ticket 10919. El flujo de `certificacion-variables` quedo apuntando a la vieja y se corrigio
+  el 2026-09-23.

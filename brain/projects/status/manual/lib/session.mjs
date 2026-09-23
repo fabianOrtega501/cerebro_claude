@@ -263,3 +263,53 @@ async function esperarSesion(cdp, timeout = 60000) {
 
   return false;
 }
+
+/**
+ * Espera a que un texto aparezca en la pantalla.
+ *
+ * @param {object} cdp Conexion CDP
+ * @param {string} texto Texto a esperar
+ * @param {number} [timeout] Milisegundos
+ * @returns {Promise<void>}
+ */
+export async function esperarTexto(cdp, texto, timeout = 60000) {
+  const limite = Date.now() + timeout;
+
+  while (Date.now() < limite) {
+    if (await evaluate(cdp, `document.body.innerText.includes(${JSON.stringify(texto)})`)) return;
+    await wait(500);
+  }
+
+  throw new Error(`No aparecio "${texto}" en la pantalla.`);
+}
+
+/**
+ * Espera a que un popup de vuesax sea visible, midiendo su caja.
+ *
+ * `waitForSelector` no sirve con los popups: al ser `position: fixed` su `offsetParent` es
+ * siempre null y la espera se agota con el modal abierto y a la vista.
+ *
+ * @param {object} cdp Conexion CDP
+ * @param {string} selector Selector del popup
+ * @param {number} [timeout] Milisegundos
+ * @returns {Promise<void>}
+ */
+export async function esperarPopup(cdp, selector, timeout = 30000) {
+  const limite = Date.now() + timeout;
+
+  while (Date.now() < limite) {
+    const visible = await evaluate(
+      cdp,
+      `(() => {
+        const el = document.querySelector(${JSON.stringify(selector)});
+        if (!el) return false;
+        const caja = el.getBoundingClientRect();
+        return caja.width > 100 && caja.height > 100;
+      })()`
+    );
+    if (visible) return;
+    await wait(400);
+  }
+
+  throw new Error(`El popup "${selector}" no se abrio.`);
+}
