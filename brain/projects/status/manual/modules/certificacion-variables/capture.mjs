@@ -8,7 +8,7 @@
  */
 
 import { mkdirSync } from "node:fs";
-import { openSession, selectOption } from "../../lib/session.mjs";
+import { openSession, selectOption, DEFAULT_BASE } from "../../lib/session.mjs";
 import { evaluate, closeBrowser, wait, screenshot, waitForSelector } from "../../lib/browser.mjs";
 
 const args = process.argv.slice(2);
@@ -19,7 +19,7 @@ const opcion = (nombre, pordefecto) => {
 
 const salida = opcion("salida");
 const empresa = opcion("empresa", "SER AMBIENTAL SAS ESP.");
-const base = opcion("base", "http://localhost:8086");
+const base = opcion("base", DEFAULT_BASE);
 
 if (!salida) {
   console.error("Falta --salida <carpeta>.");

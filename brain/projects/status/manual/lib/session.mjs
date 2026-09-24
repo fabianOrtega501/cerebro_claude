@@ -21,8 +21,11 @@ import { credentialsFor } from "../../../../lib/credentials.mjs";
 /** Tamano de ventana con el que se toman las capturas del manual. */
 export const VIEWPORT = { width: 1486, height: 795 };
 
-/** Base por defecto: el contenedor de Status publica Apache en el puerto del `.env`. */
-export const DEFAULT_BASE = "http://localhost:8086";
+/**
+ * Base por defecto: `status-frontend`, la aplicacion separada del monolito por el 7433.
+ * El monolito sigue vivo en el 8086; capturar contra el documentaria la version vieja.
+ */
+export const DEFAULT_BASE = "http://localhost:8081";
 
 /**
  * Credenciales del usuario de pruebas de Status.
@@ -68,7 +71,7 @@ export async function readCaptcha(cdp) {
   return evaluate(
     cdp,
     `(() => {
-      const cont = document.querySelector('.captcha-container');
+      const cont = document.querySelector('.captcha');
       return cont && cont.__vue__ ? cont.__vue__.generatedCaptcha : null;
     })()`
   );
@@ -205,11 +208,11 @@ export async function openSession({
     throw new Error(`No se pudo leer el captcha (leido: "${codigo}"). Pantalla:\n${await describeScreen(cdp)}`);
   }
 
-  await type(cdp, ".captcha-container input", String(codigo));
+  await type(cdp, ".captcha input", String(codigo));
 
-  // El primer boton del bloque es el de refrescar el captcha: pulsarlo genera un codigo nuevo
-  // y deja invalido el que se acaba de escribir. Hay que ir por texto, no por posicion.
-  await pulsarBoton(cdp, "Iniciar", ".captcha-container");
+  // Dentro del bloque hay dos botones sin texto —regenerar el codigo y escucharlo en voz alta—
+  // y pulsar el primero invalida el captcha que se acaba de escribir. Hay que ir por texto.
+  await pulsarBoton(cdp, "Iniciar", ".captcha");
 
   // Paso dos: el mismo formulario muestra el selector de empresa. Sin empresa el backend no
   // devuelve el menu, y toda ruta interna rebota al home.

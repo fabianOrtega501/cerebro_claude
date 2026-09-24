@@ -16,6 +16,7 @@ import {
   esperarTexto,
   esperarPopup,
   describeScreen,
+  DEFAULT_BASE,
 } from "../../lib/session.mjs";
 import { evaluate, closeBrowser, wait, screenshot } from "../../lib/browser.mjs";
 
@@ -27,7 +28,7 @@ const opcion = (nombre, pordefecto) => {
 
 const salida = opcion("salida");
 const empresa = opcion("empresa", "SERVICIOS AMBIENTALES S.A.S E.S.P.");
-const base = opcion("base", "http://localhost:8086");
+const base = opcion("base", DEFAULT_BASE);
 const radicado = opcion("radicado", "SUI-2026-0458");
 
 if (!salida) {

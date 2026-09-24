@@ -19,8 +19,9 @@ import { setting } from "./lib/config.mjs";
 // tocar fuera de la carpeta del modulo.
 import { MAPPINGS as certificacionVariables } from "./modules/certificacion-variables/mappings.mjs";
 import { MAPPINGS as gestionTramites } from "./modules/gestion-tramites/mappings.mjs";
+import { MAPPINGS as ingreso } from "./modules/ingreso/mappings.mjs";
 
-const MAPPINGS_BY_VIEW = { ...certificacionVariables, ...gestionTramites };
+const MAPPINGS_BY_VIEW = { ...certificacionVariables, ...gestionTramites, ...ingreso };
 
 const args = process.argv.slice(2);
 const arg = (nombre, pordefecto) => {

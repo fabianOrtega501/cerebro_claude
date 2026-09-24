@@ -22,9 +22,14 @@ export const PROFILE = {
 
   session: "./lib/session.mjs",
 
-  /** Repo del front y carpetas cuyo cambio percibe el usuario final. */
-  uiRepo: "/datos/proyectos/status",
-  uiGlobs: ["resources/js/src/views"],
+  /**
+   * Repo del front y carpetas cuyo cambio percibe el usuario final.
+   *
+   * Es `status-frontend`, no el monolito: el 7433 separo el front, y el monolito
+   * (`/datos/proyectos/status`) quedo como la version anterior.
+   */
+  uiRepo: "/datos/proyectos/status-full/status-frontend",
+  uiGlobs: ["src/views"],
 
   /** Base local para los datos de demostracion de `lib/seed.mjs`. */
   db: {

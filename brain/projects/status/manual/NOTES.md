@@ -11,9 +11,25 @@ fallida que ya no hace falta repetir.
 | `STATUS_TEST_EMAIL` / `STATUS_TEST_PASSWORD` | `~/.claude/secrets.env` | Usuario de pruebas |
 | `STATUS_DB_CONTAINER` | `env` de `~/.claude/settings.json` | Contenedor de Postgres (`postgres_postgis_17`). Sin el, `lib/seed.mjs` falla con `No such container: undefined` |
 
-La app se sirve desde el contenedor `status` en `http://localhost:8086` (`APP_PORT` del `.env`).
-**No usar el puerto 3000 de BrowserSync**: es otro origen y las peticiones con `Authorization`
-disparan preflight, que no admite las redirecciones 301 que devuelve Apache.
+## Cual de las dos aplicaciones se captura
+
+**Conviven dos Status y no son la misma aplicacion.** El ticket 7433 separo el backend y el
+frontend del monolito, asi que hoy hay:
+
+| | Donde | Que es |
+|---|---|---|
+| **Monolito** | `http://localhost:8086`, contenedor `status` | La version anterior, la que esta en produccion hoy |
+| **Separado** | `http://localhost:8081` (front) + `http://localhost:8087` (API) | Lo que dejo el 7433 |
+
+**El flujo apunta al separado**, que es lo que se va a desplegar. Capturar contra el 8086
+documenta la version vieja: se distingue a simple vista porque el captcha del monolito no tiene
+tarjeta ni boton de escuchar el codigo.
+
+Lo que el usuario final percibe distinto entre los dos: el captcha rediseñado, el boton de tema
+claro/oscuro en la barra superior, y que con la clave vencida ya **no** se puede entrar.
+
+**No usar el puerto 3000 de BrowserSync** del monolito: es otro origen y las peticiones con
+`Authorization` disparan preflight, que no admite las redirecciones 301 que devuelve Apache.
 
 ## El login tiene dos pasos y un captcha
 
@@ -24,15 +40,30 @@ disparan preflight, que no admite las redirecciones 301 que devuelve Apache.
 Tres trampas, todas pagadas:
 
 - **El codigo del captcha no se lee de la imagen**: esta en `generatedCaptcha` del componente,
-  accesible por `document.querySelector('.captcha-container').__vue__`.
-- **El primer boton dentro de `.captcha-container` es el de refrescar** (`sync`). Pulsarlo
-  regenera el captcha y deja invalido el que se acaba de escribir. Hay que ir por texto.
+  accesible por `document.querySelector('.captcha').__vue__`. **La clase cambio** de
+  `.captcha-container` a `.captcha` con el rediseño del 7433.
+- **Los dos botones del bloque no tienen texto**: uno regenera el codigo y el otro lo lee en voz
+  alta. Pulsar el de regenerar invalida el captcha que se acaba de escribir. Hay que ir por
+  texto al boton de *Iniciar*, nunca por posicion.
+- **El boton de voz no siempre existe.** El componente lo oculta si el navegador no publica
+  voces, que es lo normal en headless. No dar por hecho que hay dos botones.
 - **`focus()` no abre los `v-select`**: en headless la ventana no tiene foco del sistema y el
   evento no se emite. Hay que lanzar `dispatchEvent(new Event('focus'))` a mano. Vale para
   cualquier vue-select de la app, no solo el del login.
 
-Tras entrar, el usuario de pruebas puede caer en `/pages/ResetPassword` si tiene la contrasena
-marcada para renovar; la sesion sirve igual y se puede navegar a cualquier ruta.
+> **La clave vencida ahora bloquea de verdad.** Antes, si el usuario de pruebas tenia la
+> contrasena marcada para renovar, caia en `/pages/ResetPassword` pero la sesion servia igual y
+> se podia navegar a cualquier ruta. Desde el 7433 **no**: el login emite un token acotado a la
+> habilidad `clave:renovar` y un middleware rechaza todo lo demas con 403, asi que el flujo se
+> queda encerrado en esa pantalla y las capturas salen todas iguales.
+>
+> Se comprueba mirando `fecharenovacion` del usuario de pruebas: si esta en el pasado, hay que
+> ponerla adelante **antes** de capturar y devolverla despues.
+>
+> ```bash
+> cd /datos/proyectos/status-full/status-api
+> ./vendor/bin/sail artisan tinker --execute="DB::table('usuarios')->where('id',100)->update(['fecharenovacion'=>'2027-12-31']);"
+> ```
 
 ## Datos
 
@@ -62,12 +93,23 @@ su selector de formularios sale vacio aunque el usuario sea superusuario.
 
 ## Antes de capturar
 
-- **La app tiene que estar arriba**: `docker compose up -d` en el repo y esperar a que
-  `http://localhost:8086` devuelva 200. Tarda unos 30 segundos porque el entrypoint espera a
-  Postgres y corre migraciones.
-- **Recompilar el front si hay cambios de estilos sin desplegar**: `public/css/app.css` esta
-  versionado, asi que un `git checkout` de ese archivo —lo normal antes de commitear— deja el CSS
-  compilado sin los cambios de la rama. La captura saldria con los estilos viejos.
+- **Las dos piezas tienen que estar arriba**: la API (`./vendor/bin/sail up -d` en `status-api`,
+  responde en el 8087) y el front en el 8081. La API tarda unos segundos en quedar lista.
+- **El front hay que recompilarlo si hay cambios sin desplegar**, y **el build exige Node 14**
+  porque `node-sass 4` no compila con versiones nuevas:
+
+  ```bash
+  cd /datos/proyectos/status-full/status-frontend
+  export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"; nvm use 14
+  npm run build
+  ```
+
+  Con el Node del sistema falla con *"Node Sass does not yet support your current environment"*.
+  El build completo tarda cerca de 40 minutos: conviene lanzarlo en segundo plano.
+- **Las capturas del manual son en tema claro.** La aplicacion ahora recuerda el tema en
+  `localStorage` bajo la clave `temaStatus`, asi que una corrida anterior que lo dejo en oscuro
+  se lo pasa a la siguiente. Forzarlo antes de capturar:
+  `localStorage.setItem('temaStatus', 'light')`.
 
 ## Trampas de los popups
 
