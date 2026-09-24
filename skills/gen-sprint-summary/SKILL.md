@@ -163,6 +163,24 @@ Formato del JSON:
 `project` es la etiqueta corta que se ve en el slide (`AIO`, `Epsilon`, `Status`), no la clave de
 `projects.json`. El orden de los desarrollos en el arreglo es el orden en la diapositiva.
 
+**Slides de lista.** Cuando un campo remite a algo que no cabe en una caja —los pendientes de una
+migración, por ejemplo—, va en un slide aparte con `extraSlides`. Cada uno sale como
+`Retrospectiva_Sprint_<n>_2.png`, `_3`…, con el mismo diseño y la medición de letra del principal:
+
+```json
+"extraSlides": [
+  { "title": "Status API — pendientes y mejoras futuras",
+    "groups": [
+      { "name": "Prioridad alta",
+        "items": [{ "title": "Permisos por empresa", "issue": "…", "action": "…" }] }
+    ] }
+]
+```
+
+Cada grupo es una sección de color con sus cajas en tres columnas; `issue` se pinta como *Qué pasa*
+y `action` como *Qué hacer*. Si la caja habla de archivos, variables, vistas o pantallas, **se
+nombran**: en la reunión van a preguntar cuáles son.
+
 El renderizador **encoge la letra solo, midiendo en la página**, hasta que todo quepa; si avisa de
 que ni al mínimo cabe, hay texto cortado y toca quitar desarrollos o acortar frases. No ignorar ese
 aviso: el recorte de CSS no se ve hasta que alguien lee el slide proyectado.
@@ -180,6 +198,7 @@ importa HTML, por eso se entrega el PNG. Corregir una frase es editar el JSON y 
 | `Retrospectiva_Sprint_<n>.json` | La entrada del renderizador | No |
 | `Retrospectiva_Sprint_<n>.html` | La maqueta intermedia | No |
 | `Retrospectiva_Sprint_<n>.png` | Lo que se sube a Slides | No |
+| `Retrospectiva_Sprint_<n>_2.png`, … | Los slides de `extraSlides`, con su `.html` | No |
 
 El PNG llega a la presentación con el nombre puesto, sin depender de la carpeta que lo ubicaba.
 

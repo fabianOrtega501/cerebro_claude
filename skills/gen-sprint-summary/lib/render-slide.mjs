@@ -7,7 +7,8 @@
  *   node render-slide.mjs --entrada d.json --sprint 18 --salida <otro-dir>
  *   node render-slide.mjs --entrada d.json --sprint 18 --solo-html    sin abrir Chrome
  *
- * Sin `--salida` escribe en `~/.claude/brain/sprints/Sprint_<n>`.
+ * Sin `--salida` escribe en `~/.claude/brain/sprints/Sprint_<n>`. Cada elemento de `extraSlides`
+ * sale como un slide de lista aparte: `Retrospectiva_Sprint_<n>_2.png`, `_3`, …
  *
  * El JSON de entrada:
  *   {
@@ -17,6 +18,10 @@
  *     "developments": [
  *       { "project": "AIO", "ticket": "9357", "problem": "...", "value": "...",
  *         "decision": "...", "learning": "...", "improvement": "..." }
+ *     ],
+ *     "extraSlides": [
+ *       { "title": "Status API — pendientes",
+ *         "groups": [{ "name": "Prioridad alta", "items": [{ "title": "...", "issue": "...", "action": "..." }] }] }
  *     ]
  *   }
  */
@@ -29,6 +34,11 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 
 /** Colores de cada seccion, en el orden en que aparecen los proyectos. */
 const ACCENTS = ["#2f5fd0", "#2f8f4e", "#b4600f", "#7a3fb0", "#0f7f8f"];
+
+const LIST_FIELDS = [
+	["issue", "Qué pasa"],
+	["action", "Qué hacer"],
+];
 
 const FIELDS = [
 	["problem", "🛠️", "Problema abordado"],
@@ -78,27 +88,66 @@ function cardHtml(dev, showTickets) {
 	return `\t\t\t<div class="card">\n\t\t\t\t${ticket}${lines}\n\t\t\t</div>`;
 }
 
-/** HTML completo del slide, ya con la plantilla rellenada. */
-function buildHtml({ author = "Fabian", showTickets = false, developments = [] }) {
-	const names = [...new Set(developments.map(d => d.project ?? "Otros"))];
-	const grouped = names.map(name => ({ name, items: developments.filter(d => (d.project ?? "Otros") === name) }));
-	const { cols, scale, warn } = layoutFor(Math.max(...grouped.map(g => g.items.length), 1), developments.length);
+/** HTML de una caja de un slide de lista: titulo, que pasa y que hacer. */
+function itemCardHtml(item) {
+	const lines = LIST_FIELDS
+		.filter(([key]) => item[key])
+		.map(([key, label]) => `<div class="line"><b>${label}:</b> ${escapeHtml(item[key])}</div>`)
+		.join("\n\t\t\t\t");
 
-	const sections = grouped.map((group, index) => {
+	return `\t\t\t<div class="card">\n\t\t\t\t<div class="item-title">${escapeHtml(item.title)}</div>\n\t\t\t\t${lines}\n\t\t\t</div>`;
+}
+
+/**
+ * Secciones de color, una por grupo, con sus cajas ya armadas por `toCard`.
+ * @param {{name: string, items: object[]}[]} groups - Grupos en el orden del slide
+ * @param {number} cols - Columnas maximas por seccion
+ * @param {(item: object) => string} toCard - Arma el HTML de una caja
+ * @returns {string}
+ */
+function sectionsHtml(groups, cols, toCard) {
+	return groups.map((group, index) => {
 		const accent = ACCENTS[index % ACCENTS.length];
-		const cards = group.items.map(dev => cardHtml(dev, showTickets)).join("\n");
+		const cards = group.items.map(toCard).join("\n");
 
 		return `\t\t<div class="section" style="--accent: ${accent}; --cols: ${Math.min(cols, group.items.length)}">\n`
 			+ `\t\t\t<div class="section-name">${escapeHtml(group.name)}</div>\n`
 			+ `\t\t\t<div class="cards">\n${cards}\n\t\t\t</div>\n\t\t</div>`;
 	}).join("\n");
+}
 
-	const html = readFileSync(join(HERE, "slide-template.html"), "utf8")
+/**
+ * Rellena la plantilla; el logo va incrustado para que el HTML se vea desde cualquier carpeta.
+ * @param {{author: string, subtitle?: string, scale: number, sections: string}} parts - Contenido del slide
+ * @returns {string}
+ */
+function fillTemplate({ author, subtitle, scale, sections }) {
+	const logo = `data:image/png;base64,${readFileSync(join(HERE, "assets", "corner-logo.png")).toString("base64")}`;
+
+	return readFileSync(join(HERE, "slide-template.html"), "utf8")
+		.replace("{{LOGO}}", logo)
 		.replace("{{AUTHOR}}", escapeHtml(author))
+		.replace("{{SUBTITLE}}", subtitle ? `\n\t\t<div class="subtitle">${escapeHtml(subtitle)}</div>` : "")
 		.replace("{{SCALE}}", String(scale))
 		.replace("{{SECTIONS}}", `\n${sections}\n\t\t`);
+}
 
-	return { html, warn, scale };
+/** HTML completo del slide de desarrollos, ya con la plantilla rellenada. */
+function buildHtml({ author = "Fabian", showTickets = false, developments = [] }) {
+	const names = [...new Set(developments.map(d => d.project ?? "Otros"))];
+	const grouped = names.map(name => ({ name, items: developments.filter(d => (d.project ?? "Otros") === name) }));
+	const { cols, scale, warn } = layoutFor(Math.max(...grouped.map(g => g.items.length), 1), developments.length);
+	const sections = sectionsHtml(grouped, cols, dev => cardHtml(dev, showTickets));
+
+	return { html: fillTemplate({ author, scale, sections }), warn, scale };
+}
+
+/** HTML de un slide de lista (`extraSlides`): grupos en tres columnas; la letra la ajusta la medicion. */
+function buildListHtml(slide, author = "Fabian") {
+	const groups = slide.groups ?? [];
+	const sections = sectionsHtml(groups, 3, itemCardHtml);
+
+	return { html: fillTemplate({ author, subtitle: slide.title, scale: 1, sections }), warn: null, scale: 1 };
 }
 
 /**
@@ -125,8 +174,12 @@ async function fitToSlide(cdp, from) {
 	return { scale: 0.5, fits: false };
 }
 
-/** Captura el HTML a PNG de 1920x1080 con el Chrome que ya maneja `update-manual`. */
-async function renderPng(htmlPath, pngPath, scale) {
+/**
+ * Captura cada HTML a PNG de 1920x1080 con un solo Chrome, el que ya maneja `update-manual`.
+ * @param {{htmlPath: string, pngPath: string, scale: number}[]} jobs - Slides a capturar
+ * @returns {Promise<{path: string, scale: number, fits: boolean}[]>} Uno por slide, en orden
+ */
+async function renderPngs(jobs) {
 	const { launchChrome, connectPage, setViewport, screenshot, closeBrowser, waitUntil } =
 		await import("../../update-manual/lib/browser.mjs");
 
@@ -137,23 +190,30 @@ async function renderPng(htmlPath, pngPath, scale) {
 		chrome = await launchChrome({ port: 9333 });
 		cdp = await connectPage(chrome.port);
 		await setViewport(cdp, { width: 1920, height: 1080 });
-		await cdp.send("Page.navigate", { url: pathToFileURL(htmlPath).href });
-		// Sin esperar a que las fuentes esten listas la captura sale con la letra de reserva.
-		await waitUntil(cdp, "document.readyState === 'complete'", { what: "la carga del slide" });
-		await new Promise(r => setTimeout(r, 400));
 
-		const fit = await fitToSlide(cdp, scale);
+		const results = [];
 
-		if (!fit.fits) {
-			console.warn("Aviso: ni encogiendo la letra al mínimo cabe todo; hay texto cortado. Quita desarrollos o acorta las frases.");
+		for (const { htmlPath, pngPath, scale } of jobs) {
+			await cdp.send("Page.navigate", { url: pathToFileURL(htmlPath).href });
+			// Sin esperar a que las fuentes esten listas la captura sale con la letra de reserva.
+			await waitUntil(cdp, "document.readyState === 'complete'", { what: "la carga del slide" });
+			await new Promise(r => setTimeout(r, 400));
+
+			const fit = await fitToSlide(cdp, scale);
+			const name = pngPath.split("/").pop();
+
+			if (!fit.fits) {
+				console.warn(`Aviso (${name}): ni encogiendo la letra al mínimo cabe todo; hay texto cortado. Quita cajas o acorta las frases.`);
+			}
+			else if (fit.scale < scale) {
+				console.log(`${name}: la letra se encogió a ${fit.scale} para que cupiera todo.`);
+			}
+
+			await screenshot(cdp, pngPath, { clip: { x: 0, y: 0, width: 1920, height: 1080 } });
+			results.push({ path: pngPath, ...fit });
 		}
-		else if (fit.scale < scale) {
-			console.log(`La letra se encogió a ${fit.scale} para que cupiera todo.`);
-		}
 
-		await screenshot(cdp, pngPath, { clip: { x: 0, y: 0, width: 1920, height: 1080 } });
-
-		return { path: pngPath, ...fit };
+		return results;
 	}
 	finally {
 		await closeBrowser(cdp, chrome);
@@ -206,25 +266,39 @@ async function main() {
 
 	if (!/^\d+$/.test(sprint)) console.warn(`Aviso: "${sprint}" no es un número de sprint; se usa igual en el nombre.`);
 
-	const { html, warn, scale } = buildHtml(data);
 	const outDir = resolve((options.salida ?? join(process.env.HOME, ".claude", "brain", "sprints", `Sprint_${sprint}`)).replace(/^~/, process.env.HOME));
-	const htmlPath = join(outDir, `Retrospectiva_Sprint_${sprint}.html`);
+	const pages = [
+		buildHtml(data),
+		...(data.extraSlides ?? []).map(slide => buildListHtml(slide, data.author)),
+	].map((page, index) => {
+		const base = `Retrospectiva_Sprint_${sprint}${index === 0 ? "" : `_${index + 1}`}`;
+
+		return { ...page, htmlPath: join(outDir, `${base}.html`), pngPath: join(outDir, `${base}.png`) };
+	});
 
 	mkdirSync(outDir, { recursive: true });
-	writeFileSync(htmlPath, html);
-	console.log(`HTML: ${htmlPath}`);
 
-	if (warn) console.warn(`Aviso: ${warn}`);
+	for (const page of pages) {
+		writeFileSync(page.htmlPath, page.html);
+		console.log(`HTML: ${page.htmlPath}`);
+
+		if (page.warn) console.warn(`Aviso: ${page.warn}`);
+	}
 
 	if (options.soloHtml) return;
 
-	const png = await renderPng(htmlPath, join(outDir, `Retrospectiva_Sprint_${sprint}.png`), scale);
+	const pngs = await renderPngs(pages);
 
-	// El HTML se reescribe con la escala que de verdad se uso, para que abrirlo a mano muestre lo
-	// mismo que el PNG.
-	if (png.scale !== scale) writeFileSync(htmlPath, html.replace(`--scale: ${scale};`, `--scale: ${png.scale};`));
+	pngs.forEach((png, index) => {
+		const { html, htmlPath, scale } = pages[index];
 
-	console.log(`PNG:  ${png.path}`);
+		// El HTML se reescribe con la escala que de verdad se uso, para que abrirlo a mano muestre lo
+		// mismo que el PNG.
+		if (png.scale !== scale) writeFileSync(htmlPath, html.replace(`--scale: ${scale};`, `--scale: ${png.scale};`));
+
+		console.log(`PNG:  ${png.path}`);
+	});
+
 	console.log("En Google Slides: Insertar > Imagen > Subir de tu computadora.");
 }
 
