@@ -25,6 +25,17 @@ export const MAPPINGS = {
 	},
 
 	/*
+	 * Cierre masivo: el botón de la barra, el panel con los candidatos, el bloque de tripulación
+	 * que se despliega por despacho y el modal que pide la fecha del lote.
+	 */
+	"massive-closure": {
+		"cierre_masivo_boton.png": "Operaciones/Despachos/cierre_masivo_01.png",
+		"cierre_masivo_pantalla.png": "Operaciones/Despachos/cierre_masivo_02.png",
+		"cierre_masivo_tripulacion.png": "Operaciones/Despachos/cierre_masivo_04.png",
+		"cierre_masivo_modal.png": "Operaciones/Despachos/cierre_masivo_03.png",
+	},
+
+	/*
 	 * Log de Despacho. `despachos_08.png` ya está publicada: conserva el nombre numerado con el
 	 * que existe desde el principio.
 	 */

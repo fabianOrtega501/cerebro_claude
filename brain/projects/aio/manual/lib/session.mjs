@@ -348,7 +348,8 @@ export async function settleRequests(cdp, action, { what = null, timeout = 45000
  * pasos después. Cuando el escenario exige valores determinados, se eligen por nombre.
  *
  * La posición se mide en el momento de clickear: en un múltiple, cada opción marcada agrega su
- * chip, el campo crece y el menú se recoloca.
+ * chip, el campo crece y el menú se recoloca. La opción se desplaza a la vista y se confirma con
+ * `elementFromPoint` que el punto es suyo: fuera del scroll del menú, el clic caía en el diálogo.
  *
  * @param {object} cdp - Conexión devuelta por `connectPage`
  * @param {string} inputSelector - Selector del input; usar `appField(id)`
@@ -356,28 +357,44 @@ export async function settleRequests(cdp, action, { what = null, timeout = 45000
  * @param {object} [options]
  * @param {boolean} [options.closeAfter=true] - Cierra el menú al terminar. En un múltiple el
  *        `.v-list` abierto tapa los botones del diálogo, así que conviene dejarlo en `true`
+ * @param {number} [options.attempts=8] - Cuántas veces remedir si el punto todavía no es del menú
  * @returns {Promise<void>}
- * @throws {Error} Si la opción no está; el mensaje lista las disponibles, que es lo que hace falta
- *         para corregir el parámetro sin volver a correr a ciegas
+ * @throws {Error} Si la opción no está —el mensaje lista las disponibles— o si quedó tapada
  */
-export async function pickOptionByName(cdp, inputSelector, name, { closeAfter = true } = {}) {
+export async function pickOptionByName(cdp, inputSelector, name, { closeAfter = true, attempts = 8 } = {}) {
 	const options = await openSelect(cdp, inputSelector);
 
-	const point = await evaluate(
-		cdp,
-		`(() => { const item = [...document.querySelectorAll('.v-overlay--active .v-list-item')]
+	/** Desplaza la opción a la vista y devuelve su punto, con si ese punto ya le pertenece. */
+	const optionPoint = () =>
+		evaluate(
+			cdp,
+			`(() => { const item = [...document.querySelectorAll('.v-overlay--active .v-list-item')]
         .find(e => e.textContent.trim() === ${JSON.stringify(name)});
       if (!item) return null;
+      item.scrollIntoView({ block: 'center' });
       const r = item.getBoundingClientRect();
       if (!r.width || !r.height) return null;
-      return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; })()`,
-	);
+      const x = Math.round(r.left + r.width / 2), y = Math.round(r.top + r.height / 2);
+      const top = document.elementFromPoint(x, y);
+      return { x, y, onTop: !!(top && item.contains(top)) }; })()`,
+		);
+
+	let point = await optionPoint();
 
 	if (!point) {
 		throw new Error(
 			`La opción "${name}" no está en ${inputSelector}. Disponibles: ${JSON.stringify(options.slice(0, 20))}`,
 		);
 	}
+
+	// Recién abierto o recién desplazado, el menú todavía se mueve: se remide hasta que se asiente.
+	for (let attempt = 1; attempt < attempts && !point.onTop; attempt++) {
+		await wait(250);
+		point = (await optionPoint()) ?? point;
+	}
+
+	if (!point.onTop)
+		throw new Error(`La opción "${name}" de ${inputSelector} quedó tapada: el click no llegaría al menú`);
 
 	await clickAt(cdp, point.x, point.y);
 	await wait(500);

@@ -22,6 +22,7 @@ import { MAPPINGS as avl } from "./modules/avl/mappings.mjs";
 import { MAPPINGS as avlRouteSearch } from "./modules/avl/mappings-route-search.mjs";
 import { MAPPINGS as maintenanceLogbook } from "./modules/maintenance/logbook/mappings.mjs";
 import { MAPPINGS as maintenanceSystems } from "./modules/maintenance/systems/mappings.mjs";
+import { MAPPINGS as maintenanceWorkOrders } from "./modules/maintenance/work-orders/mappings.mjs";
 import { MAPPINGS as mobileVisits } from "./modules/mobile/visits/mappings.mjs";
 import { MAPPINGS as operationsDispatches } from "./modules/operations/dispatches/mappings.mjs";
 import { MAPPINGS as operationsRoutes } from "./modules/operations/routes/mappings.mjs";
@@ -30,7 +31,7 @@ import { MAPPINGS as respelClients } from "./modules/respel/clients/mappings.mjs
 import { MAPPINGS as respelClientLoyalties } from "./modules/respel/client-loyalties/mappings.mjs";
 import { MAPPINGS as publicCitizenPortal } from "./modules/public/citizen-portal/mappings.mjs";
 
-const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceLogbook, ...maintenanceSystems, ...mobileVisits, ...operationsDispatches, ...operationsRoutes, ...operationsTraining, ...respelClients, ...respelClientLoyalties, ...publicCitizenPortal };
+const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsRoutes, ...operationsTraining, ...respelClients, ...respelClientLoyalties, ...publicCitizenPortal };
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {

@@ -119,6 +119,13 @@ Reglas duras, porque el destino es una caja de una diapositiva:
   ticket —lo que costó, lo que se rehízo, lo que quedó pendiente—, y se presentan marcados como
   *propuesta*. Si no hay base real para uno, **decirlo y preguntar**, en vez de rellenar con una
   frase de manual.
+  - **Aprendizaje clave**: una lección técnica que sirva más allá del ticket, dicha como principio
+    (*"una arquitectura modular hace más fácil migrar o actualizar un sistema"*). **Nunca** empieza
+    con "aprendí" ni con un sinónimo ("descubrí", "entendí", "comprendí"). Un aprendizaje básico o
+    de proceso personal no sirve.
+  - **Mejora futura**: lo que falta corregir o mejorar en el código o el módulo que se tocó, no un
+    hábito de trabajo. Si el repo tiene un documento de pendientes o deuda técnica, sale de ahí, y
+    si son muchos puntos van en un slide aparte (ver `extraSlides` en la Fase 5).
 - **Español de Colombia, de presentación**, según la regla del `CLAUDE.md` del cerebro: pretérito
   simple (*se implementó*, no *se ha implementado*), palabras de aquí, y anglicismo solo si el
   equipo ya lo usa. Lo propio del slide: **lo que el usuario ve en pantalla se nombra como está en
