@@ -1,4 +1,9 @@
 {
+  "env": {
+    "STATUS_MANUAL_WEB": "/datos/proyectos/manua-web",
+    "STATUS_DB_CONTAINER": "postgres_postgis_17"
+  },
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "Bash(docker compose *)",
@@ -23,8 +28,7 @@
       "/datos/proyectos/imagenes_docker"
     ]
   },
-  "effortLevel": "medium",
-  "includeCoAuthoredBy": false,
+  "model": "claude-opus-5-5",
   "hooks": {
     "PostToolUse": [
       {
@@ -96,9 +100,10 @@
     "command": "node \"$HOME/.claude/statusline.mjs\"",
     "padding": 0
   },
-  "model": "opus[1m]",
-  "env": {
-    "STATUS_MANUAL_WEB": "/datos/proyectos/manua-web",
-    "STATUS_DB_CONTAINER": "postgres_postgis_17"
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
   }
 }
