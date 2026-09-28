@@ -55,5 +55,25 @@ export function run(ctx) {
 		}
 	}
 
+	// The template must list every key, so a lost secrets.env can be rebuilt knowing what was there.
+	const example = read(join(ctx.root, "secrets.example.env"));
+
+	if (example === null)
+		out.push(finding("aviso", AREA, "No existe secrets.example.env: si se pierde secrets.env no queda registro de que claves hacian falta.",
+			"Crealo con las mismas claves y valores de ejemplo; se versiona."));
+	else {
+		const keysOf = t => new Set(entries(t).map(([k]) => k).concat([...t.matchAll(/^\s*([A-Z0-9_]+)\s*=\s*$/gm)].map(m => m[1])));
+		const real = keysOf(text);
+		const template = keysOf(example);
+		const missing = [...real].filter(k => !template.has(k));
+		const extra = [...template].filter(k => !real.has(k));
+
+		if (missing.length)
+			out.push(finding("aviso", AREA, `secrets.example.env no tiene ${missing.length} clave(s) de secrets.env: ${missing.join(", ")}.`,
+				"Agregalas al ejemplo con un valor de muestra."));
+		if (extra.length)
+			out.push(finding("info", AREA, `secrets.example.env lista claves que secrets.env no tiene: ${extra.join(", ")}.`));
+	}
+
 	return out;
 }

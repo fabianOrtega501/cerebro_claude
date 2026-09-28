@@ -127,6 +127,38 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Bash|WebFetch|Write|Edit|MultiEdit|NotebookEdit|Skill|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/environment-guard.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/environment-activation.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/environment-start.mjs\"",
+            "timeout": 10
+          }
+        ]
       }
     ]
   },

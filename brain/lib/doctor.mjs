@@ -10,8 +10,9 @@ import * as versioning from "./doctor/versioning.mjs";
 import * as secrets from "./doctor/secrets.mjs";
 import * as projects from "./doctor/projects.mjs";
 import * as memory from "./doctor/memory.mjs";
+import * as environments from "./doctor/environments.mjs";
 
-const MODULES = { config, inventory, versioning, secrets, projects, memory };
+const MODULES = { config, inventory, versioning, secrets, projects, memory, environments };
 const ORDER = { error: 0, aviso: 1, info: 2 };
 const LABEL = { error: "ERROR", aviso: "AVISO", info: "info " };
 

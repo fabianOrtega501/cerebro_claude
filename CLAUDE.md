@@ -54,6 +54,17 @@ git aparte, local.
     gente que no programa: se cuenta que cambia para el usuario, no como quedo el codigo.
   - **Lenguaje de presentacion**: sin regionalismos cerrados ("parce", "berraco"), sin diminutivos,
     y nunca en segunda persona del plural ("vosotros", "os").
+- **Excepcion: en el cerebro se habla en ingles, para que Fabian practique.** Rige solo en las
+  sesiones cuyo directorio es `~/.claude`; en cualquier repo de trabajo todo sigue en espanol de
+  Colombia. Lo pidio el 2026-09-28.
+  - **En ingles**: la conversacion, los comentarios y docblocks del codigo nuevo del cerebro, y
+    los mensajes de commit del cerebro. El codigo viejo no se traduce por tanda.
+  - **Sigue en espanol**: los `.md` del cerebro (README, CLAUDE.md, SKILL.md) y todo lo que
+    producen las skills para el equipo (slide del sprint, control de cambios, set de pruebas).
+  - **Como**: ingles sencillo, frases cortas, tecnicismos sin traducir. Al final de cada respuesta,
+    un **English corner** con las 2 o 3 correcciones mas utiles de su mensaje (lo que escribio → la
+    forma natural, y un porque de una linea). **Sin dureza**: es principiante; un error menor que no
+    estorba se deja pasar. Si escribe en espanol o pide aclarar algo, se le explica en espanol.
 - **Todo desarrollo arranca en modo plan.** Antes de editar un archivo hay que contar que se
   analizo, que se encontro en el codigo y como se piensa resolver, y esperar el si. Una
   implementacion hecha antes de tiempo obliga a deshacer trabajo y esconde el razonamiento que el
@@ -228,7 +239,32 @@ git -C ~/.claude push backup main     # protege de borrar ~/.claude
 git -C ~/.claude push github main     # protege de perder el disco
 ```
 
+## Ambientes: local por omision, y el cambio lo hace Fabian
+
+Todo arranca en `local`. Para operar contra desa, qa, pre o prod, Fabian activa el ambiente con
+`/ambiente <amb> <lectura|escritura>` o con una frase («vamos a trabajar en el ambiente de qa»);
+**produccion solo por comando**. Yo no puedo activarlo: la guarda `environment-guard` niega todo
+destino de otro ambiente, niega escrituras en modo lectura y pregunta en cada operacion de prod.
+
+- Las bases se registran solas desde `secrets.env`, en dos piezas: el **servidor**
+  (`DB_DESA_HOST/PORT/USERNAME/PASSWORD`, `DB_PROD_…`) y el **nombre de cada base**
+  (`DB_<PROYECTO>_<AMB>`: `DB_STATUS_QA`, `DB_EPSILON_PRE`). Que ambientes aloja cada servidor lo
+  dice `"servers"` en `brain/environments.json` (DESA: desa, qa y pre; PROD: prod). Una clave
+  `DB_*` que no encaje queda sin registrar y Doctor lo reporta.
+- Para conectarse desde un script, `dbConnection("status", "qa")` arma la conexion con las dos
+  piezas y pasa por la guarda antes de devolverla. No se rearma a mano en cada script.
+- `secrets.example.env` (versionado) lista las mismas claves sin valores. Clave nueva en
+  `secrets.env`, clave nueva en el ejemplo: Doctor avisa si se separan.
+- Un host que la guarda no conoce se niega: preguntar a que ambiente pertenece y proponer la
+  entrada en `brain/environments.json` con Edit, que pide aprobacion.
+- Un conector del cerebro que abra una conexion llama antes a `assertEnvironment()` de
+  `brain/lib/environments.mjs`: lo que corre dentro de un script, la guarda no lo ve.
+- Lo decidio Fabian el 2026-09-28, con PRE como ambiente propio.
+
 ## Al probar, solo lecturas
+
+La guarda de ambientes hace cumplir lo mecanico de esta regla fuera de local (modo lectura niega
+el `UPDATE`); lo que sigue vale igual en local y en lo que la guarda no puede clasificar.
 
 Para verificar permisos, autorizacion o el efecto de un cambio llamando a una API, invocar **solo
 endpoints de lectura**. Un `PUT`, `POST` o `DELETE` "de control" ejecuta la accion de verdad.

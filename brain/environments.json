@@ -1,0 +1,26 @@
+{
+  "_comment": "Environment registry. Databases in secrets.env (DB_<SERVER>_* + DB_<PROJECT>_<ENV>) are added automatically; only what is not there goes here. Read by brain/lib/environments.mjs; changing it asks for approval.",
+  "servers": {
+    "DESA": ["desa", "qa", "pre"],
+    "PROD": ["prod"]
+  },
+  "environments": {
+    "desa": { "hosts": [], "ssh": [], "databases": [], "paths": [], "mcp": [] },
+    "qa": {
+      "hosts": [],
+      "ssh": [],
+      "databases": [
+        { "host": "192.168.100.36", "port": "5432", "db": "status-qa" }
+      ],
+      "paths": [],
+      "mcp": []
+    },
+    "pre": { "hosts": [], "ssh": [], "databases": [], "paths": [], "mcp": [] },
+    "prod": { "hosts": [], "ssh": [], "databases": [], "paths": [], "mcp": [] }
+  },
+  "alwaysAllowed": {
+    "hosts": ["192.168.100.34"],
+    "fromSecrets": ["MANTIS_URL", "GLPI_URL"],
+    "paths": ["/mnt/tecnologia"]
+  }
+}

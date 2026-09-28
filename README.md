@@ -27,6 +27,7 @@ cerebro solo enlaza, no copia.
 | Entender un modulo antes de tocarlo | `/explore-module` |
 | Guardar algo que no quiero repetir | `/manage-memory` |
 | Saber si el cerebro esta sano | `/brain-doctor` |
+| Trabajar contra desa, qa, pre o prod | `/ambiente qa lectura` (volver: `/ambiente local`) |
 | Ver que trajo el equipo en su `.claude/` | `/sync-brain` |
 
 Nada mas hay que configurar. Todo lo de abajo es para cuando quieras **cambiar** como funciona.
@@ -73,7 +74,8 @@ escribe codigo ni documentacion; avisa y se aparta.
 | `explore-module` | Decide si vale la pena mapear un modulo y coordina al explorador | `<proy>/exploration/` |
 | `manage-memory` | Decide si un hecho se guarda, si es del equipo o propio, y donde | — |
 | `sync-brain` | Contrastar el `.claude/` de un repo contra el cerebro y decidir que absorber; cierra con Doctor | — |
-| `brain-doctor` | Diagnostico del cerebro: hooks, README, secretos, memorias y repos. No corrige nada | — |
+| `brain-doctor` | Diagnostico del cerebro: hooks, README, secretos, memorias, repos y ambientes. No corrige nada | — |
+| `ambiente` | Muestra o cambia el ambiente (local, desa, qa, pre, prod) y el modo. Solo la invocas tu; unica via a produccion | `brain/environments.json` |
 
 `start-development` y `finish-development` son pareja: abren y cierran el mismo desarrollo. Las
 tres `gen-*` son **manuales**: no se disparan solas nunca.
@@ -89,6 +91,9 @@ tres `gen-*` son **manuales**: no se disparan solas nunca.
 | `practice-unrecorded-notice` | Al terminar una respuesta | Avisa si un ticket de practica se cerro sin registrar sus temas en el temario |
 | `bash-write-guard` | Antes de cada comando Bash | **Deniega** `sed -i`, `>`, `tee`, `cp`/`mv` y scripts en linea que escriben codigo de un repo registrado. Se apaga con `CLAUDE_ALLOW_BASH_WRITES=1` en `settings.local.json` |
 | `bash-change-audit` | Antes y despues de cada comando Bash | Detecta lo que el comando cambio en los repos y lo pasa por las guardas de Edit; avisa si lo rechazan |
+| `environment-guard` | Antes de Bash, WebFetch, Edit/Write, Skill y MCP | Mira a que host o base apunta y **permite, pregunta o niega** segun el ambiente activo; `git push` siempre pregunta |
+| `environment-activation` | Cada mensaje tuyo | Cambia el ambiente solo si tu lo pides (`/ambiente qa lectura` o una frase); recuerda el activo |
+| `environment-start` | Al abrir la sesion | Avisa si arranca fuera de local |
 | `hu-pdf-guard` | Antes de Read y de Bash | **Deniega** leer una HU en PDF/DOCX entera y remite a su `hu.md`; deja pasar Read con `pages` |
 
 Casi todos detectan y se apartan. **`i18n-keys-guard`, `bash-write-guard` y `hu-pdf-guard` si
@@ -235,17 +240,25 @@ proposito.
 
 ## 7. Credenciales
 
-Van en `~/.claude/secrets.env`, con permisos 600 y fuera del control de versiones.
+Van en `~/.claude/secrets.env`, con permisos 600 y fuera del control de versiones. La plantilla
+con todas las claves y sin valores es **`secrets.example.env`**, que si se versiona: si se pierde
+`secrets.env`, dice que hacia falta. Clave nueva en uno, clave nueva en el otro; Doctor avisa si
+se separan.
 
-```
-AIO_TEST_EMAIL=...
-AIO_TEST_PASSWORD=...
-MANTIS_URL=...        # tickets: los usa brain/lib/tickets/
-MANTIS_API_TOKEN=...  # Mantis > My Account > API Tokens (no requiere admin)
-GLPI_URL=...
-GLPI_USER=...
-GLPI_PASSWORD=...
-```
+El archivo va por bloques:
+
+| Bloque | Claves | Lo usa |
+|---|---|---|
+| Usuarios de prueba | `<PROYECTO>_TEST_EMAIL` / `_PASSWORD`, mas datos de empresas de prueba | `credentialsFor()`, flujos del manual |
+| Servidores de base | `DB_<SERVIDOR>_HOST` / `_PORT` / `_USERNAME` / `_PASSWORD` (`DESA`, `PROD`) | guarda de ambientes, `dbConnection()` |
+| Nombres de base | `DB_<PROYECTO>_<AMB>`: `DB_STATUS_QA`, `DB_EPSILON_PRE`, `DB_AIO_PROD` | guarda de ambientes, `dbConnection()` |
+| Tickets | `MANTIS_URL`, `MANTIS_API_TOKEN` (Mantis > My Account > API Tokens), `GLPI_URL`, `GLPI_USER`, `GLPI_PASSWORD` | `brain/lib/tickets/` |
+
+Host, puerto y usuario se escriben **una vez por servidor**, no por proyecto: el servidor DESA
+aloja las bases de desa, qa y pre. Que ambientes aloja cada servidor lo declara `"servers"` en
+`brain/environments.json`; sin esa linea, la guarda no sabria que `DB_STATUS_QA` vive en DESA.
+Para conectarse desde un script: `dbConnection("status", "qa")` de `brain/lib/environments.mjs`,
+que arma las dos piezas y pasa por la guarda.
 
 **Nunca dentro de un repo**, ni siquiera en un archivo ignorado: un `.gitignore` mal editado, un
 `git add -f` o un `git clean -xfd` bastan para exponerlas o perderlas.

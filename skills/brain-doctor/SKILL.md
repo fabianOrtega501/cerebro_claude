@@ -23,9 +23,10 @@ Sale con 1 si hay errores. Tarda unos segundos: compila cada script del cerebro.
 | `config` | settings.json valido; cada hook y la statusline apuntan a un script que existe; todo `.mjs` y `.py` compila; hooks sin registrar; secretos en el `env` de settings.json |
 | `inventory` | `name` de cada skill y agente igual a su carpeta o archivo; agentes con `model`; README con toda skill, agente y hook, y sin piezas que ya no existen; `subagent_type` y rutas `~/.claude/...` que no existen |
 | `versioning` | Nada prohibido versionado (secrets.env, cache, transcripciones, `__pycache__`); lo que usa settings.json no esta ignorado; cambios sin commitear y commits sin subir; el repo de GitHub sigue privado (con `gh`) |
-| `secrets` | secrets.env en 600; ningun valor de clave `PASSWORD`/`TOKEN`/`SECRET`/`_KEY` aparece en un archivo versionado **o por versionar** |
+| `secrets` | secrets.env en 600; ningun valor de clave `PASSWORD`/`TOKEN`/`SECRET`/`_KEY` aparece en un archivo versionado **o por versionar**; secrets.example.env existe y tiene las mismas claves |
 | `projects` | Repos de projects.json en disco; `additionalDirectories` al dia; proyectos sin usuario de pruebas |
 | `memory` | Cada carpeta de memoria —del cerebro y `.claude/memory/` de los repos— con MEMORY.md, sin enlaces rotos ni huerfanas, frontmatter completo, y copias del equipo que no divergen entre repos |
+| `environments` | environments.json valido; claves `DB_*` que no encajan en servidor + nombre de base; claves repetidas en secrets.env; estado del ambiente sano y cual esta activo |
 
 Niveles: **error** rompe algo hoy; **aviso** se va a degradar o confunde; **info** es contexto.
 Un `[[enlace]]` a una memoria que aun no existe es info, no error: marca algo por escribir.

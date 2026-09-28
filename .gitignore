@@ -17,6 +17,8 @@
 !/FLUJO.md
 !/settings.json
 !/CLAUDE.md
+# Template of secrets.env: keys only, no values. secrets.env itself stays ignored.
+!/secrets.example.env
 # `settings.json` invoca la statusline por ruta: si no viaja en el repo, restaurar el
 # cerebro desde un respaldo deja la sesion sin barra de estado y sin senal de que falta.
 !/statusline.mjs
