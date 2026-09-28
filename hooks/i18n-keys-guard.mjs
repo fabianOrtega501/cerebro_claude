@@ -63,9 +63,10 @@ function resultingText(input) {
 
 	if (tool === "Write") return ti.content ?? null;
 
-	let text;
+	// `previous_content` lo manda bash-change-audit: ahi el disco ya tiene el cambio aplicado.
+	let text = ti.previous_content;
 	try {
-		text = readFileSync(ti.file_path, "utf8");
+		text ??= readFileSync(ti.file_path, "utf8");
 	} catch {
 		return null;
 	}
@@ -102,7 +103,8 @@ function parentOf(root, path) {
 /** Claves nuevas que la edicion agrega, y el objeto resultante. `added` vacio si no hay nada que revisar. */
 function analyze(input) {
 	const filePath = input?.tool_input?.file_path ?? "";
-	const before = flatten(readJson(filePath) ?? {});
+	const previous = input?.tool_input?.previous_content;
+	const before = flatten((previous === undefined ? readJson(filePath) : parseJson(previous)) ?? {});
 	const text = resultingText(input);
 	if (text === null) return { added: [], after: null, before };
 
@@ -165,6 +167,15 @@ function keysInText(text) {
 	for (const match of (text ?? "").matchAll(/"([^"\\]+)"\s*:\s*"(?:[^"\\]|\\.)*"/g)) out.add(match[1]);
 
 	return out;
+}
+
+/** Texto parseado como JSON, o `null` si no es valido. */
+function parseJson(text) {
+	try {
+		return JSON.parse(text);
+	} catch {
+		return null;
+	}
 }
 
 /** Claves que la edicion escribio, leidas del payload. En `PostToolUse` el disco ya cambio y no sirve de referencia. */

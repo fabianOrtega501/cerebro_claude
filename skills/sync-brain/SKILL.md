@@ -94,16 +94,40 @@ node ~/.claude/skills/sync-brain/lib/settle.mjs dismissed [ruta-del-repo]
 Sin este paso el hook vuelve a avisar en el proximo pull. Es a proposito: una revision a medias
 no debe darse por hecha.
 
+`settle.mjs` corre **Doctor** al final, siempre (`brain/lib/doctor.mjs`). No se salta ni se
+corre aparte: la sincronizacion no esta cerrada hasta leer su diagnostico.
+
+### 5b. Revisar la coherencia de lo absorbido
+
+Doctor revisa lo mecanico —hooks vivos, README al dia, secretos, memorias—, pero no ve una regla
+que contradice a otra. Eso se revisa aqui, **solo sobre lo que se absorbio en esta
+sincronizacion** (`git -C ~/.claude diff` y los archivos nuevos):
+
+- ¿Alguna instruccion absorbida choca con el `CLAUDE.md` del cerebro? Ejemplos que ya pasaron:
+  una skill que commitea sin pedir permiso, un docblock largo, credenciales en `settings.json`.
+- ¿Duplica algo que ya existe con otro nombre (una skill, un hook, una memoria)?
+- ¿Menciona rutas, contenedores o nombres del repo de origen que en el cerebro no existen?
+
+Cada hallazgo se cuenta al usuario con la correccion propuesta. No se corrige por cuenta propia.
+
 ### 6. Dejar historia
 
-El cerebro es un repo git local. Si se absorbio algo, commitear:
+El cerebro es un repo git local. Si se absorbio algo, **proponer** el commit, con este orden y
+sin saltarse ninguno:
+
+1. El diagnostico de Doctor ya se leyo (paso 5) y la coherencia se reviso (paso 5b).
+2. Se le muestra al usuario el resumen: que se absorbio, que dijo Doctor y el mensaje propuesto.
+   **Si Doctor dio errores, se dicen antes de pedir nada**, y el usuario decide si se corrigen
+   primero o se commitea igual.
+3. Solo con su si:
 
 ```bash
 git -C ~/.claude add -A && git -C ~/.claude commit -m "Absorbe <que> desde <repo>"
 ```
 
 Mensaje en espanol, descriptivo, diciendo de donde vino. Sin este commit no hay como revertir
-una mezcla que salio mal, que es justo lo que este repo existe para permitir.
+una mezcla que salio mal, que es justo lo que este repo existe para permitir. El push a los dos
+remotos se ofrece aparte y tambien espera su si.
 
 ## Trampas conocidas
 

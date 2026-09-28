@@ -65,3 +65,6 @@
 /brain/sprints/*/*.json
 /brain/sprints/*/*.html
 /brain/sprints/*/*.png
+
+# Bytecode de Python de los conectores de brain/lib/tickets: se regenera solo.
+__pycache__/

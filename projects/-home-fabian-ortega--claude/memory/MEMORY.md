@@ -1,0 +1,1 @@
+- [python-sin-pip-en-esta-maquina](python-sin-pip-en-esta-maquina.md) — Python sin pip ni ensurepip; librerías del cerebro solo stdlib, paquetes externos piden sudo apt

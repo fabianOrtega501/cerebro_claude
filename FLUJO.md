@@ -67,6 +67,7 @@ flowchart TD
     PULL -->|"hook<br/>claude-upstream-notice"| H2{{"Cambio el .claude/<br/>del repo?"}}
     H2 ==> SB["<b>sync-brain</b><br/>clasifica y recomienda"]
     SB -.->|"solo lo aprobado"| BRAIN[("~/.claude<br/><i>el cerebro</i>")]
+    SB ==>|"al cerrar, siempre"| DOC["<b>brain-doctor</b><br/>diagnostica, no corrige"]
 
     APR{{"aparecio algo que<br/>vale para la proxima?"}} -.->|"se propone, tu apruebas"| BRAIN
     DEV -.-> APR
@@ -74,7 +75,8 @@ flowchart TD
     DEVB -.-> APR
 
     BRAIN -->|"hook<br/>brain-unpushed-notice"| H3{{"queda algo sin<br/>commitear o sin subir?"}}
-    H3 ==> RESP[["git push backup main<br/>git push github main"]]
+    H3 ==> DOC
+    DOC ==>|"resultado + tu si"| RESP[["commit, y push a<br/>backup y github"]]
 
     UTD -.->|"si tambien cambio la UI"| UM
 
@@ -190,6 +192,7 @@ Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra r
 | Cambio una regla de negocio del back | `update-tech-docs` | Hook del push, o la pides |
 | Cambio algo que el usuario ve | `update-manual` | Hook del push, o al cerrar `fullstack-ticket` |
 | Un pull trajo cambios en `.claude/` | `sync-brain` | Hook del pull |
+| Se cierra una sincronizacion o se va a commitear el cerebro | `brain-doctor` | Solo, desde `settle.mjs`; o la pides |
 | El codigo ya funciona y toca subirlo | `finish-development` | La pides tu. Es la pareja de `start-development` |
 | Hay que entregar el control de cambios | `gen-changes-controls` | Solo manual |
 | Hay que entregar el set de pruebas | `gen-test-set` | Solo manual. Lee la cola de `brain/testing/pending.md` |

@@ -33,8 +33,8 @@ etc.
   código, nombres de variables). Si un término muy técnico es imprescindible, se explica en pocas
   palabras.
 - **Uso MANUAL**: solo cuando el usuario lo pida explícitamente. No se genera por iniciativa propia.
-- **Solo texto**: no se integra con ningún sistema (Mantis, GitLab, Jira, etc.), no se hace commit ni
-  push.
+- **Solo texto**: no escribe en ningún sistema (Mantis, GLPI, GitLab, Jira, etc.), no se hace commit
+  ni push. Leer la HU con `ticket-context` sí está permitido: es solo lectura.
 
 ## Insumo
 
@@ -45,6 +45,9 @@ incluir:
 - Un diff, commits o fragmentos de código relevantes.
 - Resultados de pruebas realizadas.
 - Cualquier otro contexto útil (ticket, correo, conversación previa).
+- **La HU vigente del ticket**, para la Descripción y la Justificación: con el número de la rama,
+  `tickets.py check <clave>` de la skill `ticket-context`, y su `hu.md`. Si la HU cambió o no está
+  en caché, se baja con esa skill antes de redactar. La justificación sale de la HU, no se supone.
 
 Si falta información clave para clasificar riesgo o impacto (por ejemplo, si el cambio ya se probó, qué
 módulos toca, si hay usuarios afectados), **pregúntala** — no inventes ni asumas.

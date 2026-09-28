@@ -110,9 +110,22 @@ otro lado.
 
 **Subagentes disponibles hoy** (`~/.claude/agents/`): `branch-starter` crea la rama del
 desarrollo; `build-runner` corre builds, tests, migraciones y seeders y devuelve solo el
-veredicto; `module-explorer` mapea un modulo leyendo los dos repos en solo lectura. Los tres en
-Sonnet. Cuando aparezca otra tarea mecanica que se repita, **proponer un
+veredicto; `module-explorer` mapea un modulo leyendo los dos repos en solo lectura;
+`ticket-reader` baja el ticket y su HU y devuelve el resumen. Los cuatro en Sonnet. Cuando aparezca otra tarea mecanica que se repita, **proponer un
 agente nuevo** en vez de seguir gastando la sesion principal en ella.
+
+## La HU se lee de la fuente, cada vez que se usa
+
+La HU es el requerimiento contra el que se valida todo, y **solo cuenta la que se bajo de
+Mantis/GLPI con la skill `ticket-context`**. Rige al arrancar, y tambien:
+
+- **Al revisar o ajustar un desarrollo ya hecho**: `tickets.py check <clave>` antes de dar el
+  ajuste por bueno. Si la HU cambio, se contrasta lo hecho contra la nueva. Un ajuste "de
+  estructura" tambien lo pasa: es barato y es la unica forma de saber que no cambio la regla.
+- **En las skills que la usan despues** (`gen-test-set`, `gen-changes-controls`): el mismo check,
+  y se lee el `hu.md`, no lo que haya quedado en la conversacion.
+- **Nunca un PDF de `~/Descargas` o `~/Documentos`** por tener un nombre parecido: todas se llaman
+  `TI-PR-0005-F02…`. El hook `hu-pdf-guard` niega leer una HU en PDF entera.
 
 ## Credenciales de pruebas: una pareja por proyecto
 
@@ -198,6 +211,12 @@ que el cerebro se respalda —pero eso dice **como** respaldarlo, no que lo haga
 de ellos ni siquiera era trabajo mio: eran memorias de una sesion anterior de Fabian, commiteadas
 con un mensaje que escribi yo. El historial del cerebro es suyo y un mensaje que el no aprobo no
 tiene por que estar ahi. Lo pidio explicitamente ese dia.
+
+**La solicitud va despues de Doctor.** Antes de proponer cualquier commit del cerebro se corre
+`node ~/.claude/brain/lib/doctor.mjs` y se muestra su resultado junto con el mensaje propuesto. Si
+hay errores, se dicen antes de pedir nada, y Fabian decide si se corrigen primero o se commitea
+igual. La aprobacion sigue siendo suya y por commit; Doctor solo hace que sepa que esta aprobando.
+Lo decidio el 2026-09-28.
 
 Los permisos de `add` y `commit` sobre `~/.claude` **se quitaron a proposito** de la lista blanca,
 para que la solicitud aparezca y no dependa de que yo me acuerde. Si alguna vez vuelven a estar

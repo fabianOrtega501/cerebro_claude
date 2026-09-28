@@ -26,6 +26,7 @@ cerebro solo enlaza, no copia.
 | Armar la diapositiva del sprint | `/gen-sprint-summary` |
 | Entender un modulo antes de tocarlo | `/explore-module` |
 | Guardar algo que no quiero repetir | `/manage-memory` |
+| Saber si el cerebro esta sano | `/brain-doctor` |
 | Ver que trajo el equipo en su `.claude/` | `/sync-brain` |
 
 Nada mas hay que configurar. Todo lo de abajo es para cuando quieras **cambiar** como funciona.
@@ -58,7 +59,8 @@ escribe codigo ni documentacion; avisa y se aparta.
 
 | Skill | Para que | Perfil por proyecto |
 |---|---|---|
-| `start-development` | Checklist de arranque: proyecto, ramas al dia, crear rama, enunciado | usa `projects.json` |
+| `start-development` | Checklist de arranque: proyecto, ramas al dia, crear rama, ticket y HU | usa `projects.json` |
+| `ticket-context` | Trae el ticket de Mantis/GLPI y su HU, la deja en Markdown y confirma que siga vigente | — |
 | `practice-ticket` | El ticket como ejercicio: clase primero, despues el usuario teclea y Claude guia | `brain/learning/` |
 | `fullstack-ticket` | Ticket que cruza front y back, con contrato fijado antes de codificar | `<proy>/stack/` |
 | `finish-development` | Cierre: limpiar, verificar, commitear, integrar la base y hacer push | usa `projects.json` |
@@ -70,7 +72,8 @@ escribe codigo ni documentacion; avisa y se aparta.
 | `exploration-memory` | El mapa tecnico de un modulo, para no releer el mismo codigo cada ticket | `<proy>/exploration/` |
 | `explore-module` | Decide si vale la pena mapear un modulo y coordina al explorador | `<proy>/exploration/` |
 | `manage-memory` | Decide si un hecho se guarda, si es del equipo o propio, y donde | — |
-| `sync-brain` | Contrastar el `.claude/` de un repo contra el cerebro y decidir que absorber | — |
+| `sync-brain` | Contrastar el `.claude/` de un repo contra el cerebro y decidir que absorber; cierra con Doctor | — |
+| `brain-doctor` | Diagnostico del cerebro: hooks, README, secretos, memorias y repos. No corrige nada | — |
 
 `start-development` y `finish-development` son pareja: abren y cierran el mismo desarrollo. Las
 tres `gen-*` son **manuales**: no se disparan solas nunca.
@@ -84,9 +87,14 @@ tres `gen-*` son **manuales**: no se disparan solas nunca.
 | `brain-unpushed-notice` | Al terminar una respuesta | Avisa si el cerebro tiene algo sin commitear o sin subir a `backup`/`github` |
 | `i18n-keys-guard` | Antes y despues de editar un locale | **Deniega** la clave intercalada y la que repite un texto que ya existe; avisa de JSON roto y de paridad |
 | `practice-unrecorded-notice` | Al terminar una respuesta | Avisa si un ticket de practica se cerro sin registrar sus temas en el temario |
+| `bash-write-guard` | Antes de cada comando Bash | **Deniega** `sed -i`, `>`, `tee`, `cp`/`mv` y scripts en linea que escriben codigo de un repo registrado. Se apaga con `CLAUDE_ALLOW_BASH_WRITES=1` en `settings.local.json` |
+| `bash-change-audit` | Antes y despues de cada comando Bash | Detecta lo que el comando cambio en los repos y lo pasa por las guardas de Edit; avisa si lo rechazan |
+| `hu-pdf-guard` | Antes de Read y de Bash | **Deniega** leer una HU en PDF/DOCX entera y remite a su `hu.md`; deja pasar Read con `pages` |
 
-Todos menos uno no bloquean: detectan y se apartan. **`i18n-keys-guard` si deniega**, y es la
-excepcion a proposito: una clave intercalada o un texto duplicado no se arreglan avisando, porque
+Casi todos detectan y se apartan. **`i18n-keys-guard`, `bash-write-guard` y `hu-pdf-guard` si
+deniegan**; `bash-write-guard` porque un cambio por Bash se salta todas las guardas de Edit, y
+`hu-pdf-guard` porque una HU leida en PDF ya gasto los tokens, y una HU vieja ya contamino el plan,
+antes de que un aviso sirva de algo. La de i18n es la excepcion original: una clave intercalada o un texto duplicado no se arreglan avisando, porque
 para cuando el aviso se lee ya entraron al archivo. Solo deniega lo mecanico —donde quedo la clave
 y si su texto ya existia—; la paridad entre idiomas avisa y nunca bloquea. Los dos primeros avisan una sola vez por version; el tercero, una sola vez por
 estado: mientras no cambie lo pendiente, no repite.
@@ -98,6 +106,7 @@ estado: mientras no cambie lo pendiente, no repite.
 | `branch-starter` | Sonnet | La parte mecanica del arranque: actualizar ramas y crear la rama |
 | `build-runner` | Sonnet | Builds, tests, migraciones y seeders: devuelve solo el veredicto, no el listado |
 | `module-explorer` | Sonnet | Mapea un modulo leyendo los dos repos, en solo lectura. Devuelve el veredicto; el mapa queda en el archivo |
+| `ticket-reader` | Sonnet | Baja el ticket y su HU con `brain/lib/tickets/`, lee el `.md` y devuelve un resumen de ~30 lineas |
 
 Una skill **no puede** cambiar el modelo de la sesion; solo `/model` lo hace. Un subagente si corre
 en el modelo que se le indique, y de ahi sale el reparto: lo mecanico en Sonnet, el analisis en la
@@ -231,6 +240,11 @@ Van en `~/.claude/secrets.env`, con permisos 600 y fuera del control de versione
 ```
 AIO_TEST_EMAIL=...
 AIO_TEST_PASSWORD=...
+MANTIS_URL=...        # tickets: los usa brain/lib/tickets/
+MANTIS_API_TOKEN=...  # Mantis > My Account > API Tokens (no requiere admin)
+GLPI_URL=...
+GLPI_USER=...
+GLPI_PASSWORD=...
 ```
 
 **Nunca dentro de un repo**, ni siquiera en un archivo ignorado: un `.gitignore` mal editado, un
@@ -275,6 +289,9 @@ node ~/.claude/skills/sync-brain/lib/settle.mjs dismissed [repo]   # no interesa
 ---
 
 ## 10. Si algo no funciona
+
+**Primero, Doctor**: `node ~/.claude/brain/lib/doctor.mjs` (o `/brain-doctor`). Dice que esta roto
+y como se corrige, sin tocar nada. Lo de abajo son los casos que Doctor no puede ver.
 
 **Cambie un hook, un agente o la statusline y no pasa nada.** Se leen al arrancar: reinicia la
 sesion. Las skills si se recogen en caliente.

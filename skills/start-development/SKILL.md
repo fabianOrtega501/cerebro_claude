@@ -163,13 +163,18 @@ no crea nada y dice qué resolver.
 
 ## Paso 4 — Recoger el contexto del ticket
 
-Con la rama ya creada, pedir al usuario, en una sola interacción:
+Con la rama ya creada, **traer el ticket y su HU con la skill `ticket-context`**, usando el
+mismo número de la rama. No se pide pegar el enunciado: se baja de Mantis y GLPI, y solo cuenta
+la HU descargada en esa ejecución. Si la skill devuelve que no hay HU o que hay varias
+candidatas, se resuelve con el usuario antes de seguir. Sin número de ticket, pedir el código de
+GLPI o, en último caso, el enunciado pegado tal cual.
 
-1. **El enunciado del ticket**, pegado tal cual. Su texto crudo vale más que un resumen.
-2. **¿Recurso nuevo o ajuste sobre algo existente?** Cambia el camino por completo: en el AIO,
+En la misma interacción en que se presente el resumen de la HU, preguntar:
+
+1. **¿Recurso nuevo o ajuste sobre algo existente?** Cambia el camino por completo: en el AIO,
    recurso nuevo entra por `CreateResourceFlow` y un ajuste no. Si no lo dice, asumir ajuste, que
    es lo frecuente, y decir que se asumió.
-3. **Módulo o pantalla de referencia**, si conoce alguno parecido. Copiar el patrón que ya existe
+2. **Módulo o pantalla de referencia**, si conoce alguno parecido. Copiar el patrón que ya existe
    vale más que inventar.
 
 **Con el módulo ya identificado, mirar si el cerebro lo tiene mapeado**:

@@ -12,6 +12,9 @@
  *                                       siendo la revision anterior de verdad
  */
 
+import { spawnSync } from "node:child_process";
+import { homedir } from "node:os";
+import { join } from "node:path";
 import { findRepoRoot, markDismissed, markReviewed } from "../../../brain/lib/upstream.mjs";
 
 const [action, target] = process.argv.slice(2);
@@ -34,3 +37,7 @@ else {
   console.error("Uso: node settle.mjs <reviewed|dismissed> [ruta-del-repo]");
   process.exit(1);
 }
+
+// Toda sincronizacion cierra con diagnostico: lo absorbido puede haber roto algo o chocar con lo propio.
+console.log("\nDiagnostico posterior a la sincronizacion:\n");
+spawnSync("node", [join(homedir(), ".claude", "brain", "lib", "doctor.mjs")], { stdio: "inherit" });

@@ -91,7 +91,10 @@ funcionalidad, no dos capas.
 ## Fase 2 — Pedir el enunciado del ticket
 
 El diff dice qué cambió; el ticket dice **qué se esperaba**, y los casos funcionales salen de ahí.
-Si el usuario no lo ha compartido en la conversación, **pedirlo**. Sin criterios de aceptación los
+Los criterios salen de la HU vigente, no de lo que haya quedado en la conversación: con el número
+de la rama, correr el paso de vigencia de `ticket-context` (`tickets.py check <clave>`) y leer su
+`hu.md`; si no hay caché o la HU cambió, bajarla con esa skill. Solo si no hay ticket ni HU,
+**pedir el enunciado** al usuario. Sin criterios de aceptación los
 casos funcionales se adivinan, y un caso adivinado se prueba igual de bien que uno real: nadie nota
 que faltaba lo importante.
 

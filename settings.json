@@ -52,6 +52,16 @@
         ]
       },
       {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/bash-change-audit.mjs\" --after",
+            "timeout": 30
+          }
+        ]
+      },
+      {
         "matcher": "Edit|MultiEdit|Write",
         "hooks": [
           {
@@ -89,6 +99,31 @@
           {
             "type": "command",
             "command": "node \"$HOME/.claude/hooks/i18n-keys-guard.mjs\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/bash-write-guard.mjs\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/bash-change-audit.mjs\" --before",
+            "timeout": 20
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/hu-pdf-guard.mjs\"",
             "timeout": 10
           }
         ]

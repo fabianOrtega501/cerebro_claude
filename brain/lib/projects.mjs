@@ -64,6 +64,28 @@ export function projectOf(fromDir = process.cwd()) {
 	return Object.entries(readProjects()).find(([, config]) => config.repos?.includes(root))?.[0] ?? null;
 }
 
+/**
+ * Todos los repos registrados que existen en disco, de todos los proyectos.
+ *
+ * @returns {string[]} Rutas absolutas, sin repetir
+ */
+export function allRepos() {
+	return [...new Set(Object.values(readProjects()).flatMap(config => config.repos ?? []))].filter(existsSync);
+}
+
+/**
+ * Repo registrado que contiene una ruta; si hay anidados, gana el mas profundo.
+ *
+ * @param {string} path - Ruta absoluta
+ * @param {string[]} [repos] - Lista de repos; por defecto `allRepos()`
+ * @returns {string|null} La raiz del repo, o `null` si la ruta no cae en ninguno
+ */
+export function repoContaining(path, repos = allRepos()) {
+	return repos
+		.filter(repo => path === repo || path.startsWith(repo + "/"))
+		.sort((a, b) => b.length - a.length)[0] ?? null;
+}
+
 /** Ruta del registro, para poder decirle al usuario dónde agregar un proyecto que falte. */
 export const REGISTRY_PATH = REGISTRY;
 
