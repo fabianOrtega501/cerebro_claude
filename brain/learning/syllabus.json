@@ -4,7 +4,15 @@
     "laravel-migraciones": {
       "label": "Migraciones y cambios de esquema en Laravel",
       "level": "pendiente",
-      "keywords": ["migracion", "columna", "tabla", "campo nuevo", "esquema", "indice", "llave foranea"],
+      "keywords": [
+        "migracion",
+        "columna",
+        "tabla",
+        "campo nuevo",
+        "esquema",
+        "indice",
+        "llave foranea"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -12,26 +20,68 @@
     },
     "laravel-eloquent": {
       "label": "Modelos, relaciones y consultas con Eloquent",
-      "level": "pendiente",
-      "keywords": ["modelo", "relacion", "eloquent", "consulta", "query", "scope", "join", "listado"],
-      "lastPracticed": null,
+      "level": "visto",
+      "keywords": [
+        "modelo",
+        "relacion",
+        "eloquent",
+        "consulta",
+        "query",
+        "scope",
+        "join",
+        "listado"
+      ],
+      "lastPracticed": "2026-09-29",
       "cleanStreak": 0,
-      "tickets": [],
-      "recurringErrors": []
+      "tickets": [
+        {
+          "ticket": "11308",
+          "project": "aio",
+          "date": "2026-09-29",
+          "hint": 4,
+          "blocking": 0
+        }
+      ],
+      "recurringErrors": [
+        "ubico el filtro por estado derivado en el servicio y no en applyFilters del repositorio"
+      ]
     },
     "laravel-validacion": {
       "label": "Validacion de entrada con Form Requests",
-      "level": "pendiente",
-      "keywords": ["validacion", "request", "regla", "obligatorio", "formulario", "campo requerido"],
-      "lastPracticed": null,
+      "level": "visto",
+      "keywords": [
+        "validacion",
+        "request",
+        "regla",
+        "obligatorio",
+        "formulario",
+        "campo requerido"
+      ],
+      "lastPracticed": "2026-09-29",
       "cleanStreak": 0,
-      "tickets": [],
-      "recurringErrors": []
+      "tickets": [
+        {
+          "ticket": "11308",
+          "project": "aio",
+          "date": "2026-09-29",
+          "hint": 4,
+          "blocking": 0
+        }
+      ],
+      "recurringErrors": [
+        "creyo que pasar datos por constructor significa que la regla no valida"
+      ]
     },
     "laravel-servicios": {
       "label": "Separar la logica de negocio en servicios, fuera del controlador",
       "level": "pendiente",
-      "keywords": ["servicio", "logica de negocio", "controlador", "refactor", "proceso"],
+      "keywords": [
+        "servicio",
+        "logica de negocio",
+        "controlador",
+        "refactor",
+        "proceso"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -40,7 +90,15 @@
     "api-endpoints": {
       "label": "Disenar un endpoint: ruta, contrato de respuesta y codigos de estado",
       "level": "pendiente",
-      "keywords": ["endpoint", "api", "ruta", "respuesta", "json", "servicio web", "contrato"],
+      "keywords": [
+        "endpoint",
+        "api",
+        "ruta",
+        "respuesta",
+        "json",
+        "servicio web",
+        "contrato"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -48,17 +106,43 @@
     },
     "permisos-y-gates": {
       "label": "Permisos, roles y control de acceso",
-      "level": "pendiente",
-      "keywords": ["permiso", "rol", "acceso", "gate", "middleware", "autorizacion", "menu"],
-      "lastPracticed": null,
+      "level": "visto",
+      "keywords": [
+        "permiso",
+        "rol",
+        "acceso",
+        "gate",
+        "middleware",
+        "autorizacion",
+        "menu"
+      ],
+      "lastPracticed": "2026-09-29",
       "cleanStreak": 0,
-      "tickets": [],
-      "recurringErrors": []
+      "tickets": [
+        {
+          "ticket": "11308",
+          "project": "aio",
+          "date": "2026-09-29",
+          "hint": 4,
+          "blocking": 0
+        }
+      ],
+      "recurringErrors": [
+        "penso en delete para anular; anular es update"
+      ]
     },
     "vue-componentes": {
       "label": "Componer y comunicar componentes Vue (props, eventos, slots)",
       "level": "pendiente",
-      "keywords": ["componente", "vue", "props", "evento", "modal", "popup", "vista"],
+      "keywords": [
+        "componente",
+        "vue",
+        "props",
+        "evento",
+        "modal",
+        "popup",
+        "vista"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -67,7 +151,14 @@
     "vue-estado": {
       "label": "Estado compartido y store en el front",
       "level": "pendiente",
-      "keywords": ["store", "estado", "vuex", "global", "sesion", "usuario logueado"],
+      "keywords": [
+        "store",
+        "estado",
+        "vuex",
+        "global",
+        "sesion",
+        "usuario logueado"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -76,7 +167,14 @@
     "front-formularios": {
       "label": "Formularios en el front: binding, validacion y errores del servidor",
       "level": "pendiente",
-      "keywords": ["formulario", "campo", "guardar", "editar", "validacion", "mensaje de error"],
+      "keywords": [
+        "formulario",
+        "campo",
+        "guardar",
+        "editar",
+        "validacion",
+        "mensaje de error"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -85,7 +183,15 @@
     "front-tablas-y-filtros": {
       "label": "Listados: tablas, paginacion, filtros y busqueda",
       "level": "pendiente",
-      "keywords": ["tabla", "listado", "filtro", "buscar", "paginacion", "columna", "orden"],
+      "keywords": [
+        "tabla",
+        "listado",
+        "filtro",
+        "buscar",
+        "paginacion",
+        "columna",
+        "orden"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -94,7 +200,14 @@
     "i18n-traducciones": {
       "label": "Claves de traduccion y locales",
       "level": "pendiente",
-      "keywords": ["traduccion", "idioma", "locale", "texto", "etiqueta", "i18n"],
+      "keywords": [
+        "traduccion",
+        "idioma",
+        "locale",
+        "texto",
+        "etiqueta",
+        "i18n"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -103,7 +216,16 @@
     "sql-consultas": {
       "label": "SQL a mano: agregaciones, subconsultas y rendimiento",
       "level": "pendiente",
-      "keywords": ["sql", "consulta", "reporte", "agrupar", "suma", "conteo", "lento", "indice"],
+      "keywords": [
+        "sql",
+        "consulta",
+        "reporte",
+        "agrupar",
+        "suma",
+        "conteo",
+        "lento",
+        "indice"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -112,7 +234,15 @@
     "depuracion": {
       "label": "Depurar: leer el error, aislar la causa y comprobar la hipotesis",
       "level": "pendiente",
-      "keywords": ["error", "falla", "bug", "no funciona", "excepcion", "log", "hotfix"],
+      "keywords": [
+        "error",
+        "falla",
+        "bug",
+        "no funciona",
+        "excepcion",
+        "log",
+        "hotfix"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -121,7 +251,14 @@
     "git-flujo": {
       "label": "Ramas, merges y resolucion de conflictos",
       "level": "pendiente",
-      "keywords": ["rama", "merge", "conflicto", "rebase", "commit", "integrar"],
+      "keywords": [
+        "rama",
+        "merge",
+        "conflicto",
+        "rebase",
+        "commit",
+        "integrar"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
@@ -130,7 +267,14 @@
     "lectura-de-codigo": {
       "label": "Ubicarse en un repo ajeno: encontrar el patron que ya existe y copiarlo",
       "level": "pendiente",
-      "keywords": ["patron", "similar", "existente", "referencia", "como se hace", "modulo parecido"],
+      "keywords": [
+        "patron",
+        "similar",
+        "existente",
+        "referencia",
+        "como se hace",
+        "modulo parecido"
+      ],
       "lastPracticed": null,
       "cleanStreak": 0,
       "tickets": [],
