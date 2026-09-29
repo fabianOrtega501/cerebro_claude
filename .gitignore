@@ -68,5 +68,9 @@
 /brain/sprints/*/*.html
 /brain/sprints/*/*.png
 
+# Historial de diagnosticos del computador: estado de esta maquina, no cerebro. Sirve para
+# comparar una medicion con la anterior; en el repo solo seria ruido y datos del equipo.
+/brain/machine/history/
+
 # Bytecode de Python de los conectores de brain/lib/tickets: se regenera solo.
 __pycache__/

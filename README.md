@@ -27,6 +27,7 @@ cerebro solo enlaza, no copia.
 | Entender un modulo antes de tocarlo | `/explore-module` |
 | Guardar algo que no quiero repetir | `/manage-memory` |
 | Saber si el cerebro esta sano | `/brain-doctor` |
+| Saber por que el computador esta lento, o como van actualizaciones y componentes | `/diagnose-machine` |
 | Trabajar contra desa, qa, pre o prod | `/ambiente qa lectura` (volver: `/ambiente local`) |
 | Ver que trajo el equipo en su `.claude/` | `/sync-brain` |
 
@@ -75,6 +76,7 @@ escribe codigo ni documentacion; avisa y se aparta.
 | `manage-memory` | Decide si un hecho se guarda, si es del equipo o propio, y donde | — |
 | `sync-brain` | Contrastar el `.claude/` de un repo contra el cerebro y decidir que absorber; cierra con Doctor | — |
 | `brain-doctor` | Diagnostico del cerebro: hooks, README, secretos, memorias, repos y ambientes. No corrige nada | — |
+| `diagnose-machine` | Diagnostico del computador: rendimiento, actualizaciones, bateria, disco y espacio; compara con la medicion anterior. Solo lee | `brain/machine/history/` |
 | `ambiente` | Muestra o cambia el ambiente (local, desa, qa, pre, prod) y el modo. Solo la invocas tu; unica via a produccion | `brain/environments.json` |
 
 `start-development` y `finish-development` son pareja: abren y cierran el mismo desarrollo. Las
@@ -138,6 +140,8 @@ Muestra **modelo │ proyecto │ rama**. Opus sale en amarillo y Sonnet en verd
 | `hooks/` | Disparadores |
 | `brain/projects.json` | Que repos componen cada proyecto. **Registro unico** |
 | `brain/lib/` | Motores compartidos: proyectos, secretos, upstream, enchufe |
+| `brain/lib/machine-check.mjs` | El diagnostico del computador, con sus modulos en `brain/lib/machine/`. Solo lee, sin sudo |
+| `brain/machine/history/` | Una foto por diagnostico, para comparar. **Fuera del control de versiones** |
 | `brain/projects/<proy>/` | Perfiles: `manual/`, `stack/`, `docs/`, `skills/local-*` |
 | `brain/upstream/` | Foto del `.claude/` de cada repo en su ultima revision |
 | `brain/projects/<proy>/exploration/` | Mapa tecnico por modulo: donde esta cada endpoint, permiso y servicio |
