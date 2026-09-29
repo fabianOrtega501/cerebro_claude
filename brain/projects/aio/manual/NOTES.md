@@ -289,6 +289,11 @@ Cada uno de estos puntos costó una corrida fallida:
   los campos que dependen de él (Actividad depende de Sistema). Una relectura inmediata cae en
   ese hueco y no ve ningún campo: hay que volver a esperar a que el formulario monte, y esperar
   también a los campos que están **deshabilitados** mientras cargan.
+- **El boton de guardar del formulario estandar cambia de texto segun la accion**: `Guardar` al
+  crear y **`Editar`** al editar. Buscar "Guardar" en la edicion no encuentra nada y el flujo sigue
+  como si hubiera guardado.
+- **El buscador de Clientes abre en skeletons**, a diferencia del de la tabla estandar: esperar el
+  dialogo no basta, hay que esperar el campo `[id^="app-text-field-name-"]`.
 - **El `.footer-dialog` de `DialogComponent` es `position: fixed` a lo ancho de la ventana**,
   con `z-index: 999`: se lleva el click de cualquier botón que caiga en esa franja, y el
   síntoma es que no pasa nada. Bajar el scroll del diálogo sube los botones por encima.
@@ -379,6 +384,7 @@ grep -o "[a-z0-9_-]*\.png" docs/AIO/<ruta>/<Documento>.md | sort -u
 | Operaciones > Despachos | `modules/operations/dispatches/capture-change-vehicle.mjs` | `dispatch-change-vehicle` (cambio de vehiculo del despacho, la accion con permiso propio). Absorbido del `.claude/` del repo |
 | Respel > Clientes | `modules/respel/clients/capture.mjs` | `clients-map` (mapa geografico de clientes). Absorbido del repo; trae su `seed.sql` |
 | Respel > Clientes | `modules/respel/client-loyalties/capture.mjs` | `client-loyalties-authorization` (ventana de Autorización de fidelización, dentro del asistente de Gestiones: `clients.md`). Trae su `seed.sql`. Hay que pasarle `--empresa "Empresa Demo"` |
+| Respel > Comercial | `modules/respel/client-operation-costs/capture.mjs` | `client-operation-costs` (maestro Costos de Operación: `client-operation-costs.md`, y su opción en la ficha del cliente: `clients.md`). Trae su `seed.sql` con cuatro vigencias de COSMITET LTDA en PROMOCALI, una por estado; ese cliente tiene prestaciones ejecutadas en 2026, que es lo que hace salir el aviso de rentabilidad. No guarda nada: cierra cada formulario con Cerrar |
 | Operaciones > Despachos | `modules/operations/dispatches/capture-daily-filters.mjs` | `dispatch-daily-filters` (criterios de la Gestión Diaria: `Despachos.md`). Con `--turno`, que debe tener rutas cuya frecuencia cubra hoy, y `--vehiculo` / `--otro-vehiculo`. Es sobre todo prueba de la cascada de limpieza. **La cascada del campo vaciado está en `qa` pero no en `prod`**: sobre una rama de `prod` esa comprobación falla y no es un fallo del flujo. Absorbido del repo |
 | Operaciones > Despachos | `modules/operations/dispatches/capture-daily-card.mjs` | `dispatch-daily-card` (la tarjeta del despacho encontrado, con **Servicio** y **Vehículo**: `Despachos.md`). Con `--fecha`, `--turno` y `--vehiculo`, que tienen que apuntar a un día con despachos. Absorbido del repo |
 | Mantenimiento > Bitácora | `modules/maintenance/logbook/capture-search.mjs` | `logbook-search` (formulario de búsqueda, ya sin el campo **Tipo de Equipo**: `BitacoraDeMantenimiento.md`). Con `--vehiculo`, la etiqueta del desplegable (código/placa), que debe apuntar a un vehículo **con** bitácoras. Absorbido del repo |

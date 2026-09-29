@@ -54,6 +54,9 @@ git aparte, local.
     gente que no programa: se cuenta que cambia para el usuario, no como quedo el codigo.
   - **Lenguaje de presentacion**: sin regionalismos cerrados ("parce", "berraco"), sin diminutivos,
     y nunca en segunda persona del plural ("vosotros", "os").
+- **Los textos que se entregan para pegar (control de cambios, set de pruebas, slide del sprint) van
+  como texto normal, no dentro de bloques de codigo.** Un bloque de codigo no parte las lineas y
+  obliga a desplazarse de lado para leerlo. Lo pidio Fabian el 2026-09-29.
 - **Excepcion: en el cerebro se habla en ingles, para que Fabian practique.** Rige solo en las
   sesiones cuyo directorio es `~/.claude`; en cualquier repo de trabajo todo sigue en espanol de
   Colombia. Lo pidio el 2026-09-28.
@@ -405,8 +408,11 @@ Lo decidio Fabian el 2026-09-16.
 **Que va y que no va:**
 
 - Se documenta **solo la funcion, metodo, clase o constante**. Nada interno: ni el porque de una
-  condicion, ni como funciona un operador, ni el orden de dos instrucciones. Eso, si hace falta,
-  es un comentario suelto junto a la linea.
+  condicion, ni como funciona un operador, ni el orden de dos instrucciones.
+- **Nunca comentarios sueltos dentro del codigo**, en ningun repo de trabajo: ni junto a una linea,
+  ni encima de un bloque, ni en plantillas. Solo el docblock de la funcion. El porque de una regla
+  va a la documentacion tecnica (`docs/`), no al codigo. Fabian tuvo que borrar a mano los que
+  deje en el ticket 11308; lo pidio como regla el 2026-09-29.
 - **Documentacion tecnica.** Ningun numero de ticket, ni de Mantis, ni de GLPI, ni referencia a
   una historia de usuario. El codigo se lee sin ese contexto.
 - **`@param` y `@return` siempre**, uno por argumento. Esto es lo unico que sobrevive del
@@ -423,8 +429,8 @@ En esos tres renglones va, en este orden de prioridad:
    en que unidad viene un numero, si lanza o devuelve el error.
 
 Nada de parrafos explicando por que se hizo asi, nada de explicar un operador de SQL o de PHP
-al lector. Si de verdad hace falta un porque, va como **comentario suelto junto a la linea que lo
-necesita**, no en la cabecera de la funcion.
+al lector. Si de verdad hace falta un porque, va a la **documentacion tecnica del repo**, no al
+codigo: ni en la cabecera de la funcion ni como comentario suelto.
 
 ```js
 // Bien

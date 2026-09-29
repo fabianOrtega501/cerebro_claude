@@ -29,9 +29,10 @@ import { MAPPINGS as operationsRoutes } from "./modules/operations/routes/mappin
 import { MAPPINGS as operationsTraining } from "./modules/operations/training-records/mappings.mjs";
 import { MAPPINGS as respelClients } from "./modules/respel/clients/mappings.mjs";
 import { MAPPINGS as respelClientLoyalties } from "./modules/respel/client-loyalties/mappings.mjs";
+import { MAPPINGS as respelClientOperationCosts } from "./modules/respel/client-operation-costs/mappings.mjs";
 import { MAPPINGS as publicCitizenPortal } from "./modules/public/citizen-portal/mappings.mjs";
 
-const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsRoutes, ...operationsTraining, ...respelClients, ...respelClientLoyalties, ...publicCitizenPortal };
+const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsRoutes, ...operationsTraining, ...respelClients, ...respelClientLoyalties, ...respelClientOperationCosts, ...publicCitizenPortal };
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {
