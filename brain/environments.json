@@ -5,7 +5,13 @@
     "PROD": ["prod"]
   },
   "environments": {
-    "desa": { "hosts": [], "ssh": [], "databases": [], "paths": [], "mcp": [] },
+    "desa": {
+      "hosts": ["172.17.10.15"],
+      "ssh": [],
+      "databases": [],
+      "paths": [],
+      "mcp": []
+    },
     "qa": {
       "hosts": [],
       "ssh": [],

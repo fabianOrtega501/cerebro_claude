@@ -279,6 +279,15 @@
       "cleanStreak": 0,
       "tickets": [],
       "recurringErrors": []
+    },
+    "offline-first-sincronizacion": {
+      "label": "Apps offline-first: importar a la base local, trabajar sin red y enviar por lotes",
+      "level": "pendiente",
+      "keywords": [],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
     }
   }
 }
