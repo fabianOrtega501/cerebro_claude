@@ -39,6 +39,10 @@ hace falta configurar, cómo verificar que hay datos, la estructura de su manual
 flujo ya escrito y —lo más valioso— la lista de trampas de esa app, cada una pagada con una
 corrida fallida.
 
+**Para verificar lo publicado, el manual está en `https://services.datint.co/Manual/docs/<id del
+sidebar>/`**, con barra final. La `url` de `website/siteConfig.js` en `manua-web` declara un
+dominio viejo que ya no resuelve: no la uses.
+
 ## 3. Preparar la rama del manual — antes de escribir nada ahí
 
 La documentación **no se escribe sobre lo que estuviera activo** en el repo del manual: nace de
@@ -254,6 +258,20 @@ escritorio y una de móvil— la oculta mide 0×0 y su centro cae sobre cualquie
 
 Al escribir un flujo nuevo, conviene la misma pauta: verificar cada paso en el momento en vez de
 dejar que el error salte tres pasos después, lejos de su causa.
+
+### Un parche desde CDP que la app no ve
+
+**Un `import()` dinámico desde CDP no devuelve la misma instancia de módulo que cargó la app**, así
+que parchear el prototipo de un servicio no cambia el que usa el componente. Para mostrar un
+estado que no se puede provocar (por ejemplo, uno que solo existe en nativo), se escribe el estado
+del que lee el componente, en el store de Pinia de la app montada:
+
+```js
+document.querySelector('#app').__vue_app__.config.globalProperties.$pinia.state.value.<store>
+```
+
+Escríbelo cuando el flujo real ya llegó a ese punto, no antes: si no, la captura muestra un orden
+que nunca ocurre.
 
 ## 8. Al terminar
 
