@@ -31,7 +31,9 @@ El método, en cuatro pasos:
 
 Dos herramientas que alcanzan para casi todo:
 
-- **`grep` del nombre del dato** en todo el repo, no solo en la carpeta del módulo. Un nombre en
+- **`grep` del nombre del dato** en todo el repo, no solo en la carpeta del módulo. `grep` es el
+  "Ctrl+F" de la terminal, pero sobre miles de archivos a la vez: `grep -rn "texto" src` recorre
+  la carpeta (`-r`) y devuelve cada archivo y número de línea (`-n`) donde aparece. Un nombre en
   `snake_case` (`capture_staff_information`) suele cruzar de la API a la base local y a la vista
   sin cambiar.
 - **`git log -S "<texto>"`**: dice en qué commit apareció una línea. Si la línea sospechosa entró
