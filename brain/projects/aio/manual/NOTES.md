@@ -328,6 +328,17 @@ El candado solo se pinta si `is_active && isCommercialDirector && allows_authori
 El flujo **no confirma la decision**: abre la ventana y la fotografia en sus dos estados. Guardar
 cambiaria el estado del acuerdo y la siguiente corrida ya no encontraria nada pendiente.
 
+Desde el 2026-09-30 un acuerdo **sin elementos pactados no ofrece decidir**: la ventana oculta los
+radios, las notas y Guardar, y deja solo Cerrar. Tres consecuencias para el flujo:
+
+- **`aprobar` y `rechazar` necesitan un acuerdo pendiente con elementos.** Los pendientes de
+  `Prueba Catastro` hoy no los tienen, asi que esas dos capturas no se pueden regenerar con el
+  escenario actual hasta agregarle elementos a uno.
+- **La vista `sin-elementos`** (`--solo sin-elementos --acuerdo 5`) abre el acuerdo por su id, no el
+  primer candado, y falla si la ventana ofrece radios. `seed.sql` deja sus totales en nulo.
+- **El candado ya no lleva `title`**: se busca por `aria-label="Autorización de fidelización"`, y la
+  fila se busca dentro de `.v-dialog tbody tr`, porque la primera tabla del DOM es la de clientes.
+
 ### Gestion Diaria de despachos: el orden de turno y fecha
 
 Dos trampas del buscador de la Gestion Diaria, documentadas por el equipo en su copia de la skill

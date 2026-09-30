@@ -11,5 +11,6 @@ export const MAPPINGS = {
 		"acciones-tabla.png": "Respel/Maestros/Clientes/Gestiones/loyalty/autorizacion-acciones.png",
 		"modal-aprobar.png": "Respel/Maestros/Clientes/Gestiones/loyalty/autorizacion-aprobar.png",
 		"modal-rechazar.png": "Respel/Maestros/Clientes/Gestiones/loyalty/autorizacion-rechazar.png",
+		"modal-sin-elementos.png": "Respel/Maestros/Clientes/Gestiones/loyalty/autorizacion-sin-elementos.png",
 	},
 };

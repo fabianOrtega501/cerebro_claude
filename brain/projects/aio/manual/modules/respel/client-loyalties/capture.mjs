@@ -9,7 +9,7 @@
  * Uso:
  *   node --experimental-websocket modules/respel/client-loyalties/capture.mjs --salida <carpeta>
  *        [--empresa "PROMOCALI"] [--cliente "Prueba Catastro"]
- *        [--solo tabla|aprobar|rechazar|todo]
+ *        [--solo tabla|aprobar|rechazar|todo|sin-elementos] [--acuerdo 5]
  *
  * Solo lee: abre la ventana y la fotografia, nunca confirma la decision. Los valores
  * presentables del acuerdo los deja `seed.sql`, que hay que aplicar antes.
@@ -48,9 +48,10 @@ const outputDir = arg("salida", "./capturas");
 const company = arg("empresa", "PROMOCALI");
 const clientName = arg("cliente", "Prueba Catastro");
 const only = arg("solo", "todo");
+const agreementId = arg("acuerdo", "5");
 
-/** Boton del candado: `.v-item` la comparte con Elementos, asi que se filtra por su `title`. */
-const AUTHORIZE_BUTTON = '[title="Autorización de fidelización"]';
+/** Boton del candado. Las acciones de la fila ya no llevan `title`: el nombre va en `aria-label`. */
+const AUTHORIZE_BUTTON = 'button[aria-label="Autorización de fidelización"]';
 
 /** Contenedor del formulario de la ventana. `.v-dialog` no sirve para esperar: es `position: fixed`. */
 const DIALOG_FORM = ".authorization-form";
@@ -231,6 +232,40 @@ async function run() {
 			await highlight(cdp, AUTHORIZE_BUTTON, { label: "1", padding: 8 });
 			await screenshot(cdp, `${outputDir}/acciones-tabla.png`);
 			await clearHighlights(cdp);
+		}
+
+		// Vista aparte, fuera de "todo": abre un acuerdo concreto sin elementos pactados, cuya ventana no
+		// ofrece decidir. La fila se elige por su id, porque el primer candado puede ser de otro acuerdo.
+		if (only === "sin-elementos") {
+			const opened = await evaluate(
+				cdp,
+				`(() => {
+					const row = [...document.querySelectorAll('.v-dialog tbody tr')]
+						.find(r => [...r.querySelectorAll('td')].some(td => td.textContent.trim() === ${JSON.stringify(agreementId)}));
+					const button = row && [...row.querySelectorAll('${AUTHORIZE_BUTTON}')]
+						.find(b => b.getBoundingClientRect().width > 0);
+
+					if (!button) return false;
+
+					button.click();
+
+					return true;
+				})()`,
+			);
+
+			if (!opened) throw new Error(`El acuerdo ${agreementId} no muestra el candado de autorizacion.`);
+
+			await waitForSelector(cdp, DIALOG_FORM, { timeout: 30000 });
+			await wait(2500);
+
+			const radios = await evaluate(cdp, `document.querySelectorAll('.v-overlay--active .v-radio').length`);
+
+			if (radios > 0) throw new Error(`El acuerdo ${agreementId} ofrece decidir: ¿tiene elementos pactados?`);
+
+			await shotTopDialog(cdp, `${outputDir}/modal-sin-elementos.png`);
+			console.log("listo:", outputDir);
+
+			return;
 		}
 
 		// La ventana se abre una sola vez y se fotografia en sus dos estados.

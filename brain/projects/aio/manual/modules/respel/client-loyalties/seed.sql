@@ -20,3 +20,12 @@ set permanence_months        = 24,
 where client_id = 1076155
   and status = 'Pendiente de Autorización'
   and active = true;
+
+-- Acuerdo de la vista `sin-elementos`: sin elementos pactados nunca se calculan el total ni el valor
+-- mensual, y la ventana los muestra en $ 0. Se dejan vacios para que la captura diga lo mismo que un
+-- acuerdo real sin elementos.
+update public.client_loyalties
+set total_advantage_value    = null,
+    monthly_individual_value = null
+where id = 5
+  and client_id = 1076155;
