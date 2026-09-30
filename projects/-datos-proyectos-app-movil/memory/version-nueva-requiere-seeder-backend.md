@@ -1,0 +1,1 @@
+/datos/proyectos/app-movil/.claude/memory/version-nueva-requiere-seeder-backend.md
