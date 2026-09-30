@@ -27,6 +27,36 @@ export const VIEWPORT = { width: 1486, height: 795 };
  */
 export const DEFAULT_BASE = "http://localhost:8081";
 
+/** Nombre del producto tal como lo ve el usuario final, sin el sufijo del ambiente. */
+export const NOMBRE_PUBLICADO = "STATUS";
+
+/**
+ * Pone el nombre publicado donde la app muestra el del ambiente. En local sale
+ * `STATUS-LOCAL`, y la barra superior le suma `-PRUEBAS`, que no van al manual.
+ *
+ * @param {object} cdp Conexion al navegador
+ * @returns {Promise<number>} Cuantos textos se reemplazaron
+ */
+export async function usarNombrePublicado(cdp) {
+  return evaluate(
+    cdp,
+    `(() => {
+      const nombre = ${JSON.stringify(NOMBRE_PUBLICADO)};
+      let cambiados = 0;
+      const recorrer = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const pendientes = [];
+      while (recorrer.nextNode()) {
+        if (/STATUS-[A-Z]+/.test(recorrer.currentNode.nodeValue)) pendientes.push(recorrer.currentNode);
+      }
+      for (const nodo of pendientes) {
+        nodo.nodeValue = nodo.nodeValue.replace(/STATUS(-[A-Z]+)+/g, nombre);
+        cambiados += 1;
+      }
+      return cambiados;
+    })()`
+  );
+}
+
 /**
  * Credenciales del usuario de pruebas de Status.
  *

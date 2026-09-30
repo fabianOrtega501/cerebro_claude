@@ -84,12 +84,33 @@ su selector de formularios sale vacio aunque el usuario sea superusuario.
   **negrita** al inicio.
 - Varios documentos estan escritos sin tildes. Es un defecto heredado: lo nuevo se escribe bien.
 
+## Lo que el ambiente local mete en las capturas
+
+Tres cosas que salen en pantalla y **no pueden publicarse**. Descubiertas el 2026-09-30 al
+regenerar el ingreso.
+
+| Que se ve | De donde sale | Que hacer |
+|---|---|---|
+| El titulo dice `STATUS-LOCAL`, y en la barra superior `STATUS-LOCAL-PRUEBAS` | `VUE_APP_NAME_APP` del `.env` de `status-frontend`; `TheNavbarHorizontal` le suma el sufijo | Llamar a `usarNombrePublicado(cdp)` de `lib/session.mjs` justo antes de cada `screenshot`. Reemplaza el texto en el DOM, asi no hay que tocar el `.env` ni reiniciar el dev server |
+| El logo de la empresa sale como imagen rota en la barra | Las empresas de la base local tienen la columna `logo` vacia. La API responde bien: `status: warning`, *"El logo no se ha cargado aun"* | No es un defecto. Para capturar la barra hay que cargarle un logo a la empresa primero |
+| Un aviso rojo *"Error cargando datos de eficiencia: (permiso denegado)"* encima del tablero | El widget lee `bi.vw_balance_2`, que por `dblink` va al datawarehouse externo. Ese permiso no existe en local | **El tablero no se puede capturar desde local** mientras siga asi |
+
+`usarNombrePublicado` vive en `session.mjs` y no en el modulo porque le sirve a cualquier captura
+de Status que incluya la barra o la tarjeta del ingreso.
+
 ## Modulos con flujo escrito
 
 | Modulo | Que captura |
 |---|---|
 | `certificacion-variables` | Formulario *Registrar Variables SD* y tabla de informacion de rellenos sanitarios |
 | `gestion-tramites` | Listado, ventana de creacion, captura del formulario, formatos afectados, edicion y seguimiento |
+| `ingreso` | Pantalla de ingreso, recuadro del captcha, seleccion de empresa, tablero y barra superior |
+
+**Las imagenes del ingreso ya estaban publicadas** en
+`img/Status/ManualUsuarioBI/AccesoUsuarios/`, con los nombres `AccesoUsuarios_1..3`, y las lee
+`docs/Status/ManualUsuarioBI/AccesoUsuarios/ingreso_plataforma.md`. El `mappings.mjs` del modulo
+nacio apuntando a `Status/Ingreso/`, que no existe en el manual; se corrigio el 2026-09-30.
+Renombrar esas imagenes romperia el documento.
 
 ## Antes de capturar
 

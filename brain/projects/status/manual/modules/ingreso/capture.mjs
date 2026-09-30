@@ -19,6 +19,7 @@ import {
   pulsarBoton,
   describeScreen,
   type,
+  usarNombrePublicado,
   DEFAULT_BASE,
   VIEWPORT,
 } from "../../lib/session.mjs";
@@ -87,6 +88,9 @@ try {
   await waitForSelector(cdp, 'input[name="email"]', { timeout: 90000 });
   await wait(2500);
 
+  // El nombre del ambiente no va al manual: en local la app se llama STATUS-LOCAL.
+  await usarNombrePublicado(cdp);
+
   // 1. La pantalla de ingreso completa.
   await screenshot(cdp, `${salida}/login.png`);
 
@@ -117,12 +121,14 @@ try {
     throw new Error(`El login no paso del primer paso.\n${await describeScreen(cdp)}`);
   });
   await wait(1500);
+  await usarNombrePublicado(cdp);
   await screenshot(cdp, `${salida}/empresa.png`);
 
   // 4. Ya dentro: el tablero, que es donde aterriza todo el mundo.
   await selectOption(cdp, ".v-select", empresa);
   await pulsarBoton(cdp, "Ingresar");
   await wait(9000);
+  await usarNombrePublicado(cdp);
   await screenshot(cdp, `${salida}/tablero.png`);
 
   // 5. La barra superior, señalando el boton que cambia el tema. Se busca por su `title` y no
@@ -133,6 +139,7 @@ try {
     throw new Error(`No aparecio el boton de tema en la barra.\n${await describeScreen(cdp)}`);
   });
 
+  await usarNombrePublicado(cdp);
   await highlight(cdp, BOTON_TEMA, { label: "1", padding: 8 });
   await screenshot(cdp, `${salida}/barra-superior.png`, { selector: ".vx-navbar-wrapper" });
   await clearHighlights(cdp);
