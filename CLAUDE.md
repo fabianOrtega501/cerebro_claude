@@ -86,6 +86,10 @@ git aparte, local.
   del equipo y una atribucion a la herramienta ahi no le sirve a nadie; ademas ensucia el
   `git log` y los MR. El mensaje termina en su ultima linea util. Lo pidio Fabian el 2026-09-07.
 - Nombres de codigo (funciones, variables, archivos) en ingles; comentarios y documentacion en espanol.
+- **Nombres de funciones, metodos y pruebas: maximo 5 palabras.** `test_approval_requires_advantage_items`
+  si; `test_agreement_without_advantage_items_cannot_be_approved` no. En las pruebas el prefijo
+  `test_` no cuenta. Si no cabe en cinco palabras, el detalle va en el docblock. Lo pidio Fabian el
+  2026-09-30.
 - **Credenciales: en ningun archivo versionado, nunca.** Van a `~/.claude/secrets.env`, que la
   lista blanca del `.gitignore` deja fuera del repo. Los scripts las leen de ahi.
 - **Rutas absolutas: aqui si, en un repo de trabajo jamas.** El cerebro es local y personal, y hay
