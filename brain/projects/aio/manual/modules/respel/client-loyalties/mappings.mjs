@@ -13,4 +13,11 @@ export const MAPPINGS = {
 		"modal-rechazar.png": "Respel/Maestros/Clientes/Gestiones/loyalty/autorizacion-rechazar.png",
 		"modal-sin-elementos.png": "Respel/Maestros/Clientes/Gestiones/loyalty/autorizacion-sin-elementos.png",
 	},
+
+	/* Signature audit of the agreement, documented in `Respel/Comercial/Fidelizacion/auditoria-firmas.md`. */
+	"signature-audit": {
+		"acciones.png": "Respel/Comercial/Fidelizacion/acciones.png",
+		"auditoria-firmas.png": "Respel/Comercial/Fidelizacion/auditoria-firmas.png",
+		"auditoria-firmas-expandida.png": "Respel/Comercial/Fidelizacion/auditoria-firmas-expandida.png",
+	},
 };

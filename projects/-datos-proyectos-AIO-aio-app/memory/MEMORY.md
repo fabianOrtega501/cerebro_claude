@@ -9,6 +9,7 @@ hay un enlace: **no se editan desde el cerebro, se editan en el repo**. Las mant
 - [lint-del-aio-reformatea-todo](lint-del-aio-reformatea-todo.md) — En aio-app `pnpm lint` lleva --fix y reformatea todo el repo; nunca usarlo para verificar
 - [locales-muertos-del-aio](locales-muertos-del-aio.md) — En aio-app solo es.json y en.json estan vivos; fr.json y ar.json son restos de la plantilla del tema, no traducciones atrasadas
 - [run-artisan-via-sail](run-artisan-via-sail.md) — En los repos del AIO, ejecutar comandos artisan con sail, no con php artisan del host ni docker exec
+- [typecheck-del-aio-no-sirve](typecheck-del-aio-no-sirve.md) — En aio-app `pnpm typecheck` no sirve como control; hay que comparar los errores de los archivos del ticket contra desa
 
 **Propias** — se quedan aqui porque no le sirven a nadie mas: preferencias de como quiero que se
 trabaje, o hechos que solo valen en esta maquina o en este clon.

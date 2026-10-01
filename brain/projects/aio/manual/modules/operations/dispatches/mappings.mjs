@@ -69,4 +69,11 @@ export const MAPPINGS = {
 	"dispatch-daily-card": {
 		"gestion_diaria_tarjeta.png": "Operaciones/Despachos/gestion-diaria-tarjeta.png",
 	},
+
+	/* Reopen a closed dispatch, from the table and from the daily management. New images. */
+	"dispatch-reopen": {
+		"reabrir-tabla.png": "Operaciones/Despachos/reabrir-despacho-tabla.png",
+		"reabrir-boton.png": "Operaciones/Despachos/reabrir-despacho-boton.png",
+		"reabrir-modal.png": "Operaciones/Despachos/reabrir-despacho-formulario.png",
+	},
 };

@@ -13,4 +13,11 @@ export const MAPPINGS = {
 	"logbook-search": {
 		"bitacora_buscar.png": "Mantenimiento/bita3.png",
 	},
+
+	/* Logbook follow-ups with responsible area and times. Already published: regenerate with `--sobrescribir`. */
+	"logbook-tracking": {
+		"bitacora_seguimientos.png": "Mantenimiento/bita7.png",
+		"bitacora_seguimiento_form.png": "Mantenimiento/bita8.png",
+		"bitacora_seguimiento_detalle.png": "Mantenimiento/bita9.png",
+	},
 };

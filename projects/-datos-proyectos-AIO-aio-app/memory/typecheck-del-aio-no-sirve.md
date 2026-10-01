@@ -1,0 +1,1 @@
+/datos/proyectos/AIO/aio-app/.claude/memory/typecheck-del-aio-no-sirve.md
