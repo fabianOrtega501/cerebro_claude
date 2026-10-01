@@ -59,6 +59,8 @@ vista (.vue)  ->  servicio local (services/app, SQL a SQLite)  ->  importación 
   el dato no llegó: funciona en la prueba y rompe la regla de la configuración.
 - **Quedarse en un solo repo.** Si el filtro que se sospecha lo aplica el backend, hay que ir a
   mirar qué hace con él, aunque el arreglo termine siendo del front.
+- **Tuyo, ticket 11349** — Proponer cambiar el backend sin leer cómo trataba el parámetro (ya era
+  opcional), y agregar una protección que ya existía en otro tramo. Leer antes de proponer.
 - **No preguntar por qué está la línea.** Borrar un filtro sin mirar el `git log` puede reabrir la
   falla que ese filtro corrigió.
 
@@ -66,7 +68,7 @@ vista (.vue)  ->  servicio local (services/app, SQL a SQLite)  ->  importación 
 
 | Ticket | Proyecto | Como aparecio | Pista mas alta |
 |---|---|---|---|
-| 11349 | ami | Visita sin preguntas que no pedía firma: la causa estaba en un filtro de la importación | — |
+| 11349 | ami | Visita sin preguntas que no pedía firma: la causa estaba en un filtro de la importación | 2 |
 
 ## Preguntas de cierre
 

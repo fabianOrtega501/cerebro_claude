@@ -61,13 +61,15 @@ El caso de Visitas Clientes de Green:
   el problema es que no los tiene.
 - **Probar sin volver a importar.** Cambiar el filtro y mirar la pantalla sin importar de nuevo
   muestra el comportamiento viejo, y lleva a pensar que el cambio no sirvió.
+- **Tuyo, ticket 11349** — Creer que cerrar sesión o reinstalar refresca los datos. Lo que los
+  refresca es volver a importar; reinstalar además borra lo que no se ha enviado.
 - **Escribir directo a la API desde la pantalla** para esquivar el problema: rompe el modo sin red.
 
 ## 5. Apariciones
 
 | Ticket | Proyecto | Como aparecio | Pista mas alta |
 |---|---|---|---|
-| 11349 | ami | Un maestro de formulario sin preguntas no llegaba al celular y la visita no pedía firma | — |
+| 11349 | ami | Un maestro de formulario sin preguntas no llegaba al celular y la visita no pedía firma | 2 |
 
 ## Preguntas de cierre
 

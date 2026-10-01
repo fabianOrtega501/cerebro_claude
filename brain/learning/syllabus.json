@@ -233,7 +233,7 @@
     },
     "depuracion": {
       "label": "Depurar: leer el error, aislar la causa y comprobar la hipotesis",
-      "level": "pendiente",
+      "level": "practicado",
       "keywords": [
         "error",
         "falla",
@@ -243,9 +243,17 @@
         "log",
         "hotfix"
       ],
-      "lastPracticed": null,
-      "cleanStreak": 0,
-      "tickets": [],
+      "lastPracticed": "2026-09-30",
+      "cleanStreak": 1,
+      "tickets": [
+        {
+          "ticket": "11349",
+          "project": "ami",
+          "date": "2026-09-30",
+          "hint": 2,
+          "blocking": 0
+        }
+      ],
       "recurringErrors": []
     },
     "git-flujo": {
@@ -282,12 +290,22 @@
     },
     "offline-first-sincronizacion": {
       "label": "Apps offline-first: importar a la base local, trabajar sin red y enviar por lotes",
-      "level": "pendiente",
+      "level": "practicado",
       "keywords": [],
-      "lastPracticed": null,
-      "cleanStreak": 0,
-      "tickets": [],
-      "recurringErrors": []
+      "lastPracticed": "2026-09-30",
+      "cleanStreak": 1,
+      "tickets": [
+        {
+          "ticket": "11349",
+          "project": "ami",
+          "date": "2026-09-30",
+          "hint": 2,
+          "blocking": 0
+        }
+      ],
+      "recurringErrors": [
+        "Pensó que cerrar sesión o reinstalar refresca los datos; lo que los refresca es volver a importar"
+      ]
     }
   }
 }
