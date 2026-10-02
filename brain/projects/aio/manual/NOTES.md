@@ -50,6 +50,17 @@ dependencies changed. reloading` en su log). La app vuelve al splash y la espera
 agota. No es un fallo del flujo: se vuelve a correr y con la cache caliente pasa. Si una corrida
 falla con el splash en `_fallo.png`, mirar primero el log del dev server.
 
+**Dos dev servers del mismo repo se pisan la caché.** Si hay un segundo `vite` (por ejemplo, uno
+en el 5174 que el usuario levantó para probar), comparten `node_modules/.vite`. Cuando el nuevo
+vuelve a optimizar las dependencias, el viejo sigue sirviéndolas con los hashes anteriores y la app
+**queda en blanco, sin excepciones en consola**: el flujo falla con `Timeout esperando
+input[type="email"]`. Revisar con `ss -ltnp | grep 517` y pasar `--base` con el puerto que sí
+carga. No matar ninguno de los dos sin preguntar: los dos son del usuario. Pasó el 2026-10-02.
+
+**Un `timeout` de shell que corta el flujo deja el navegador vivo en el 9222**, porque mata a Node
+antes del `finally`. La corrida siguiente se conecta a él. Correr `close-orphans.mjs` después de
+cada corte, aunque el script diga que no hay huérfanos al arrancar.
+
 Tambien hace falta el **backend local arriba** (el de `aio-backend`, con Sail), salvo en las
 vistas publicas que no consultan nada.
 
@@ -413,6 +424,7 @@ grep -o "[a-z0-9_-]*\.png" docs/AIO/<ruta>/<Documento>.md | sort -u
 | Operaciones > Despachos | `modules/operations/dispatches/capture-reopen.mjs` | `dispatch-reopen` (acción **Reabrir Despacho** en la fila de la tabla y en la tarjeta de la Gestión Diaria, con su modal del motivo: `Despachos.md`). Con `--despacho`, que tiene que estar **Cerrado**, y `--abierto`, uno Programado o En Operación. El usuario de pruebas necesita el permiso `/operations/reopen-dispatch` en la empresa. **Nunca confirma** la reapertura. Sirve de prueba: una corrida limpia termina en `hallazgos (0)`. Absorbido del repo |
 | Mantenimiento > Bitácora | `modules/maintenance/logbook/capture-tracking.mjs` | `logbook-tracking` (seguimientos con **área responsable**, fechas y tiempo transcurrido, su formulario y el detalle: `BitacoraDeMantenimiento.md`). Necesita una bitácora **En proceso** con al menos un seguimiento. Absorbido del repo |
 | Mantenimiento > Órdenes de trabajo | `modules/maintenance/work-orders/capture-supplies.mjs` | `work-order-supplies` (buscador de suministros con el menú desplegado: `WorkOrder.md`). Regenera `OT_26.png` con `--sobrescribir`. Absorbido del repo |
+| Respel > Operaciones > Prestación de Servicios | `modules/respel/service-provisions/capture.mjs` | `service-provisions-edit` (diálogo **Editar Prestación de Servicios** con una cantidad recibida decimal digitada: `Respel/Operaciones/service-provision.md`, regenera `pr_1.png` con `--sobrescribir`). Con `--prestacion`, que tiene que estar en la primera página y mostrar el lápiz; en PROMOCALI local sirve la 121354. **Nunca guarda**: digita y cierra |
 | Respel > Fidelización | `modules/respel/client-loyalties/capture-signature-audit.mjs` | `signature-audit` (acción de auditoría en el listado de acuerdos y la pantalla del quórum con la tabla de firmantes: `Comercial/Fidelizacion/auditoria-firmas.md`). Con `--cliente`, `--acuerdo` y `--solo acciones\|auditoria\|todo`. Saca la auditoría normal y **expandida**, y falla si abre a pantalla completa o sin el botón Ampliar. Espera las 102 de 120 firmas del acuerdo #5 de la base local, que se cargaron con un `seed.sql` que **nunca se commiteó**: sin él la barra sale casi vacía. Absorbido del repo, con `runSql` asíncrono |
 
 La navegación del wizard —abrir la pestaña Planes, abrir el wizard de una fila, saltar entre
