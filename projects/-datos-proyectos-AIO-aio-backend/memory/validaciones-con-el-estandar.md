@@ -1,0 +1,1 @@
+/datos/proyectos/AIO/aio-backend/.claude/memory/validaciones-con-el-estandar.md

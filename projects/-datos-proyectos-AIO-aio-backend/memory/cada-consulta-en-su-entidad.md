@@ -1,0 +1,1 @@
+/datos/proyectos/AIO/aio-backend/.claude/memory/cada-consulta-en-su-entidad.md
