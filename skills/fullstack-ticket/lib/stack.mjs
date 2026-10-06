@@ -2,14 +2,14 @@
  * Resuelve y presenta el proyecto sobre el que se va a trabajar un ticket full-stack.
  *
  * La skill es transversal, así que **lo primero es saber en qué proyecto está**. El usuario lo
- * indica al invocarla (`/fullstack-ticket aio`); si no lo dice, se deduce del repo actual.
+ * indica al invocarla (`/fullstack-ticket aio`); si no lo dice, se le pregunta. Nunca se deduce
+ * del directorio actual.
  *
  * Lo que imprime no es decorativo: es el contexto con el que se trabaja el resto de la sesión.
  * Sin él, la skill escribiría código a ciegas sobre rutas que puede no tener permitido tocar.
  *
  * Uso:
- *   `node stack.mjs`         deduce el proyecto del directorio actual
- *   `node stack.mjs aio`     fuerza un proyecto
+ *   `node stack.mjs aio`     el proyecto es obligatorio
  *   `node stack.mjs --list`  qué proyectos tienen stack definido
  *   `node stack.mjs aio --json`  salida procesable
  *   `node stack.mjs aio --from /ruta/al/repo`  raíz de sesión explícita
@@ -19,7 +19,6 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { projectOf } from "../../../brain/lib/projects.mjs";
 
 const BRAIN = join(homedir(), ".claude", "brain");
 
@@ -110,10 +109,10 @@ if (args.includes("--list")) {
 	process.exit(0);
 }
 
-const project = wanted ?? projectOf();
+const project = wanted;
 
 if (!project) {
-	console.error(`No se indicó proyecto y el repo actual no está registrado.\nÚsala así: /fullstack-ticket <proyecto>\nDisponibles: ${projectsWithStack().join(", ") || "(ninguno)"}`);
+	console.error(`Falta el proyecto.\nÚsala así: /fullstack-ticket <proyecto>\nDisponibles: ${projectsWithStack().join(", ") || "(ninguno)"}`);
 	process.exit(1);
 }
 
