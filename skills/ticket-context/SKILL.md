@@ -52,7 +52,7 @@ Segun el `code` que devuelva:
 | 6 | Falta una credencial | Decir la linea exacta que falta en `secrets.env`. **No inventarla ni reusar otra** |
 | 7 | Sin conexion o login rechazado | Si es timeout y el usuario esta fuera de la red corporativa, preguntar por la VPN |
 
-Si la misma HU viene en PDF y DOCX, se bajan las dos y se lee el DOCX: sus tablas salen limpias.
+Si la misma HU viene en PDF y DOCX, se bajan las dos y `hu.md` sale del DOCX: sus tablas salen limpias.
 
 ## Paso 3 — Leer lo que haga falta, nada mas
 

@@ -203,7 +203,7 @@ if (dirs === null) {
 const blocked = repos.filter(r => !r.exists || r.writable === false);
 
 if (blocked.length) {
-	console.log(`\nBLOQUEANTE: ${blocked.length} repo(s) sin acceso de escritura. Añádelos a "additionalDirectories"`);
-	console.log(`del settings.local.json del repo desde el que trabajas, y reinicia la sesión.`);
+	console.log(`\nBLOQUEANTE: ${blocked.length} repo(s) sin acceso de escritura. Regístralos en brain/projects.json,`);
+	console.log(`corre node ~/.claude/brain/lib/plug.mjs para regenerar "additionalDirectories" y reinicia la sesión.`);
 	process.exit(2);
 }

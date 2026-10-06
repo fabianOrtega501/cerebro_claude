@@ -1,6 +1,6 @@
 ---
 name: branch-starter
-description: Ejecuta la parte mecánica del checklist de arranque — actualizar ramas y crear la rama de trabajo— cuando ya se conocen proyecto, tipo, base y descripción. No decide nada ni pregunta: corre dos scripts y reporta. Lo usa la skill `start-development`.
+description: Ejecuta la parte mecánica del checklist de arranque — actualizar ramas y crear la rama de trabajo— cuando ya se conocen proyecto, tipo, base, descripción y lado. No decide nada ni pregunta: corre dos scripts y reporta. Lo usa la skill `start-development`.
 model: sonnet
 tools: Bash
 ---

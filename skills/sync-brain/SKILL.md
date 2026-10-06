@@ -122,10 +122,10 @@ sin saltarse ninguno:
 3. Solo con su si:
 
 ```bash
-git -C ~/.claude add -A && git -C ~/.claude commit -m "Absorbe <que> desde <repo>"
+git -C ~/.claude add -A && git -C ~/.claude commit -m "Absorb <que> from <repo>"
 ```
 
-Mensaje en espanol, descriptivo, diciendo de donde vino. Sin este commit no hay como revertir
+Mensaje en ingles, descriptivo, diciendo de donde vino. Sin este commit no hay como revertir
 una mezcla que salio mal, que es justo lo que este repo existe para permitir. El push a los dos
 remotos se ofrece aparte y tambien espera su si.
 
@@ -133,9 +133,8 @@ remotos se ofrece aparte y tambien espera su si.
 
 - **La foto excluye `settings.local.json`** a proposito: es local, tiene credenciales y no se
   versiona. No lo compares ni lo copies nunca al cerebro.
-- **Una skill del repo con el mismo nombre que una propia gana en ese repo**, porque el nivel
-  de proyecto tiene prioridad sobre el de usuario. Si quieres que la tuya mande dentro de ese
-  repo, hay que enchufarla con un symlink local ignorado en `.git/info/exclude` — no tocando
-  el `.gitignore` versionado.
+- **Una skill del repo con el mismo nombre que una propia no se usa en ese repo**: el nivel
+  personal (`~/.claude/skills/`) tiene prioridad sobre el de proyecto, asi que manda la propia
+  sin hacer nada.
 - **Nunca metas nada del cerebro en un commit del repo de trabajo.** Si un cambio se te fue al
   staging del repo, sacalo antes de seguir.

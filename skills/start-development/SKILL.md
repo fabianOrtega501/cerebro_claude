@@ -5,8 +5,8 @@ description: Usar SIEMPRE al empezar un desarrollo nuevo, antes de escribir una 
 
 # Arrancar un desarrollo
 
-Checklist obligatorio antes de tocar código. Tres pasos mecánicos y una recogida de contexto, en
-ese orden. **No saltarse ninguno ni cambiar el orden**: la rama tiene que nacer de un origen
+Checklist obligatorio antes de tocar código. Pasos mecánicos, después la recogida de contexto y el
+plan, en ese orden. **No saltarse ninguno ni cambiar el orden**: la rama tiene que nacer de un origen
 actualizado, y eso solo se garantiza actualizando primero.
 
 ## Paso 0 — Leer lo que ya dijo el usuario
@@ -31,11 +31,12 @@ lo vuelve un peaje en lugar de una ayuda.
 
 Los pasos 2 y 3 son mecánicos —correr dos scripts y leer su salida— y no necesitan un modelo
 pesado. **Cuando no falte ningún dato, delegarlos al subagente `branch-starter`, que corre en
-Sonnet**, con el proyecto, tipo, base, ticket y descripción en el prompt:
+Sonnet**, con el proyecto, tipo, base, ticket, descripción y lado en el prompt ("no lo sé" va
+como `both`):
 
 ```
 Agent(subagent_type: "branch-starter", run_in_background: false,
-      prompt: "proyecto: aio | tipo: feature | base: desa | ticket: 10842 | descripción: ...")
+      prompt: "proyecto: aio | tipo: feature | base: desa | ticket: 10842 | descripción: ... | lado: both")
 ```
 
 El paso 4 y todo lo que sigue —entender el enunciado, decidir si toca los dos lados, fijar el
@@ -91,14 +92,14 @@ base atrasada no falla ahora: falla al mezclar, con conflictos que no eran neces
 
 ## Paso 3 — Crear la rama
 
-Faltan cuatro datos, y **solo dos de ellos son elecciones**. `AskUserQuestion` sirve para elegir
+Faltan varios datos, y **solo algunos son elecciones**. `AskUserQuestion` sirve para elegir
 entre opciones; el ticket y la descripción son texto libre y meterlos ahí sale mal:
 
 - Una "pregunta" con una sola opción **se rechaza** — la descripción no cabe.
 - Una opción etiquetada *"Escribir el número"* **se puede seleccionar como si fuera la
-  respuesta**, y entonces hay que volver a pedir el número igualmente. Pasó en la segunda prueba.
+  respuesta**, y entonces hay que volver a pedir el número igualmente.
 
-Así que: **una llamada a `AskUserQuestion` con las dos preguntas reales, y en el mismo turno una
+Así que: **una llamada a `AskUserQuestion` con las preguntas de opciones que falten, y en el mismo turno una
 petición de texto con los dos datos libres.** Un solo intercambio, sin trampas.
 
 | Pregunta (opciones) | Valores |
@@ -239,8 +240,9 @@ después de que esta skill haya terminado.
 | **Entrega** | Todo igual que siempre |
 | **Práctica** | Encadenar `practice-ticket`, que conduce el desarrollo entero. Si el lado es "los dos" o "no lo sé", el contrato lo sigue fijando `fullstack-ticket` y su resultado entra como insumo de la Fase 3 de `practice-ticket` |
 
-En modo práctica, el plan del paso 5 lo redacta **el usuario** y yo lo corrijo. La exigencia del
-diagrama no cambia; cambia quién lo dibuja.
+En modo práctica, el borrador del plan del paso 5 lo escribe **el usuario**; yo lo corrijo, dibujo
+el diagrama con sus decisiones ya corregidas y redacto el plan de construcción, como dice la Fase 4
+de `practice-ticket`.
 
 ## Lo que esta skill NO hace
 

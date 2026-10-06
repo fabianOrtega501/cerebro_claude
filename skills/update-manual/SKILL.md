@@ -254,7 +254,7 @@ Al escribir un flujo nuevo, **cópiale el cierre a uno que ya lo haga bien** en 
 el elemento que crees.** Un velo de diálogo, un tooltip que quedó abierto o una barra fija se
 llevan el evento sin error ninguno, y el síntoma aparece pasos después y en otro sitio. Vale
 también para elementos duplicados: si el DOM tiene dos variantes del mismo botón —una de
-escritorio y una de móvil— la oculta mide 0×0 y su centro cae sobre cualquier otra cosa.
+escritorio y una de celular— la oculta mide 0×0 y su centro cae sobre cualquier otra cosa.
 
 Al escribir un flujo nuevo, conviene la misma pauta: verificar cada paso en el momento en vez de
 dejar que el error salte tres pasos después, lejos de su causa.
@@ -283,8 +283,9 @@ que nunca ocurre.
   el `NOTES.md` del perfil: algunos proyectos ensucian archivos generados al levantar el dev server.
 - **Si aprendiste algo nuevo de la app, escríbelo en el `NOTES.md` del perfil** antes de cerrar. Ese
   archivo es el que evita repetir corridas fallidas.
-- Si tocaste el motor, **commitea el cerebro**: `git -C ~/.claude add -A && git -C ~/.claude commit`
-  y `git -C ~/.claude push backup main`.
+- Si tocaste el motor, **ofrece commitear el cerebro**: primero se corre
+  `node ~/.claude/brain/lib/doctor.mjs` y su resultado se muestra con el mensaje propuesto; el
+  commit y el push se hacen solo con el sí del usuario.
 - Reportar qué capturas se regeneraron, qué documentos se editaron y qué imágenes previas se
   dejaron intactas.
 - El commit del manual queda en la rama que creó el paso 3, no en la que estuviera antes. **Después

@@ -31,7 +31,7 @@ brain/projects/<proy>/exploration/
 
 Un modulo, un archivo. El `<slug>` va en **ingles y kebab-case**, formado por el modulo del backend
 y el submodulo: `settings-reports.md`, `operation-dispatches.md`. En un proyecto que es solo movil
-—AMI, Ruta+— sobra el prefijo del proyecto: ya lo da la carpeta.
+—AMI, Ruta+— sobra el prefijo `mobile-` que en AIO marca los modulos de la app: ya lo da la carpeta.
 
 **No hay archivo de configuracion.** Lo que hace falta ya esta escrito: `stack.json` da los repos,
 sus roles y sus contenedores; `docs/profile.json` da el vocabulario de modulos del backend. Si
@@ -106,8 +106,8 @@ Las secciones que no apliquen se omiten; no se dejan vacias.
 - **Enlaces al codigo relativos y al archivo real**, para que se rompan de forma visible cuando
   algo se mueve: esa es la señal de que el mapa quedo viejo.
 - **Un hallazgo que no es de un modulo concreto no va aqui.** Si es una restriccion del entorno o
-  una correccion sobre como trabajar, va a `projects/<repo>/memory/`, que es donde el cerebro
-  guarda eso. No se abre una segunda memoria en paralelo.
+  una correccion sobre como trabajar, es una memoria: donde va —`<repo>/.claude/memory/` o
+  `projects/<repo>/memory/`— lo decide `manage-memory`. No se abre una segunda memoria en paralelo.
 
 ## Agregar un proyecto
 

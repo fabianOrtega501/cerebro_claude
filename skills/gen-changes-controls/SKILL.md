@@ -136,7 +136,8 @@ Efectos de no implementarlo:
 3. Con el contexto en mano, redacta los 5 apartados siguiendo las reglas de esta skill.
 4. Propón el nivel de Riesgo e Impacto con su justificación. Espera confirmación o ajuste del usuario
    antes de dar el texto por definitivo.
-5. Entrega el texto final en el formato de la plantilla, listo para copiar y pegar.
+5. Entrega el texto final en el formato de la plantilla, como texto normal y no dentro de un bloque
+   de código, listo para copiar y pegar.
 6. Si el usuario tiene otro desarrollo para documentar, repite el proceso desde el paso 2 con el nuevo
    contexto.
 

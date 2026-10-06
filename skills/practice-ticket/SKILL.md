@@ -56,7 +56,7 @@ alguna terminologia que no entiendo".
 | 1 | Análisis del ticket y elección de temas | yo, sin soltarlo todavía |
 | 2 | **La clase** | yo |
 | 3 | Encuadre invertido | él |
-| 4 | Plan y diagrama | él, yo corrijo |
+| 4 | Plan y diagrama | él el borrador; yo corrijo, dibujo el diagrama y escribo el plan de construcción |
 | 5 | Ejecución con escalera de pistas | él |
 | 6 | Review de par exigente | yo |
 | 7 | Cierre: bitácora y temario | yo |
@@ -149,10 +149,10 @@ Yo ya tengo la respuesta desde la Fase 1, así que aquí solo contrasto:
 La clase enseñó el patrón; esta fase es ubicarlo en el repo. Son dos habilidades distintas y se
 practican por separado a propósito.
 
-## Fase 4 — El plan y el diagrama los escribe él
+## Fase 4 — Él escribe el borrador; yo, el diagrama y el plan de construcción
 
-El `CLAUDE.md` ya exige plan con diagrama Mermaid antes de tocar código. En modo práctica **el
-borrador lo escribe él**, y yo lo corrijo:
+El `CLAUDE.md` exige plan antes de tocar código, y el paso 5 de `start-development` le suma un
+diagrama Mermaid. En modo práctica **el borrador lo escribe él**, y yo lo corrijo:
 
 - La rama del flujo que falta.
 - La decisión escrita como `¿válido?` en vez de con su condición real.
@@ -162,8 +162,8 @@ borrador lo escribe él**, y yo lo corrijo:
 Si el ticket toca los dos lados, el contrato lo sigue fijando `fullstack-ticket` (su Fase 3), y
 ese contrato es el insumo del plan. `practice-ticket` no lo reemplaza.
 
-**Profesor que construye** (acordado en el ticket 10841, 2026-09-04). Corregir el borrador no
-basta: el diagrama y el plan de construccion los escribo **yo**, a partir de sus decisiones ya
+**Profesor que construye** (acordado en el ticket 10841, 2026-09-04). Además de corregir el
+borrador, el diagrama y el plan de construccion los escribo **yo**, a partir de sus decisiones ya
 corregidas, y despues el ejecuta. Por cada etapa del ticket:
 
 1. **El escribe el borrador**: archivos, orden, decisiones.
@@ -220,10 +220,11 @@ suavizar: un review complaciente le hace perder el ticket dos veces, ahora y cua
 Qué se mira:
 
 - **Correctitud**, incluidos los casos borde que el plan no cubría.
-- **Convenciones del repo** — las de *ese* repo, no las mías ni las del cerebro. Se comprueban
-  mirando el código vecino.
+- **Convenciones del repo** — las de *ese* repo, que se comprueban mirando el código vecino. Donde
+  el cerebro tiene regla propia (docblocks, comentarios, claves de traducción), manda la del cerebro.
 - **Seguridad**: entrada sin validar, permiso que falta, dato que no debía viajar.
-- **Documentación** según el estándar del repo, y traducciones al final del archivo de locales.
+- **Documentación**: docblock de máximo tres renglones con `@param` y `@return`, sin comentarios
+  sueltos, y traducciones al final del archivo de locales.
 
 Se puede usar la skill `code-review` para la pasada mecánica, pero **el reporte se entrega en
 formato didáctico**:

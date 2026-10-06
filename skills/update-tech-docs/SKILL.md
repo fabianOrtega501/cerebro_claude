@@ -20,10 +20,9 @@ sistema y por que*.
 
 Lo que mas se cuela por esa frontera **no son los pasos de pantalla** —esos se reconocen solos—
 sino la seccion que situa el flujo: explicar el negocio como para alguien que nunca uso el
-aplicativo. Dos frases bastan: que entidad es, donde vive y que resuelve en el sistema. Paso el
-2026-09-23 en el AIO, y venia de que el estandar del repo pedia literalmente "definicion en
-lenguaje de negocio"; **si el estandar del repo empuja a eso, el desactualizado es el estandar**,
-y se corrige ahi antes de escribir el documento.
+aplicativo. Dos frases bastan: que entidad es, donde vive y que resuelve en el sistema. **Si el
+estandar del repo pide esa seccion, el desactualizado es el estandar**, y se corrige ahi antes de
+escribir el documento.
 
 ## 1. Situarse
 
@@ -64,7 +63,9 @@ quien abre el archivo dentro de seis meses.
 
 **Qué se documenta, y solo eso:**
 
-- Las funciones **nuevas**. Sin excepción: código nuevo sale documentado.
+- Las funciones **nuevas**: código nuevo sale documentado. La excepción es el método de
+  controlador al que llega una ruta en un proyecto que documenta su API con Swagger (AIO,
+  status-api): no lleva PHPDoc, su documentación es el bloque `@OA`.
 - Las que **ya existían sin docblock** en un archivo que estás tocando. Ya lo tienes abierto.
 
 **Lo que NO se toca:** las funciones que ya tienen docblock, aunque se pueda mejorar, y las de
@@ -90,15 +91,12 @@ qué hace, cómo lo hace y por qué, esa parte quedó desactualizada y manda est
  */
 public function nearbyAddress($visit)
 {
-    // Transaccion anidada a proposito: en PostgreSQL una consulta que falla invalida la
-    // transaccion entera, y un fallo de PostGIS se llevaria por delante la visita completa.
     return DB::transaction(fn () => ...);
 }
 ```
 
-**Dónde va el porqué: en el docblock no.** Si la razón de que algo esté resuelto así importa, va
-como comentario suelto junto a la línea que lo necesita —como arriba—, o en el `.md` de `docs/`
-cuando es una regla de negocio y no un detalle de implementación.
+**Dónde va el porqué: ni en el docblock ni en un comentario suelto dentro del código.** Si la
+razón de que algo esté resuelto así importa, va en el `.md` de `docs/`.
 
 **Esa es la frontera entre los dos pasos de esta skill.** El docblock son 3 renglones y dice *qué
 hace*. El `.md` de `docs/` no tiene ese límite y es justamente donde va el *por qué*: para eso

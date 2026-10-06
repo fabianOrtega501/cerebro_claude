@@ -148,7 +148,7 @@ Fuentes de casos, según lo que el diff muestre:
 | Cualquier listado con paginación | Última página, y la pantalla sin datos |
 
 En un sistema multiempresa, el caso de permisos incluye **el usuario de otra empresa**: no debe ver
-los datos del desarrollo. Es el fallo más caro de todos los que aquí se pueden pillar.
+los datos del desarrollo. Es la falla más cara de todas las que aquí se pueden detectar.
 
 ### Familia 3 — De regresión: que nada más se dañó
 
@@ -173,8 +173,9 @@ rehacerlo.
 
 ## Formato de salida
 
-**El estándar es fijo. No se agregan, quitan ni renombran campos**, porque el bloque se pega tal cual
-en el aplicativo donde se documentan las pruebas:
+**El estándar es fijo. No se agregan, quitan ni renombran campos**, porque el texto se pega tal cual
+en el aplicativo donde se documentan las pruebas. Se entrega como texto normal, no dentro de un bloque
+de código:
 
 ```
 Caso Prueba #1
@@ -218,7 +219,7 @@ Qué va en cada campo:
 ### Cómo se redacta cada caso: quien lo ejecuta no conoce el código
 
 **La prueba de fuego: el caso lo tiene que poder ejecutar alguien que no participó en el desarrollo,
-sin preguntar nada.** Si para saber dónde pulsar hay que reconstruir el flujo mentalmente, el caso
+sin preguntar nada.** Si para saber dónde dar clic hay que reconstruir el flujo mentalmente, el caso
 está mal escrito, y el que lo ejecuta acaba probando lo que cree que decía.
 
 - **Nombrar cada elemento como se lee en pantalla**, con su texto literal: el botón `Siguiente`, la
@@ -227,7 +228,7 @@ está mal escrito, y el que lo ejecuta acaba probando lo que cree que decía.
 - **Los iconos sin texto se describen por su forma y su tooltip**: «el icono de lápiz (*Editar
   Categoría*)». Decir solo «la acción Editar» obliga a buscarla.
 - **Nada de jerga interna.** Está prohibido *el paso 2*, *el modo show*, *el subject*, *el
-  componente tal*, *el wizard*: son nombres del código, no de la interfaz. Se dice qué se pulsa y
+  componente tal*, *el wizard*: son nombres del código, no de la interfaz. Se dice dónde se da clic y
   qué sección aparece.
 - **El rol se enumera, no se abrevia.** «El rol de los cuatro permisos» no le dice nada a quien
   configura: se escriben los permisos activos y los inactivos sobre qué menú.

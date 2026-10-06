@@ -27,11 +27,11 @@ barato.
 ## Fase 0 — Situarse en el proyecto
 
 **Siempre lo primero.** El usuario indica el proyecto al invocar (`/fullstack-ticket aio`). Si no
-lo dijo, se deduce del repo actual — pero **si se dedujo, decir cuál se dedujo** y seguir; no
-preguntar por algo que ya está claro.
+lo dijo, **se pregunta; nunca se deduce del directorio**: la sesión puede estar abierta en otro
+repo, y la rama terminaría en el equivocado.
 
 ```bash
-node ~/.claude/skills/fullstack-ticket/lib/stack.mjs [proyecto]
+node ~/.claude/skills/fullstack-ticket/lib/stack.mjs <proyecto>
 ```
 
 Imprime el contexto de trabajo y comprueba lo que puede arruinar el ticket a mitad de camino:
@@ -44,16 +44,16 @@ Imprime el contexto de trabajo y comprueba lo que puede arruinar el ticket a mit
 | Si hay cambios sin commitear | Distinguir lo tuyo de lo que ya estaba |
 | Contenedores arriba | Solo si el ticket necesita probar en vivo |
 
-**Sale con código 2 si algún repo no es escribible.** Eso es bloqueante: hay que añadirlo a
-`additionalDirectories` del `settings.local.json` del repo desde el que trabajas y **reiniciar la
-sesión**. Decirlo y parar; seguir a ciegas genera trabajo que hay que rehacer.
+**Sale con código 2 si algún repo no es escribible.** Eso es bloqueante: el repo tiene que estar
+registrado en `brain/projects.json`; después se corre `node ~/.claude/brain/lib/plug.mjs`, que
+regenera `additionalDirectories`, y se **reinicia la sesión**. Decirlo y parar; seguir a ciegas genera trabajo que hay que rehacer.
 
 Si el proyecto no tiene stack definido, el script dice cómo crearlo desde la plantilla.
 
 **Si algún repo está en una rama protegida —o si es un desarrollo nuevo y todavía no hay rama—,
 ejecutar la skill `start-development` antes de seguir.** Ese checklist pone las ramas al día,
 pregunta lo necesario y crea la rama de trabajo en los dos repos. Volver aquí con la rama ya
-creada; su paso 3 recoge el enunciado del ticket, que es justo lo que necesita la fase 1.
+creada; su paso 4 recoge el enunciado del ticket, que es justo lo que necesita la fase 1.
 
 **Después, leer el `NOTES.md` del stack.** Ahí está lo específico del proyecto: cómo encuadrar,
 dónde buscar, qué se olvida siempre en cada lado, y cómo cerrar. Sin eso, los pasos que siguen son
@@ -125,8 +125,9 @@ ticket haya tocado, probar el endpoint de verdad y ver la pantalla real.
   funcionalidad solo existe con los dos desplegados**. Hay que coordinar el orden de mezcla.
 - Si cambió algo que el usuario ve, **ofrecer la skill `update-manual`**.
 - Lo demás específico del cierre está en el `NOTES.md`.
-- Si tocaste esta skill o el stack de un proyecto, **commitea el cerebro**:
-  `git -C ~/.claude add -A && git -C ~/.claude commit` y `git -C ~/.claude push backup main`.
+- Si tocaste esta skill o el stack de un proyecto, **ofrece commitear el cerebro**: primero se
+  corre `node ~/.claude/brain/lib/doctor.mjs` y su resultado se muestra con el mensaje propuesto;
+  el commit y el push se hacen solo con el sí del usuario.
 
 ## Agregar un proyecto
 
