@@ -70,6 +70,7 @@ escribe codigo ni documentacion; avisa y se aparta.
 | `update-tech-docs` | Docblocks de las funciones tocadas y reglas de negocio en el `docs/` del backend | `<proy>/docs/` |
 | `gen-changes-controls` | Texto del control de cambios de un desarrollo ya hecho | — |
 | `gen-test-set` | Set de pruebas manual, sacado del diff de la rama | — |
+| `review-overengineering` | Revisa el diff buscando lo que sobra: reimplementaciones, dependencias y abstracciones sin uso. Solo senala | — |
 | `gen-sprint-summary` | La diapositiva del sprint: texto y PNG, desde las ramas de los ultimos dias | — |
 | `exploration-memory` | El mapa tecnico de un modulo, para no releer el mismo codigo cada ticket | `<proy>/exploration/` |
 | `explore-module` | Decide si vale la pena mapear un modulo y coordina al explorador | `<proy>/exploration/` |

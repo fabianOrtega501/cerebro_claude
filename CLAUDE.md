@@ -375,6 +375,34 @@ una pantalla o accion nueva (necesita permiso), un filtro que la API no soporta,
 viene en la respuesta actual. Al reves, un ticket "solo de back" toca el front cuando cambia la
 forma de una respuesta que alguien ya consume.
 
+## Antes de escribir codigo: lo minimo que resuelve
+
+Primero se entiende el problema: se lee el codigo que toca el cambio y se sigue el flujo real de
+punta a punta. Despues se para en el primer escalon que lo resuelva:
+
+1. **¿Hace falta?** Si la necesidad es especulativa, no se construye y se dice en una linea.
+2. **¿Ya existe en el repo?** Un servicio, trait, helper o componente que hace lo mismo se usa tal
+   cual. Es la falla mas comun: reescribir lo que esta dos carpetas mas alla.
+3. **¿Lo hace el lenguaje o el framework?** Carbon, colecciones, reglas del FormRequest.
+4. **¿Lo hace la plataforma?** Una restriccion de la base antes que codigo; un input nativo antes
+   que un componente.
+5. **¿Lo resuelve una dependencia ya instalada?** No se agrega otra por algo de pocas lineas.
+6. **Solo entonces, lo minimo que funcione**: sin abstracciones que nadie pidio, sin interfaces de
+   una sola implementacion, sin configuracion para un valor que no cambia.
+
+**Una falla se corrige en la causa, no en el sintoma.** El ticket nombra el camino donde se vio.
+Antes de editar se buscan todos los que llaman a la funcion y se corrige una vez, en la compartida:
+corregir solo el camino del ticket deja rotos a los demas.
+
+**Lo minimo nunca recorta** la validacion en el request, el manejo de errores que evita perder
+datos, los permisos ni lo que la HU pide. **Tampoco pasa por encima del estandar del repo**: si el
+equipo ya tiene la pieza (`BaseService`, `CommonFormRequest`), usarla es el escalon 2.
+
+La escalera se aplica **al armar el plan**: el plan dice que se reutiliza y que se escribe nuevo.
+Se tomo de Ponytail el 2026-10-05 sin instalar el plugin, que choca con el modo plan, con la regla
+de comentarios y con las suites de pruebas. Para revisar un diff con este criterio esta la skill
+`review-overengineering`.
+
 ## Documentar funciones: maximo 3 renglones, en todas partes
 
 **Rige en todo lo que se escriba**: el codigo propio de `~/.claude` y tambien los repos de
