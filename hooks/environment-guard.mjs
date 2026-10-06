@@ -413,9 +413,43 @@ function targetsOf(event, registry) {
 	return [];
 }
 
+/**
+ * Replaces `<` and `>` inside quotes with spaces, so quoted text never reads as a redirect.
+ * An unclosed quote ends at the newline, so the next line is scanned as unquoted (fails closed).
+ * @param {string} command
+ * @returns {string} Same length as `command`.
+ */
+function maskQuotedRedirects(command) {
+	let quote = null;
+	let out = "";
+
+	for (let i = 0; i < command.length; i++) {
+		const c = command[i];
+
+		if (c === "\n")
+			quote = null;
+		else if (c === "\\" && quote !== "'" && command[i + 1] !== undefined && command[i + 1] !== "\n") {
+			out += c + command[++i];
+			continue;
+		}
+		else if (quote && c === quote)
+			quote = null;
+		else if (!quote && (c === "\"" || c === "'"))
+			quote = c;
+		else if (quote && (c === ">" || c === "<")) {
+			out += " ";
+			continue;
+		}
+
+		out += c;
+	}
+
+	return out;
+}
+
 /** Archivos a los que escribe un comando: redirecciones, `tee`, `sed -i`, `cp`, `mv`, `rm`, `dd of=`. */
 function writeTargets(command) {
-	const out = [...command.matchAll(/(?:^|[^<>0-9&])\d?>>?(?!&)\s*(['"]?)([^\s'"|;&<>()]+)\1/g)].map(m => m[2]);
+	const out = [...maskQuotedRedirects(command).matchAll(/(?:^|[^<>0-9&])\d?>>?(?!&)\s*(['"]?)([^\s'"|;&<>()]+)\1/g)].map(m => m[2]);
 
 	for (const { program, args } of segments(command)) {
 		const positional = args.filter(arg => !arg.startsWith("-"));
