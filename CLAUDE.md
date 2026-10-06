@@ -78,8 +78,8 @@ git aparte, local.
   a las del mismo tema. Insertar en medio cambia el contexto de lineas que nadie toco y provoca
   conflictos cuando dos ramas agregan claves en la misma zona; al final, cada clave es una linea
   agregada limpia. Aplica a todos los locales del proyecto por igual, para que no se desincronice
-  su orden. **Esto ya no depende de acordarse**: el hook `i18n-keys-guard` deniega la edicion que
-  deja una clave intercalada, y tambien la que crea una clave con un texto que ya existe bajo otra.
+  su orden. **Lo hace cumplir el hook `i18n-keys-guard`**: deniega la edicion que deja una clave
+  intercalada, y tambien la que crea una clave con un texto que ya existe bajo otra.
   Si de verdad hacen falta dos claves con el mismo texto porque van a divergir, se pide y se agrega.
 - **Los commits no llevan trailer de coautoria.** Nada de `Co-Authored-By: Claude...` ni ninguna
   otra firma de la herramienta, en ningun repo: ni los de trabajo ni el cerebro. El historial es
@@ -126,11 +126,9 @@ queda arriba.
 por que se subio. Usarlo por defecto es el mismo error que Sonnet para todo, con la factura al
 otro lado.
 
-**Subagentes disponibles hoy** (`~/.claude/agents/`): `branch-starter` crea la rama del
-desarrollo; `build-runner` corre builds, tests, migraciones y seeders y devuelve solo el
-veredicto; `module-explorer` mapea un modulo leyendo los dos repos en solo lectura;
-`ticket-reader` baja el ticket y su HU y devuelve el resumen. Los cuatro en Sonnet. Cuando aparezca otra tarea mecanica que se repita, **proponer un
-agente nuevo** en vez de seguir gastando la sesion principal en ella.
+**Subagentes**: viven en `~/.claude/agents/` y la sesion ya los ve listados con su descripcion.
+Cuando aparezca otra tarea mecanica que se repita, **proponer un agente nuevo** en vez de seguir
+gastando la sesion principal en ella.
 
 ## La HU se lee de la fuente, cada vez que se usa
 
@@ -224,11 +222,9 @@ este terminado, verificado, que sea mio, que el hook este avisando o que la sesi
 commits aprobados: cada uno se ofrece y se espera el si. Aprobar un commit no autoriza el
 siguiente.
 
-El 2026-09-14 hice ocho commits y dieciseis push sin preguntar, apoyandome en que la regla dice
-que el cerebro se respalda —pero eso dice **como** respaldarlo, no que lo haga por mi cuenta—. Uno
-de ellos ni siquiera era trabajo mio: eran memorias de una sesion anterior de Fabian, commiteadas
-con un mensaje que escribi yo. El historial del cerebro es suyo y un mensaje que el no aprobo no
-tiene por que estar ahi. Lo pidio explicitamente ese dia.
+Que el cerebro se respalde dice **como** respaldarlo, no que se haga sin preguntar. El historial
+del cerebro es de Fabian: un commit que el no aprobo —y menos uno con trabajo de otra sesion y un
+mensaje que el no leyo— no tiene por que estar ahi. Lo pidio explicitamente el 2026-09-14.
 
 **La solicitud va despues de Doctor.** Antes de proponer cualquier commit del cerebro se corre
 `node ~/.claude/brain/lib/doctor.mjs` y se muestra su resultado junto con el mensaje propuesto. Si
@@ -289,33 +285,27 @@ previo.
 La misma cautela vale para las banderas que prometen simular: hay proyectos donde
 `migrate --pretend` **ejecuta** los cambios.
 
-## La VPN solo hace falta desde fuera, y ya no tumba las bases locales
+## La VPN solo hace falta desde fuera, y no afecta las bases locales
 
 **Primero: en que red esta el usuario.** En la **red corporativa** el GitLab interno
 (192.168.100.34) se alcanza directo y **la VPN no hace falta para nada**. La VPN existe para las
 **redes externas** (casa, datos moviles).
 
-**Encendida, la VPN ya NO quita las bases locales.** Se comprobo el 2026-09-18 en status-api con
-la VPN activa: las cinco conexiones por esquema responden y la suite completa pasa (124 pruebas),
-al tiempo que `git fetch` y `git push` contra el GitLab interno funcionan. Se puede trabajar con
-la VPN encendida de principio a fin.
+**Con la VPN encendida, las bases locales siguen funcionando** (comprobado el 2026-09-18 en
+status-api: las cinco conexiones por esquema y la suite completa), y a la vez funcionan `git fetch`
+y `git push` contra el GitLab interno. Se puede trabajar con la VPN encendida de principio a fin.
 
 | VPN (desde red externa) | Bases locales (postgres en docker) | GitLab interno (192.168.100.34) |
 |---|---|---|
 | **Encendida** | funcionan | funciona: `git push`, `fetch` |
 | **Apagada** | funcionan | `ssh: connect to host ... port 22: Connection timed out` |
 
-**Esto corrige lo que decia antes esta seccion**, que las dos cosas se excluian y que con la VPN
-encendida los comandos con base se colgaban hasta el timeout. Era cierto cuando se escribio; la
-configuracion de red cambio. **No pedir que apague la VPN para correr pruebas ni consultar la
-base**: es una peticion inutil que ademas le deja sin GitLab.
+**No pedir que apague la VPN para correr pruebas ni consultar la base**: es una peticion inutil
+que ademas le deja sin GitLab.
 
 **No pedir que encienda la VPN antes de un push por precaucion.** Si esta en la red corporativa,
 es una peticion inutil; y la sesion no puede saber en que red esta. Lo correcto es **intentar el
 push** y, solo si da timeout de SSH, preguntar por la VPN.
-
-Pasó en el ticket 10812 (2026-09-01): se pidio encender la VPN para el push estando en la red
-corporativa, y el push funcionaba sin ella.
 
 ## Modo practica: el ticket es una actividad y yo soy el profesor
 
@@ -339,7 +329,7 @@ como ejercicio: **lo escribe Fabian, yo guio**. El procedimiento completo esta e
   ejercicio.
 - **Al cerrar se registra** en `~/.claude/brain/learning/`: una bitacora del ticket y el temario
   actualizado con `lib/syllabus.mjs`. Sin registro, a la tercera sesion se repiten los mismos
-  errores sin que nadie lo note. **Esto ya no depende de acordarse**: la clase abre una marca con
+  errores sin que nadie lo note. **Lo hacen cumplir tres piezas**: la clase abre una marca con
   `lib/practice-session.mjs`, el preflight de `finish-development` la revisa, y el hook
   `practice-unrecorded-notice` avisa si el ticket se cerro sin registrar. Los numeros del registro
   —el peldano de pista y los bloqueantes— **los da Fabian**: inventarlos corrompe el temario.
@@ -447,8 +437,8 @@ Lo decidio Fabian el 2026-09-16.
   deje en el ticket 11308; lo pidio como regla el 2026-09-29.
 - **Documentacion tecnica.** Ningun numero de ticket, ni de Mantis, ni de GLPI, ni referencia a
   una historia de usuario. El codigo se lee sin ese contexto.
-- **`@param` y `@return` siempre**, uno por argumento. Esto es lo unico que sobrevive del
-  estandar viejo, y no cuenta dentro de los tres renglones.
+- **`@param` y `@return` siempre**, uno por argumento, salvo en los metodos de endpoint con
+  Swagger. No cuentan dentro de los tres renglones.
 
 **Tres renglones de prosa por funcion. Ni uno mas.** El limite es duro y no admite "es que esta funcion
 es especial": si no cabe, el problema es la funcion, no el limite.
