@@ -109,6 +109,11 @@
             "type": "command",
             "command": "node \"$HOME/.claude/hooks/i18n-keys-guard.mjs\"",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/code-standards-guard.mjs\"",
+            "timeout": 10
           }
         ]
       },

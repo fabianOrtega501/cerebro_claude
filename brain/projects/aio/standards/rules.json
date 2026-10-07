@@ -1,0 +1,85 @@
+{
+  "description": "Reglas de AIO que code-standards-guard aplica sobre las lineas que agrega cada edicion. Los casos que un patron no distingue estan en reuse.md, seccion No se hace.",
+  "rules": [
+    {
+      "id": "rule-exists",
+      "pattern": "Rule::exists\\(",
+      "files": "^app/Http/Requests/",
+      "message": "Llaves foraneas con $this->mergeRules([new ForeignKeyExists(...)]), no con Rule::exists.",
+      "source": "aio-backend/.claude/memory/validaciones-con-el-estandar.md",
+      "exceptions": []
+    },
+    {
+      "id": "env-outside-config",
+      "pattern": "(^|[^>\\w])env\\(",
+      "files": "^app/",
+      "message": "env() fuera de config/ devuelve null con la configuracion cacheada. Declarar la variable en config/aio.php y leerla con config().",
+      "source": "aio-backend/CLAUDE.md, seccion Que evitar",
+      "exceptions": []
+    },
+    {
+      "id": "job-public-queue",
+      "pattern": "public\\s+(string\\s+)?\\$queue",
+      "files": "^app/Jobs/",
+      "message": "public $queue en un Job es un error fatal con Queueable. Asignar la cola con $this->onQueue(QueueNames::X) en el constructor.",
+      "source": "aio-backend/CLAUDE.md, seccion Que evitar",
+      "exceptions": []
+    },
+    {
+      "id": "soft-deletes",
+      "pattern": "use\\s+SoftDeletes",
+      "files": "^app/Models/",
+      "message": "El proyecto no usa SoftDeletes: la baja logica es la columna active.",
+      "source": "aio-backend/CLAUDE.md, seccion Dos decisiones transversales",
+      "exceptions": []
+    },
+    {
+      "id": "user-find-auth",
+      "pattern": "User::find\\(\\s*Auth::(id\\(\\)|user\\(\\)->id)\\s*\\)",
+      "files": "^app/",
+      "message": "El usuario autenticado ya es el modelo User: Auth::user()?->staff, sin volver a consultarlo con User::find.",
+      "source": "brain/projects/aio/standards/reuse.md, seccion Empresa, fechas, usuario y parametros",
+      "exceptions": []
+    },
+    {
+      "id": "standard-service-method",
+      "kind": "standard-service-method",
+      "files": "^app/Services/Modules/",
+      "message": "El <Entidad>Service del estandar no se modifica: la logica va en Custom<Entidad>Service, en applyFilters() o en una Action.",
+      "source": "aio-backend/.claude/memory/estandar-intacto.md",
+      "exceptions": []
+    },
+    {
+      "id": "api-in-component",
+      "pattern": "\\$api\\(",
+      "files": "^src/(views|components|pages)/",
+      "message": "La API no se llama desde un componente: siempre a traves de una clase de src/services/.",
+      "source": "aio-app/CLAUDE.md, seccion Reglas para agregar codigo nuevo",
+      "exceptions": []
+    },
+    {
+      "id": "define-model",
+      "pattern": "defineModel\\s*[<(]",
+      "files": "^src/",
+      "message": "defineModel no esta activado en la configuracion de Vite (Vue 3.3): usar la prop modelValue y el evento update:modelValue.",
+      "source": "brain/projects/aio/standards/reuse.md, seccion No se hace",
+      "exceptions": []
+    },
+    {
+      "id": "use-api-or-fake-imports",
+      "pattern": "useApi\\(|from\\s+['\"]@(db|api-utils)/",
+      "files": "^src/",
+      "message": "useApi y los imports de @db/ o @api-utils/ son restos del template: usar $api desde un service.",
+      "source": "aio-app/CLAUDE.md, seccion Que evitar",
+      "exceptions": []
+    },
+    {
+      "id": "console-log",
+      "pattern": "console\\.log\\(",
+      "files": "^src/",
+      "message": "Sin console.log: los errores se muestran con handleResponseErrors y notify.",
+      "source": "aio-app/CLAUDE.md, seccion Que evitar",
+      "exceptions": []
+    }
+  ]
+}

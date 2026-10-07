@@ -98,11 +98,13 @@ tres `gen-*` son **manuales**: no se disparan solas nunca.
 | `environment-activation` | Cada mensaje tuyo | Cambia el ambiente solo si tu lo pides (`/ambiente qa lectura` o una frase); recuerda el activo cuando cambia o si no es local |
 | `environment-start` | Al abrir la sesion | Avisa si arranca fuera de local |
 | `hu-pdf-guard` | Antes de Read y de Bash | **Deniega** leer una HU en PDF/DOCX entera y remite a su `hu.md`; deja pasar Read con `pages` |
+| `code-standards-guard` | Antes de Edit / MultiEdit / Write | **Deniega** la edicion cuyas lineas **agregadas** rompen una regla: las comunes de `brain/standards/common.json` (comentario suelto, docblock de mas de 3 renglones, PHPDoc junto a `@OA`, nombre de mas de 5 palabras) y las del proyecto en `brain/projects/<p>/standards/rules.json`. No mira el cerebro ni el codigo heredado que no se toca. Un falso positivo se resuelve agregando el archivo a `exceptions` de la regla, con aprobacion |
 | `standards-context` | Al abrir la sesion | Si el repo es de un proyecto con inventario (`brain/projects/<p>/standards/reuse.md`), pone en contexto su seccion **No se hace** y la ruta del inventario, para planear reutilizando |
 | `overengineering-notice` | Al terminar una respuesta | Avisa una vez si hay codigo sin commitear en un repo del proyecto que no paso por `review-overengineering`; calla hasta que se registre la revision (`brain/lib/review-state.mjs mark`) o el codigo cambie despues de ella. Ignora los `.d.ts` y lockfiles regenerados |
 
-Casi todos detectan y se apartan. **`i18n-keys-guard`, `bash-write-guard` y `hu-pdf-guard` si
-deniegan**; `bash-write-guard` porque un cambio por Bash se salta todas las guardas de Edit, y
+Casi todos detectan y se apartan. **`i18n-keys-guard`, `bash-write-guard`, `hu-pdf-guard` y
+`code-standards-guard` si deniegan**; la ultima, porque una regla del estandar que solo avisa se
+corrige en la revision del MR, que es justo lo que se queria evitar; `bash-write-guard` porque un cambio por Bash se salta todas las guardas de Edit, y
 `hu-pdf-guard` porque una HU leida en PDF ya gasto los tokens, y una HU vieja ya contamino el plan,
 antes de que un aviso sirva de algo. La de i18n es la excepcion original: una clave intercalada o un texto duplicado no se arreglan avisando, porque
 para cuando el aviso se lee ya entraron al archivo. Solo deniega lo mecanico —donde quedo la clave

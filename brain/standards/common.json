@@ -1,0 +1,40 @@
+{
+  "description": "Reglas de forma que code-standards-guard aplica en todos los repos de trabajo. Solo se mide lo que la edicion agrega.",
+  "skipPaths": "^(\\.claude/|vendor/|node_modules/|public/|dist/|storage/)",
+  "rules": [
+    {
+      "id": "inline-comment",
+      "kind": "inline-comment",
+      "files": "\\.(php|ts|js|mjs|vue)$",
+      "message": "Comentario suelto dentro del codigo. Solo se documenta la funcion con su docblock; el porque de una regla va a la documentacion tecnica (docs/).",
+      "source": "~/.claude/CLAUDE.md, seccion Documentar funciones",
+      "exceptions": []
+    },
+    {
+      "id": "docblock-length",
+      "kind": "docblock-length",
+      "files": "\\.(php|ts|js|mjs|vue)$",
+      "max": 3,
+      "message": "Docblock con mas de 3 renglones de prosa. Que hace y sus entradas y salidas en 3 renglones; @param y @return no cuentan.",
+      "source": "~/.claude/CLAUDE.md, seccion Documentar funciones",
+      "exceptions": []
+    },
+    {
+      "id": "phpdoc-with-oa",
+      "kind": "phpdoc-with-oa",
+      "files": "\\.php$",
+      "message": "PHPDoc junto a un bloque @OA. El metodo que atiende una ruta se documenta solo con @OA, sin @param ni @return.",
+      "source": "~/.claude/CLAUDE.md, seccion Documentar funciones (excepcion de Swagger)",
+      "exceptions": []
+    },
+    {
+      "id": "function-name-words",
+      "kind": "function-name-words",
+      "files": "\\.(php|ts|js|mjs|vue)$",
+      "max": 5,
+      "message": "Nombre de funcion, metodo o prueba de mas de 5 palabras (el prefijo test no cuenta). El detalle va en el docblock.",
+      "source": "~/.claude/CLAUDE.md, preferencias de trabajo (nombres de maximo 5 palabras)",
+      "exceptions": []
+    }
+  ]
+}
