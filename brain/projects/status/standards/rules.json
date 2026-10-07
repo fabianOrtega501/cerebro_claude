@@ -1,0 +1,136 @@
+{
+  "description": "Reglas de status (monolito) y status-api que code-standards-guard aplica sobre las lineas que agrega cada edicion. `repos` limita una regla a uno de los dos repos.",
+  "rules": [
+    {
+      "id": "php74-syntax",
+      "repos": ["status"],
+      "pattern": "\\?->|(?<![\\w>$:])match\\s*\\(|^\\s*enum\\s+[A-Z]|__construct\\s*\\([^)]*\\b(private|public|protected)\\s",
+      "files": "^(app|database|routes|config)/.*\\.php$",
+      "message": "El monolito corre PHP 7.4: sin ?->, match, enum ni promocion de propiedades en el constructor.",
+      "source": "status/CLAUDE.md, seccion 2",
+      "exceptions": []
+    },
+    {
+      "id": "soft-deletes",
+      "pattern": "\\bSoftDeletes\\b|->softDeletes\\(",
+      "files": "^(app|database)/.*\\.php$",
+      "message": "El borrado logico es la columna estado; no se usa SoftDeletes.",
+      "source": "status/CLAUDE.md, seccion 5",
+      "exceptions": []
+    },
+    {
+      "id": "vue-deep",
+      "repos": ["status"],
+      "pattern": "::v-deep|\\s>>>\\s",
+      "files": "^resources/js/src/.*\\.vue$",
+      "message": "Usar :deep(selector), no ::v-deep ni >>>.",
+      "source": "status/CLAUDE.md, seccion 9",
+      "exceptions": []
+    },
+    {
+      "id": "store-without-http",
+      "repos": ["status"],
+      "pattern": "\\b(axios|\\$http)\\.(get|post|put|delete|request)\\(",
+      "files": "^resources/js/src/store/",
+      "message": "El store no hace llamadas HTTP: van en services/<Modulo>/<Nombre>Service.js.",
+      "source": "status/CLAUDE.md, seccion 7",
+      "exceptions": []
+    },
+    {
+      "id": "routes-outside-api-php",
+      "pattern": "\\bRoute::",
+      "files": "^routes/api\\.php$",
+      "message": "Las rutas nuevas van en routes/api/v0/<Producto>/..., que se autocarga; api.php solo guarda autenticacion y salud.",
+      "source": "status-api/CLAUDE.md, seccion 4",
+      "exceptions": []
+    },
+    {
+      "id": "frozen-seeds",
+      "repos": ["status-api"],
+      "pattern": ".",
+      "files": "^database/seeds/",
+      "message": "database/seeds esta congelada en status-api: los seeders nuevos van en database/seeders.",
+      "source": "status-api/CLAUDE.md, seccion 7.2",
+      "exceptions": []
+    },
+    {
+      "id": "no-sipa-aprovechamiento-level",
+      "repos": ["status-api"],
+      "pattern": ".",
+      "files": "^(app/Http/Controllers|app/Services|routes/api/v0)/Sipa/Aprovechamiento/",
+      "message": "Sipa ya es Aprovechamiento: la entidad cuelga directo de Sipa/.",
+      "source": "status-api/CLAUDE.md, seccion 3",
+      "exceptions": []
+    },
+    {
+      "id": "sanitize-query",
+      "pattern": "\\bsanitizeQuery\\(",
+      "files": "^app/.*\\.php$",
+      "message": "sanitizeQuery no protege: usar bindings parametrizados.",
+      "source": "status-api/CLAUDE.md, seccion 10",
+      "exceptions": []
+    },
+    {
+      "id": "providers-in-config-app",
+      "repos": ["status-api"],
+      "pattern": "^\\s*'providers'\\s*=>",
+      "files": "^config/app\\.php$",
+      "message": "Los providers se registran en bootstrap/providers.php, no en config/app.php.",
+      "source": "status-api/CLAUDE.md, seccion 4",
+      "exceptions": []
+    },
+    {
+      "id": "no-ticket-references",
+      "pattern": "\\b(Mantis|GLPI)\\b|\\bticket\\s*#?\\s*\\d{3,}",
+      "files": "^(docs/|app/|routes/|database/migrations/|resources/js/src/)",
+      "message": "Sin referencias a tickets, Mantis, GLPI ni HU en el codigo ni en la documentacion tecnica.",
+      "source": "~/.claude/CLAUDE.md, seccion Documentar funciones",
+      "exceptions": []
+    },
+    {
+      "id": "api-response",
+      "repos": ["status-api"],
+      "pattern": "response\\(\\)->json\\(|\\bestablecerArregloRetorno\\(",
+      "files": "^app/Http/Controllers/(?!SinUso/|Controller\\.php$|HealthController\\.php$|Auth/)",
+      "message": "Responder con App\\Http\\Responses\\ApiResponse; el controlador tocado se migra.",
+      "source": "status-api/CLAUDE.md, seccion 3.1",
+      "exceptions": []
+    },
+    {
+      "id": "generic-request",
+      "repos": ["status-api"],
+      "pattern": "function\\s+\\w+\\s*\\([^)]*\\bRequest\\s+\\$",
+      "files": "^app/Http/Controllers/(?!SinUso/)",
+      "message": "Un Form Request propio por metodo, no el Request generico.",
+      "source": "status-api/CLAUDE.md, seccion 3.1",
+      "exceptions": []
+    },
+    {
+      "id": "fn-prefix",
+      "repos": ["status"],
+      "pattern": "^\\s*(async\\s+)?fn_\\w+\\s*\\([^)]*\\)\\s*\\{\\s*$",
+      "files": "^resources/js/src/.*\\.(vue|js)$",
+      "message": "Sin el prefijo fn_ en codigo nuevo: fnNombre en camelCase.",
+      "source": "status/CLAUDE.md, seccion 9",
+      "exceptions": []
+    },
+    {
+      "id": "console-log",
+      "repos": ["status"],
+      "pattern": "^(?!\\s*//).*\\bconsole\\.log\\(",
+      "files": "^resources/js/src/.*\\.(vue|js)$",
+      "message": "Sin console.log.",
+      "source": "status/CLAUDE.md, seccion 9",
+      "exceptions": []
+    },
+    {
+      "id": "var-declaration",
+      "repos": ["status"],
+      "pattern": "(?:^|[;{(])\\s*var\\s+[A-Za-z_$]",
+      "files": "^resources/js/src/.*\\.(vue|js)$",
+      "message": "Usar const o let, no var.",
+      "source": "status/CLAUDE.md, seccion 9",
+      "exceptions": []
+    }
+  ]
+}

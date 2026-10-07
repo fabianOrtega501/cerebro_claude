@@ -5,7 +5,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, relative } from "node:path";
+import { basename, join, relative } from "node:path";
 import { readProjects, repoContaining } from "../brain/lib/projects.mjs";
 
 const BRAIN = join(homedir(), ".claude");
@@ -185,6 +185,7 @@ if (common?.skipPaths && new RegExp(common.skipPaths).test(path))
 const project = Object.entries(readProjects()).find(([, config]) => config.repos?.includes(repo))?.[0];
 const own = project ? readJson(join(BRAIN, "brain", "projects", project, "standards", "rules.json")) : null;
 const rules = [...(common?.rules ?? []), ...(own?.rules ?? [])]
+	.filter(rule => !rule.repos || rule.repos.includes(basename(repo)))
 	.filter(rule => new RegExp(rule.files ?? ".").test(path) && !(rule.exceptions ?? []).includes(path));
 
 const { before, after } = texts(tool, input);

@@ -34,6 +34,11 @@ function checkCatalog(ctx, label, catalog, repos) {
 		if (!rule.kind && !rule.pattern)
 			problems.push(`${rule.id}: sin pattern ni kind`);
 
+		for (const name of rule.repos ?? []) {
+			if (!repos.some(repo => basename(repo) === name))
+				problems.push(`${rule.id}: el repo "${name}" no es del proyecto, la regla no aplica en ninguna parte`);
+		}
+
 		for (const regex of [rule.pattern, rule.files].filter(Boolean)) {
 			try {
 				new RegExp(regex);
