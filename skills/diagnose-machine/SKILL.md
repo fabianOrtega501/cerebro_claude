@@ -43,6 +43,8 @@ sale **que cambio frente a la medicion anterior** que midio lo mismo. `--no-save
    corren despues del inicio (`fstrim`, `apt-daily-upgrade`) no retrasan el arranque.
 4. **El RSS de las apps de varios procesos esta inflado** (navegador, VS Code): comparten memoria.
    Para saber cuanto pesa de verdad, mira la RAM disponible, no la suma.
+5. **Los 867 apagados forzados del disco son del dueño anterior** del equipo (medido el
+   2026-10-06). No se reportan como problema; solo importa si el numero sube de ahi.
 
 ## Como responder
 

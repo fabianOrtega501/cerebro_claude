@@ -89,13 +89,13 @@ tres `gen-*` son **manuales**: no se disparan solas nunca.
 |---|---|---|
 | `claude-upstream-notice` | Despues de `git pull`/`merge`/`rebase` | Si el `.claude/` del repo cambio, lo avisa y arranca `sync-brain` |
 | `docs-on-push` | Despues de `git push` | Avisa si quedo documentacion sin actualizar, tecnica o de manual |
-| `brain-unpushed-notice` | Al terminar una respuesta | Avisa si el cerebro tiene algo sin commitear o sin subir a `backup`/`github` |
+| `brain-unpushed-notice` | Al terminar una respuesta | Avisa si el cerebro tiene algo sin commitear o sin subir a `backup`/`github`; calla si esa respuesta ya ofrecio el commit |
 | `i18n-keys-guard` | Antes y despues de editar un locale | **Deniega** la clave intercalada y la que repite un texto que ya existe; avisa de JSON roto y de paridad |
 | `practice-unrecorded-notice` | Al terminar una respuesta | Avisa si un ticket de practica se cerro sin registrar sus temas en el temario |
 | `bash-write-guard` | Antes de cada comando Bash | **Deniega** `sed -i`, `>`, `tee`, `cp`/`mv` y scripts en linea que escriben codigo de un repo registrado. Se apaga con `CLAUDE_ALLOW_BASH_WRITES=1` en `settings.local.json` |
 | `bash-change-audit` | Antes y despues de cada comando Bash | Detecta lo que el comando cambio en los repos y lo pasa por las guardas de Edit; avisa si lo rechazan |
 | `environment-guard` | Antes de Bash, WebFetch, Edit/Write, Skill y MCP | Mira a que host o base apunta y **permite, pregunta o niega** segun el ambiente activo; `git push` siempre pregunta |
-| `environment-activation` | Cada mensaje tuyo | Cambia el ambiente solo si tu lo pides (`/ambiente qa lectura` o una frase); recuerda el activo |
+| `environment-activation` | Cada mensaje tuyo | Cambia el ambiente solo si tu lo pides (`/ambiente qa lectura` o una frase); recuerda el activo cuando cambia o si no es local |
 | `environment-start` | Al abrir la sesion | Avisa si arranca fuera de local |
 | `hu-pdf-guard` | Antes de Read y de Bash | **Deniega** leer una HU en PDF/DOCX entera y remite a su `hu.md`; deja pasar Read con `pages` |
 
@@ -106,6 +106,9 @@ antes de que un aviso sirva de algo. La de i18n es la excepcion original: una cl
 para cuando el aviso se lee ya entraron al archivo. Solo deniega lo mecanico —donde quedo la clave
 y si su texto ya existia—; la paridad entre idiomas avisa y nunca bloquea. Los dos primeros avisan una sola vez por version; el tercero, una sola vez por
 estado: mientras no cambie lo pendiente, no repite.
+
+Un hook de `Stop` que necesite la ultima respuesta usa `last_assistant_message` del evento, no el
+transcript: el transcript se escribe de forma asincrona y puede no tener todavia el ultimo mensaje.
 
 ### Agentes
 
