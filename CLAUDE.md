@@ -237,8 +237,12 @@ Los permisos de `add` y `commit` sobre `~/.claude` **se quitaron a proposito** d
 para que la solicitud aparezca y no dependa de que yo me acuerde. Si alguna vez vuelven a estar
 ahi, no es autorizacion: es un descuido que hay que revertir.
 
+Se agregan solo los archivos de ese trabajo, nunca `git add -A`: otra sesion puede tener cambios a
+medias en el cerebro, y `-A` los mete en un commit con un mensaje que no los describe. Paso el
+2026-10-07. Si queda un archivo por fuera, lo avisan `brain-unpushed-notice` y Doctor.
+
 ```bash
-git -C ~/.claude add -A && git -C ~/.claude commit -m "..."
+git -C ~/.claude add <archivos> && git -C ~/.claude commit -m "..."
 git -C ~/.claude push backup main     # protege de borrar ~/.claude
 git -C ~/.claude push github main     # protege de perder el disco
 ```

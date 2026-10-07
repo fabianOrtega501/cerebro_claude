@@ -122,10 +122,11 @@ sin saltarse ninguno:
 3. Solo con su si:
 
 ```bash
-git -C ~/.claude add -A && git -C ~/.claude commit -m "Absorb <que> from <repo>"
+git -C ~/.claude add <archivos absorbidos> && git -C ~/.claude commit -m "Absorb <que> from <repo>"
 ```
 
-Mensaje en ingles, descriptivo, diciendo de donde vino. Sin este commit no hay como revertir
+Solo los archivos de esta absorcion, nunca `git add -A`: otra sesion puede tener cambios a medias
+en el cerebro. Mensaje en ingles, descriptivo, diciendo de donde vino. Sin este commit no hay como revertir
 una mezcla que salio mal, que es justo lo que este repo existe para permitir. El push a los dos
 remotos se ofrece aparte y tambien espera su si.
 

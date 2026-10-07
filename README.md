@@ -220,7 +220,7 @@ alias cerebro='git -C ~/.claude'    # comodo para el dia a dia
 
 cerebro status
 cerebro log --oneline
-cerebro add -A && cerebro commit -m "..."
+cerebro add <archivos> && cerebro commit -m "..."   # nunca -A: otra sesion puede tener cambios a medias
 cerebro push backup main            # respaldo local
 cerebro push github main            # respaldo remoto
 ```
