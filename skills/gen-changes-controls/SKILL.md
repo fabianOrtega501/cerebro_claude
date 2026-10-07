@@ -35,6 +35,10 @@ etc.
 - **Uso MANUAL**: solo cuando el usuario lo pida explícitamente. No se genera por iniciativa propia.
 - **Solo texto**: no escribe en ningún sistema (Mantis, GLPI, GitLab, Jira, etc.), no se hace commit
   ni push. Leer la HU con `ticket-context` sí está permitido: es solo lectura.
+- **Las medidas de adopción y de mitigación no mencionan tareas del propio desarrollo**: actualizar el
+  manual, acompañar en algún ambiente, desplegar o probar. Cuando se redacta el control de cambios,
+  eso ya está hecho. Solo van las medidas que dependen de las personas o de la operación tras la
+  salida. Lo pidió Fabian el 2026-10-07.
 
 ## Insumo
 
