@@ -1,0 +1,77 @@
+{
+  "description": "Reglas de app-movil (AMI, Ionic + Vue 3 con SQLite local) que code-standards-guard aplica sobre las lineas que agrega cada edicion.",
+  "rules": [
+    {
+      "id": "frozen-legacy-migrations",
+      "pattern": "\\S",
+      "files": "^src/database/Migrations\\.ts$",
+      "message": "Migrations.ts esta congelado: crear una clase que extienda BaseMigration en src/database/migrations/ y registrarla en NewMigrations.ts.",
+      "source": "app-movil/CLAUDE.md, secciones 4 y 8",
+      "exceptions": []
+    },
+    {
+      "id": "no-legacy-run-seeders",
+      "pattern": "\\.runSeeders\\(\\)",
+      "files": "^src/(?!services/app/(SchemaService|DatabaseService)\\.ts$|database/NewSeeders\\.ts$).*\\.(ts|vue)$",
+      "message": "runSeeders() solo se llama desde SchemaService al arrancar: con la app montada destruye la base en jeep-sqlite.",
+      "source": "app-movil/CLAUDE.md, seccion 8",
+      "exceptions": []
+    },
+    {
+      "id": "no-env-api-url",
+      "pattern": "import\\.meta\\.env\\.VITE_API_URL",
+      "files": "^src/(?!utils/api\\.ts$|composables/useApiUrlFunction\\.ts$).*\\.(ts|vue)$",
+      "message": "La URL del backend cambia por empresa: usar getApiUrl() de @/composables/useApiUrlFunction o una clase BaseApi.",
+      "source": "app-movil/CLAUDE.md, secciones 2 y 8",
+      "exceptions": []
+    },
+    {
+      "id": "no-sql-in-ui",
+      "pattern": "\\.(executeQuery|runQuery|runStmt)\\(",
+      "files": "^src/(views|components|composables|layouts)/",
+      "message": "Nada de SQL en componentes ni composables: un servicio de src/services/app/ que extienda BaseService.",
+      "source": "app-movil/CLAUDE.md, seccion 4",
+      "exceptions": []
+    },
+    {
+      "id": "no-raw-api-in-ui",
+      "pattern": "\\$api\\.fetchApi\\(|\\bfetch\\(\\s*(await\\s+getApiUrl|[`'\"]https?:)",
+      "files": "^src/(views|components|layouts)/",
+      "message": "Las llamadas al backend van en una clase de src/services/api/ que extienda BaseApi.",
+      "source": "app-movil/CLAUDE.md, seccion 4",
+      "exceptions": []
+    },
+    {
+      "id": "no-axios-ofetch",
+      "pattern": "from\\s+['\"](axios|ofetch)['\"]|require\\(\\s*['\"](axios|ofetch)['\"]\\)",
+      "files": "^src/.*\\.(ts|vue)$",
+      "message": "El HTTP usa $api y BaseApi (fetch envuelto): no se agregan axios ni ofetch.",
+      "source": "app-movil/CLAUDE.md, seccion 3",
+      "exceptions": []
+    },
+    {
+      "id": "no-global-index-selector",
+      "pattern": "querySelectorAll\\([^)]*\\)\\[\\d+\\]",
+      "files": "^src/.*\\.(ts|vue|js)$",
+      "message": "No seleccionar por indice global (el primero suele ser del menu lateral): acotar el selector al contenedor.",
+      "source": "app-movil/CLAUDE.md, seccion 8",
+      "exceptions": []
+    },
+    {
+      "id": "no-automation-libs",
+      "pattern": "from\\s+['\"](puppeteer(-core)?|playwright|chrome-remote-interface)['\"]",
+      "files": "^(src|scripts)/.*\\.(ts|js|mjs|vue)$",
+      "message": "Los scripts de automatizacion y capturas viven en la skill de capturas, no en src/ ni en scripts/.",
+      "source": "app-movil/CLAUDE.md, secciones 8 y 10",
+      "exceptions": []
+    },
+    {
+      "id": "schema-stamp-in-preferences",
+      "pattern": "localStorage\\.\\w+\\(\\s*['\"`]?SCHEMA_STAMP",
+      "files": "^src/.*\\.(ts|vue)$",
+      "message": "SCHEMA_STAMP vive en Preferences: el logout hace localStorage.clear().",
+      "source": "app-movil/CLAUDE.md, seccion 4",
+      "exceptions": []
+    }
+  ]
+}
