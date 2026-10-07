@@ -78,6 +78,48 @@ try {
 }
 catch { /* sin estado previo se avisa, que es lo prudente */ }
 
+/**
+ * Text of the last assistant message in the session transcript. Fallback only: the transcript is
+ * written asynchronously and can lag behind `last_assistant_message`.
+ * @param {string} path - `transcript_path` from the Stop event (JSONL).
+ * @returns {string} Empty string when the transcript can't be read.
+ */
+function lastReply(path) {
+	try {
+		const lines = readFileSync(path, "utf8").trimEnd().split("\n");
+
+		for (let i = lines.length - 1; i >= 0; i--) {
+			const entry = JSON.parse(lines[i]);
+			const blocks = entry.type === "assistant" && Array.isArray(entry.message?.content) ? entry.message.content : [];
+			const text = blocks.filter(b => b.type === "text").map(b => b.text).join("\n");
+
+			if (text)
+				return text;
+		}
+	}
+	catch { /* sin transcript se avisa, que es lo prudente */ }
+
+	return "";
+}
+
+let event = {};
+
+try {
+	event = JSON.parse(readFileSync(0, "utf8") || "{}");
+}
+catch { /* idem */ }
+
+const reply = event.last_assistant_message ?? lastReply(event.transcript_path ?? "");
+
+if (/\b(commit|push)/i.test(reply) && /(cerebro|~\/\.claude|\bbackup\b)/i.test(reply)) {
+	try {
+		writeFileSync(STATE, JSON.stringify({ signature }));
+	}
+	catch { /* idem */ }
+
+	quiet();
+}
+
 const lines = [];
 
 if (dirty.length) {

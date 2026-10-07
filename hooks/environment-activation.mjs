@@ -2,7 +2,8 @@
 /**
  * UserPromptSubmit: cambia el ambiente solo con mensajes del usuario, por `/ambiente <amb> [modo]`
  * o por frase con sustantivo e intencion («vamos a trabajar en el ambiente de qa»). Produccion solo
- * por comando. En cada mensaje le recuerda a Claude el ambiente activo.
+ * por comando. Le recuerda a Claude el ambiente cuando cambia y en cada mensaje fuera de local;
+ * en local sin cambios calla, porque ya lo dijo `environment-start` al abrir la sesion.
  */
 import { readFileSync } from "node:fs";
 import { ALIAS_PATTERN, describeState, isProduction, log, normalizeEnvironment, readRegistry, readState, saveState } from "../brain/lib/environments.mjs";
@@ -102,7 +103,11 @@ else {
 	}
 }
 
-instructions.push(`Ambiente activo: ${describeState(state)}. Antes de iniciar un desarrollo nuevo, recuerdale al usuario en que ambiente estamos.`);
+if (state.environment !== "local" || instructions.length || notices.length)
+	instructions.push(`Ambiente activo: ${describeState(state)}.`);
+
+if (!instructions.length)
+	process.exit(0);
 
 const out = { hookSpecificOutput: { hookEventName: "UserPromptSubmit", additionalContext: instructions.join(" ") } };
 

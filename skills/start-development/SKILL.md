@@ -11,6 +11,9 @@ actualizado, y eso solo se garantiza actualizando primero.
 
 ## Paso 0 — Leer lo que ya dijo el usuario
 
+**Lo primero que se dice es el ambiente activo** (local, desa, qa, pre o prod), en una línea: el
+desarrollo se hace contra él.
+
 **Antes de preguntar nada.** El usuario puede haber pasado los datos al invocar:
 
 ```

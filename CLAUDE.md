@@ -214,7 +214,8 @@ cualquier repo** —absorber algo estando en aio-app escribe en `~/.claude`— a
 del repo en el que trabajas nunca lo delata.
 
 El hook `brain-unpushed-notice` avisa al terminar una respuesta si queda algo sin commitear o sin
-subir, y no repite hasta que el estado cambie. Cuando avise, **decirlo en una linea y ofrecer
+subir, y no repite hasta que el estado cambie. Calla si esa respuesta ya ofrecio el commit del
+cerebro. Cuando avise, **decirlo en una linea y ofrecer
 hacerlo**; si el usuario dice que no, no insistir.
 
 **Commitear y hacer push en `~/.claude` se pide SIEMPRE, sin excepcion.** No importa que el trabajo
