@@ -1,0 +1,157 @@
+{
+  "description": "Reglas de epsilon (front Vue 3 Options API) y epsilon-backend (Express + Sequelize) que code-standards-guard aplica sobre las lineas que agrega cada edicion.",
+  "rules": [
+    {
+      "id": "no-script-setup",
+      "repos": ["epsilon"],
+      "pattern": "<script[^>]*\\bsetup\\b",
+      "files": "^src/.*\\.vue$",
+      "message": "El front usa Options API: no se introduce <script setup> sin acordarlo.",
+      "source": "epsilon/CLAUDE.md, seccion 4",
+      "exceptions": []
+    },
+    {
+      "id": "no-pinia",
+      "repos": ["epsilon"],
+      "pattern": "from\\s+['\"]pinia['\"]",
+      "files": "^src/",
+      "message": "El estado compartido va en el store Vuex (src/store.js).",
+      "source": "epsilon/CLAUDE.md, seccion 4",
+      "exceptions": []
+    },
+    {
+      "id": "no-i18n",
+      "repos": ["epsilon"],
+      "pattern": "vue-i18n|\\$t\\(",
+      "files": "^src/",
+      "message": "El front no tiene i18n: los textos van en español en la plantilla.",
+      "source": "epsilon/CLAUDE.md, seccion 9",
+      "exceptions": []
+    },
+    {
+      "id": "no-require-context",
+      "repos": ["epsilon"],
+      "pattern": "require\\.context\\(",
+      "files": "^src/",
+      "message": "Nada nuevo con require.context: import estatico.",
+      "source": "epsilon/CLAUDE.md, seccion 10",
+      "exceptions": []
+    },
+    {
+      "id": "no-bearer-token",
+      "pattern": "Authorization['\"]?\\s*[:=]\\s*['\"`]Bearer",
+      "files": "^src/",
+      "message": "El token viaja en x-access-token, que ya pone $api; no Authorization: Bearer.",
+      "source": "epsilon/docs/contrato-backend.md, seccion 2",
+      "exceptions": []
+    },
+    {
+      "id": "keep-jwtoken-typo",
+      "repos": ["epsilon"],
+      "pattern": "['\"]jwtToken['\"]",
+      "files": "^src/",
+      "message": "La clave de sesion se llama jwtOken (errata propagada a proposito); no se corrige.",
+      "source": "epsilon/CLAUDE.md, seccion 10",
+      "exceptions": []
+    },
+    {
+      "id": "no-dead-deps",
+      "repos": ["epsilon"],
+      "pattern": "from\\s+['\"](vuelidate|xlsx|dotenv)['\"]",
+      "files": "^src/",
+      "message": "vuelidate@0.7, xlsx y dotenv son dependencias muertas: usar @vuelidate/core.",
+      "source": "epsilon/CLAUDE.md, seccion 10",
+      "exceptions": []
+    },
+    {
+      "id": "no-axios-outside-api",
+      "repos": ["epsilon"],
+      "pattern": "import\\s+axios|from\\s+['\"]axios['\"]",
+      "files": "^src/(services|views|components/standard)/|\\.vue$",
+      "message": "Las llamadas van con $api desde una clase de src/services/.",
+      "source": "epsilon/CLAUDE.md, seccion 5",
+      "exceptions": []
+    },
+    {
+      "id": "no-legacy-service-in-new-layer",
+      "repos": ["epsilon"],
+      "pattern": "from\\s+['\"]@/service/(?!procesos/bloqueoTarifas/)",
+      "files": "^src/(services|views/modules)/",
+      "message": "Nada nuevo sobre src/service/ (legado): usar src/services/ con $api.",
+      "source": "epsilon/CLAUDE.md, seccion 5",
+      "exceptions": []
+    },
+    {
+      "id": "no-manual-token-in-new-layer",
+      "repos": ["epsilon"],
+      "pattern": "x-access-token|verificarStatusCode|api_endpoint",
+      "files": "^src/(services|views)/",
+      "message": "El interceptor de $api pone el token y maneja 401/403: usar handleResponseErrors.",
+      "source": "epsilon/CLAUDE.md, seccion 7",
+      "exceptions": []
+    },
+    {
+      "id": "notify-not-fnnotificar",
+      "repos": ["epsilon"],
+      "pattern": "fnNotificar\\(|ToastService",
+      "files": "^src/(services|views/modules)/",
+      "message": "Para avisos nuevos, notify() de @/utils/notify.",
+      "source": "epsilon/CLAUDE.md, seccion 10",
+      "exceptions": []
+    },
+    {
+      "id": "no-console-log",
+      "repos": ["epsilon"],
+      "pattern": "console\\.log\\(",
+      "files": "^src/",
+      "message": "Sin console.log: los errores se manejan con handleResponseErrors y notify.",
+      "source": "epsilon/CLAUDE.md, seccion 10",
+      "exceptions": []
+    },
+    {
+      "id": "no-db-open-new-layer",
+      "repos": ["epsilon-backend"],
+      "pattern": "\\bdb\\.open\\(",
+      "files": "^src/(App|routes)/",
+      "message": "Nada de db.open() en codigo nuevo: Sequelize, sequelize.query o connection.query con bind.",
+      "source": "epsilon-backend/CLAUDE.md, seccion 10",
+      "exceptions": []
+    },
+    {
+      "id": "no-literal-interpolation",
+      "repos": ["epsilon-backend"],
+      "pattern": "\\bliteral\\(\\s*`[^`]*\\$\\{",
+      "files": "^src/",
+      "message": "No interpolar en Sequelize.literal(): usar replacements o bind.",
+      "source": "epsilon-backend/CLAUDE.md, seccion 10",
+      "exceptions": []
+    },
+    {
+      "id": "no-function-in-migration",
+      "repos": ["epsilon-backend"],
+      "pattern": "create\\s+(or\\s+replace\\s+)?function",
+      "files": "^src/database/migrations/",
+      "message": "Las funciones PL/pgSQL van en src/database/DBobjects/, no en una migracion.",
+      "source": "epsilon-backend/CLAUDE.md, seccion 10",
+      "exceptions": []
+    },
+    {
+      "id": "no-new-legacy-mount",
+      "repos": ["epsilon-backend"],
+      "pattern": "app\\.use\\(\\s*apiv1\\s*\\+",
+      "files": "^src/index\\.js$",
+      "message": "Lo nuevo va en src/routes/api/Modules/.../v0.js, que se autocarga; no se montan rutas legacy.",
+      "source": "epsilon-backend/CLAUDE.md, seccion 4",
+      "exceptions": []
+    },
+    {
+      "id": "no-raw-res-in-controllers",
+      "repos": ["epsilon-backend"],
+      "pattern": "\\bres\\.(send|json|status)\\(",
+      "files": "^src/App/Controllers/Modules/(?!Health/)",
+      "message": "Envolver con this.executeWithHandling y responder con this.apiResponseSuccess.",
+      "source": "epsilon-backend/CLAUDE.md, seccion 4",
+      "exceptions": []
+    }
+  ]
+}
