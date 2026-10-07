@@ -78,8 +78,9 @@ sustituto de leer lo que se escribió.
 Quitar lo que sobre y pasar el formateador del proyecto (`lint` suele traer `--fix`). **No
 reescribir de paso cosas que no son del ticket**: un cierre no es una refactorización.
 
-Después, **ofrecer** la skill `review-overengineering` sobre el diff de la rama. Si el usuario
-acepta, se muestran los hallazgos y solo se aplican los que él elija; si no, se sigue a la Fase 2.
+Después, **correr siempre** la skill `review-overengineering` sobre el diff de la rama: es
+obligatoria, aunque el resultado sea "Nada que quitar". Se muestran los hallazgos y solo se aplican
+los que el usuario elija. No se pasa a la Fase 2 sin haberla corrido.
 
 ## Fase 2 — Verificar
 

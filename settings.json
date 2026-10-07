@@ -90,6 +90,15 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/overengineering-notice.mjs\"",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -156,6 +165,15 @@
           {
             "type": "command",
             "command": "node \"$HOME/.claude/hooks/environment-start.mjs\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/standards-context.mjs\"",
             "timeout": 10
           }
         ]

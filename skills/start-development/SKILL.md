@@ -192,6 +192,11 @@ En la misma interacción en que se presente el resumen de la HU, preguntar:
   escribir código. Proponer, no arrancar sola: para un ajuste puntual no compensa, y ahí se hace
   el ticket y se guarda lo aprendido al cerrar.
 
+**Y leer el inventario de lo reutilizable del proyecto**, si existe:
+`brain/projects/<proy>/standards/reuse.md`. Dice qué pieza ya resuelve cada necesidad común y qué no
+se hace en ese repo. Es lo que permite que el plan nazca reutilizando, en vez de corregirlo después
+en la revisión.
+
 ## Paso 5 — El plan lleva diagrama de flujo. Siempre
 
 Antes de tocar un archivo hay que exponer el plan y esperar el sí —eso ya lo exige el `CLAUDE.md`—,
@@ -218,6 +223,16 @@ diagrama por cada uno. Meterlos todos en uno los vuelve ilegibles.
 
 Y un diagrama **no reemplaza la prosa del plan**: qué archivos se tocan, qué regla vive dónde y qué
 se decidió no hacer sigue yendo escrito. El diagrama muestra el recorrido; el texto, las razones.
+
+**El plan lleva también la tabla de reutilización**, armada con el inventario del proyecto y la
+escalera de `CLAUDE.md` ("Antes de escribir código"):
+
+| Se reutiliza | No se implementa | Se escribe nuevo |
+| --- | --- | --- |
+| La pieza y su ruta | Lo descartado y por qué (no lo pide la HU, el estándar no lo hace) | Qué, y siguiendo qué pieza de referencia |
+
+Si una columna queda vacía se dice, no se omite: una columna "Se reutiliza" vacía casi siempre es
+una búsqueda que no se hizo.
 
 ## Al terminar — a dónde va cada camino
 

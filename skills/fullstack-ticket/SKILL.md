@@ -76,6 +76,10 @@ marca el patrón a seguir; copiarlo vale más que inventar.
 
 El `NOTES.md` dice dónde mirar en cada lado y qué trampas de nombres tiene ese proyecto.
 
+**Leer el inventario de lo reutilizable**, `brain/projects/<proyecto>/standards/reuse.md`, si existe.
+El contrato y el plan de la Fase 3 llevan la tabla **Se reutiliza / No se implementa / Se escribe
+nuevo** que describe `start-development` en su Paso 5.
+
 Si el stack declara un verificador, mirar el estado del contrato para ese recurso **antes** de
 empezar, para no confundir un fallo heredado con uno propio.
 

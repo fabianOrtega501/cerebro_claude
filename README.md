@@ -98,6 +98,8 @@ tres `gen-*` son **manuales**: no se disparan solas nunca.
 | `environment-activation` | Cada mensaje tuyo | Cambia el ambiente solo si tu lo pides (`/ambiente qa lectura` o una frase); recuerda el activo cuando cambia o si no es local |
 | `environment-start` | Al abrir la sesion | Avisa si arranca fuera de local |
 | `hu-pdf-guard` | Antes de Read y de Bash | **Deniega** leer una HU en PDF/DOCX entera y remite a su `hu.md`; deja pasar Read con `pages` |
+| `standards-context` | Al abrir la sesion | Si el repo es de un proyecto con inventario (`brain/projects/<p>/standards/reuse.md`), pone en contexto su seccion **No se hace** y la ruta del inventario, para planear reutilizando |
+| `overengineering-notice` | Al terminar una respuesta | Avisa una vez si hay codigo sin commitear en un repo del proyecto que no paso por `review-overengineering`; calla hasta que se registre la revision (`brain/lib/review-state.mjs mark`) o el codigo cambie despues de ella. Ignora los `.d.ts` y lockfiles regenerados |
 
 Casi todos detectan y se apartan. **`i18n-keys-guard`, `bash-write-guard` y `hu-pdf-guard` si
 deniegan**; `bash-write-guard` porque un cambio por Bash se salta todas las guardas de Edit, y
