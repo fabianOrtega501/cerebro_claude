@@ -51,3 +51,12 @@ set name = 'TALLER AUTOMOTRIZ LOS ANDES S.A.S.',
     commune_id = 39,
     neighborhood_id = 113
 where id = 1076427;
+
+-- 4. Las sedes de la clínica sobre la Av. 5AN # 23 (sucursales en el mapa). Están en
+--    el barrio Versalles, Comuna 2, y son las que abren el globo de sucursal. La sede San Marcos
+--    (id 9) queda sin zona: su dirección no permite asegurar el barrio, y así también se ve cómo
+--    sale una sucursal sin comuna. Requiere la migración que agrega estas columnas a branches.
+update public.branches
+set commune_id = 39,        -- Comuna 2
+    neighborhood_id = 359   -- Versalles
+where id in (8, 10, 11);

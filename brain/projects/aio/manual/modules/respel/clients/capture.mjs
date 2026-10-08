@@ -6,7 +6,7 @@
  *
  * Uso:
  *   node --experimental-websocket modules/respel/clients/capture.mjs --salida <carpeta>
- *        --empresa "PROMOCALI" [--solo general|capas|filtros|globo|completa|todo]
+ *        --empresa "PROMOCALI" [--solo general|capas|filtros|globo|sucursal|completa|todo]
  *        [--municipio CAL] [--comuna "Comuna 2"] [--barrio San]
  *
  * No modifica nada: solo consulta y captura. Los datos presentables los deja `seed.sql`, que hay
@@ -60,7 +60,7 @@ const neighborhood = arg("barrio", "San Vicente");
 
 const CLIENTS_VIEW = "/respel/clients";
 const MAP = ".client-map.leaflet-container";
-const LAYER_CONTROL = ".leaflet-control-layers.custom-icon-control";
+const LAYER_CHIP = ".client-map-layers__chip";
 const FULLSCREEN_BUTTON = ".client-map__card .v-toolbar button";
 
 /**
@@ -102,7 +102,7 @@ const painted = (cdp) =>
 			return JSON.stringify({
 				clientes: document.querySelectorAll('.client-map-marker--client').length + suma('.client-map-cluster--client'),
 				prospectos: document.querySelectorAll('.client-map-marker--prospect').length + suma('.client-map-cluster--prospect'),
-				totales: [...document.querySelectorAll('.client-map-count')].map(e => e.innerText.replace(/\\s+/g, ' ').trim()),
+				totales: [...document.querySelectorAll('${LAYER_CHIP}')].map(e => e.innerText.replace(/\\s+/g, ' ').trim()),
 			});
 		})()`,
 	).then((raw) => JSON.parse(raw));
@@ -219,33 +219,19 @@ async function run() {
 		}
 
 		if (wants("capas")) {
-			// El control se despliega con el mouseenter real, como el del AVL.
-			const box = await evaluate(
-				cdp,
-				`(() => {
-					const c = document.querySelector('${LAYER_CONTROL}');
-					if (!c) return '';
-					const r = c.getBoundingClientRect();
-
-					return JSON.stringify({ x: r.x + r.width / 2, y: r.y + r.height / 2 });
-				})()`,
-			);
-
-			if (!box) throw new Error("No se encontro el control de capas del mapa");
-
-			const { x, y } = JSON.parse(box);
-
-			await moveMouseTo(cdp, x, y);
-			await wait(1500);
+			// Las capas se apagan desde las pastillas de la esquina; se apaga Clientes para que se vea el
+			// estado apagado, con el cursor sobre el mapa para que salgan sus coordenadas.
+			await toggleLayerChip(cdp, "Clientes");
+			await hoverMap(cdp);
 			await screenshot(cdp, `${outputDir}/mapa-capas.png`, { selector: MAP });
 			console.log("captura: mapa-capas");
 
-			// Se saca el cursor para que el panel se recoja antes de la siguiente captura.
+			await toggleLayerChip(cdp, "Clientes");
 			await moveMouseTo(cdp, 40, 40);
 			await wait(1200);
 		}
 
-		if (wants("filtros") || wants("globo")) {
+		if (wants("filtros") || wants("globo") || wants("sucursal")) {
 			await pickZone(cdp, "Municipio", municipality, municipality);
 			await pickZone(cdp, "Comuna", commune, commune);
 			await pickZone(cdp, "Barrio", neighborhood, neighborhood);
@@ -279,6 +265,28 @@ async function run() {
 				await wait(1500);
 				await screenshot(cdp, `${outputDir}/mapa-globo.png`, { selector: MAP });
 				console.log("captura: mapa-globo");
+			}
+
+			if (wants("sucursal")) {
+				await evaluate(cdp, `document.querySelector('.leaflet-popup-close-button')?.click()`);
+				await wait(800);
+
+				// El globo del cliente corre el mapa al abrir: se repite la busqueda para volver a encuadrar
+				// sobre el cliente y sus sedes antes de buscar la sucursal.
+				await settleRequests(cdp, () => clickByText(cdp, ".v-card button", "Buscar"), {
+					what: "la busqueda para el globo de sucursal",
+					timeout: 90000,
+				});
+				await wait(3000);
+				await waitForMarkers(cdp);
+
+				const sucursal = await openBranchPopup(cdp);
+
+				if (!sucursal) throw new Error("No se pudo abrir el globo de ninguna sucursal");
+
+				await wait(1500);
+				await screenshot(cdp, `${outputDir}/mapa-globo-sucursal.png`, { selector: MAP });
+				console.log("captura: mapa-globo-sucursal");
 			}
 		}
 
@@ -324,6 +332,105 @@ async function run() {
 	} finally {
 		if (cdp) await closeBrowser(cdp, chrome).catch(() => {});
 	}
+}
+
+/**
+ * Apaga o enciende una capa con su pastilla, la de la esquina del mapa bajo el zoom.
+ *
+ * @param {object} cdp - Conexion al navegador.
+ * @param {string} name - Inicio del texto de la pastilla, por ejemplo "Clientes".
+ * @returns {Promise<void>} - Lanza si la pastilla no esta.
+ */
+async function toggleLayerChip(cdp, name) {
+	const point = await evaluate(
+		cdp,
+		`(() => {
+			const chip = [...document.querySelectorAll('${LAYER_CHIP}')].find(e => e.innerText.trim().startsWith(${JSON.stringify(name)}));
+			if (!chip) return '';
+			const r = chip.getBoundingClientRect();
+
+			return JSON.stringify({ x: r.x + r.width / 2, y: r.y + r.height / 2 });
+		})()`,
+	);
+
+	if (!point) throw new Error(`No se encontro la pastilla de capa "${name}"`);
+
+	const { x, y } = JSON.parse(point);
+
+	await clickAt(cdp, x, y);
+	await wait(1500);
+}
+
+/**
+ * Deja el cursor sobre el mapa para que el rotulo de coordenadas muestre una posicion.
+ *
+ * @param {object} cdp - Conexion al navegador.
+ * @returns {Promise<void>}
+ */
+async function hoverMap(cdp) {
+	const { x, y } = JSON.parse(
+		await evaluate(
+			cdp,
+			`(() => { const r = document.querySelector('${MAP}').getBoundingClientRect();
+				return JSON.stringify({ x: r.x + r.width * 0.6, y: r.y + r.height * 0.55 }); })()`,
+		),
+	);
+
+	await moveMouseTo(cdp, x, y);
+	await wait(800);
+}
+
+/**
+ * Abre el globo de una sucursal: entra en los grupos de sucursales hasta que aparece un marcador
+ * suelto y prueba los marcadores hasta que uno abre.
+ *
+ * Las sedes de un mismo cliente suelen estar a pocos metros entre si, asi que siguen agrupadas aun
+ * con el maximo acercamiento; ahi el clic sobre el grupo las despliega en abanico en vez de acercar.
+ *
+ * @param {object} cdp - Conexion al navegador.
+ * @returns {Promise<boolean>} - `false` si ningun marcador de sucursal abrio su globo.
+ */
+async function openBranchPopup(cdp) {
+	const visible = (selector) =>
+		evaluate(
+			cdp,
+			`JSON.stringify([...document.querySelectorAll('${MAP} ${selector}')].map(e => {
+				const r = e.getBoundingClientRect();
+				const m = e.closest('.leaflet-container').getBoundingClientRect();
+				const ok = r.width > 0 && r.top > m.top + 10 && r.bottom < m.bottom - 10 && r.left > m.left + 10 && r.right < m.right - 10;
+
+				return { x: r.x + r.width / 2, y: r.y + r.height / 2, ok };
+			}).filter(p => p.ok))`,
+		).then((raw) => JSON.parse(raw));
+
+	// Se prefiere un grupo: son las sedes vecinas, las que tienen la zona completa en el seed. Se
+	// entra en él hasta que suelte marcadores, y luego se prueban primero los más cercanos al grupo.
+	const loose = (await visible(".client-map-marker--branch")).length;
+	let target = null;
+
+	for (let i = 0; i < 8; i++) {
+		const [cluster] = await visible(".client-map-cluster--branch");
+
+		if (!cluster || (await visible(".client-map-marker--branch")).length > loose) break;
+
+		target = cluster;
+		await clickAt(cdp, cluster.x, cluster.y);
+		await wait(2500);
+	}
+
+	const distance = (p) => (target ? Math.hypot(p.x - target.x, p.y - target.y) : 0);
+	const markers = (await visible(".client-map-marker--branch")).sort((a, b) => distance(a) - distance(b));
+
+	console.log("marcadores de sucursal en pantalla:", markers.length);
+
+	for (const { x, y } of markers) {
+		await clickAt(cdp, x, y);
+		await wait(1800);
+
+		if (await evaluate(cdp, `!!document.querySelector('.leaflet-popup-content .map-popup-card')`)) return true;
+	}
+
+	return false;
 }
 
 /**
