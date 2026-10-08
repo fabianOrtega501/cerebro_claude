@@ -1,0 +1,1 @@
+- [No trabajar en el monolito](no-trabajar-en-el-monolito.md) — backend de SIPA/Status solo en status-api; el monolito solo si Fabian lo pide.
