@@ -1,6 +1,6 @@
 ---
 name: sipa-roto-por-la-migracion
-description: "Inventario de lo que habra que ajustar en SIPA el dia que apunte a status-api. Hoy SIPA usa el monolito, asi que NO esta roto."
+description: "Inventario de lo que habra que ajustar en SIPA al apuntar a status-api. En local ya apunta (rama 7433); en desa/prod depende de VUE_APP_API del despliegue."
 metadata: 
   node_type: memory
   type: project
@@ -8,7 +8,16 @@ metadata:
   modified: 2026-09-22T01:38:40.404Z
 ---
 
-## SIPA hoy NO esta roto
+## Estado al 2026-10-08
+
+- **Local**: el `.env` de SIPA (no versionado) apunta a `http://localhost:8087/api`, status-api.
+  El ajuste del front al contrato nuevo vive en la rama `feature/7433-...ConexionConStatusApi`
+  de SIPA, que aun no entra a `desa`.
+- **desa / prod**: la URL sale de `VUE_APP_API` del despliegue (`docker/40-runtime-config.sh`);
+  no se ve en el repo. Mientras el 7433 no este desplegado, se asume que siguen en el monolito,
+  asi que un cambio hecho solo en status-api no llega al usuario de SIPA hasta entonces.
+
+## Lo que se vio el 2026-09-22 (ya no vale en local)
 
 Lo comprobo Fabian el 2026-09-22 y se verifico: **SIPA apunta al monolito, no a status-api**.
 

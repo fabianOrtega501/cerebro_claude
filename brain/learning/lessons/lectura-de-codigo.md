@@ -40,8 +40,8 @@ valvula cerrada a mitad de camino. Leer codigo es seguir el tubo.
 
 | Proyecto | Ejemplo | Nota |
 |---|---|---|
-| sipa | `src/@core/components/cargue-toneladas/CargueToneladas.vue:337` | El boton "Procesar": desde aqui arranca el recorrido del calculo |
-| status-api | `routes/api/v0/Sipa/ToneladaAforada/toneladas_aforadas.php` | La ruta `procesar-toneladas` que lleva al controlador |
+| sipa | `src/@core/components/cargue-toneladas/CargueToneladas.vue:28` y `:240-297` | La misma pantalla tiene **dos tubos**. Boton "Cargar" → `EstructuraService.js:33` → `procesar-archivo-csv` → `CargarArchivosController::procesar`: llena `dt_cargue_toneladas` y valida |
+| sipa | `CargueToneladas.vue:60` y `:333-337` | Boton "Procesar" (uno por fila) → `procesar-toneladas` → `ToneladasAforadasController`: calcula. La fila solo existe si el tubo de carga termino bien |
 | status-api | `app/Http/Controllers/Sipa/CargarArchivos/CargarArchivosController.php:126-199` | `procesar`: la carga del csv. Una cadena de validaciones que cortan con `return false` antes de que exista algo que calcular |
 | status-api | `CargarArchivosController.php:608-623` | `validarToneladasPeriodoActual`: el nombre dice "periodo actual" y la consulta pide el mes **anterior** al periodo (`- interval '1 month'`). El nombre engaña |
 | status-api | `app/Services/Sipa/CalculoToneladasAforadas/ToneladasAforadasServices.php:29-41` | El docblock habla de un trabajo en segundo plano segun 10.000 registros; el cuerpo no despacha ningun job. Comentario envejecido |
@@ -49,6 +49,10 @@ valvula cerrada a mitad de camino. Leer codigo es seguir el tubo.
 
 ## 4. Errores tipicos
 
+- Seguir el boton que suena al tema ("Procesar") cuando la falla ocurre en un tubo anterior de la
+  misma pantalla ("Cargar"). Antes de elegir boton, preguntarse en que paso del uso real se tranca
+  el usuario segun la HU. **Ticket 11180**: la clase senalo "Procesar" como punto de partida y
+  desvio la lectura; la HU decia "debe modificar el archivo .csv", que apunta a la carga.
 - Ir directo al archivo que suena al tema de la HU ("promedio" → el servicio de calculo) sin
   verificar que el flujo llega hasta ahi.
 - Creerle al nombre de un metodo o a su docblock sin leer el cuerpo.
