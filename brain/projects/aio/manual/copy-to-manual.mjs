@@ -33,9 +33,10 @@ import { MAPPINGS as respelClients } from "./modules/respel/clients/mappings.mjs
 import { MAPPINGS as respelClientLoyalties } from "./modules/respel/client-loyalties/mappings.mjs";
 import { MAPPINGS as respelClientOperationCosts } from "./modules/respel/client-operation-costs/mappings.mjs";
 import { MAPPINGS as respelServiceProvisions } from "./modules/respel/service-provisions/mappings.mjs";
+import { MAPPINGS as respelDashboards } from "./modules/respel/dashboards/mappings.mjs";
 import { MAPPINGS as publicCitizenPortal } from "./modules/public/citizen-portal/mappings.mjs";
 
-const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceIssues, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsIssues, ...operationsRoutes, ...operationsTraining, ...respelClients, ...respelClientLoyalties, ...respelClientOperationCosts, ...respelServiceProvisions, ...publicCitizenPortal };
+const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceIssues, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsIssues, ...operationsRoutes, ...operationsTraining, ...respelClients, ...respelClientLoyalties, ...respelClientOperationCosts, ...respelServiceProvisions, ...respelDashboards, ...publicCitizenPortal };
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {

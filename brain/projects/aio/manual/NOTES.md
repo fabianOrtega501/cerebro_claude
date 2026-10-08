@@ -375,6 +375,20 @@ Los tres flujos absorbidos el 2026-09-15 (`dispatch-daily-filters`, `dispatch-da
 contra los helpers del perfil, nada mas. La primera corrida puede necesitar ajustes de datos
 (`--turno`, `--fecha`, `--vehiculo`).
 
+### Roles y Permisos: solo Agregar Rol tiene buscador
+
+Para fotografiar permisos concretos en **Configuración > Usuarios > Roles y Permisos**:
+
+- **El diálogo del ojo (Leer Rol) no tiene buscador y está paginado** (36 páginas en local). No
+  sirve para llegar a un permiso puntual. El de **Agregar Rol** sí tiene el campo **Buscar**, y se
+  cierra sin guardar.
+- **Agregar Rol solo aparece con Crear sobre `/settings/users`.** Un rol con solo Leer ve las
+  tarjetas, pero no el botón.
+- **El botón dice "Agregar Rol"**, con R mayúscula. Compararlo en minúsculas.
+- **No se usa el usuario administrador para escenas de permisos**: cambiarle permisos al rol 1 los
+  cambia para todos. Se crea en local un usuario y un rol propios, con los permisos de la escena, y
+  se borran al terminar (tokens, permisos, `role_users`, rol y usuario).
+
 ## Al terminar, en este repo
 
 **Levantar el dev server reescribe `components.d.ts`**, que regenera `unplugin-vue-components` al
@@ -438,6 +452,7 @@ grep -o "[a-z0-9_-]*\.png" docs/AIO/<ruta>/<Documento>.md | sort -u
 | Mantenimiento > Órdenes de trabajo | `modules/maintenance/work-orders/capture-supplies.mjs` | `work-order-supplies` (buscador de suministros con el menú desplegado: `WorkOrder.md`). Regenera `OT_26.png` con `--sobrescribir`. Absorbido del repo |
 | Respel > Operaciones > Prestación de Servicios | `modules/respel/service-provisions/capture.mjs` | `service-provisions-edit` (diálogo **Editar Prestación de Servicios** con una cantidad recibida decimal digitada: `Respel/Operaciones/service-provision.md`, regenera `pr_1.png` con `--sobrescribir`). Con `--prestacion`, que tiene que estar en la primera página y mostrar el lápiz; en PROMOCALI local sirve la 121354. **Nunca guarda**: digita y cierra |
 | Respel > Fidelización | `modules/respel/client-loyalties/capture-signature-audit.mjs` | `signature-audit` (acción de auditoría en el listado de acuerdos y la pantalla del quórum con la tabla de firmantes: `Comercial/Fidelizacion/auditoria-firmas.md`). Con `--cliente`, `--acuerdo` y `--solo acciones\|auditoria\|todo`. Saca la auditoría normal y **expandida**, y falla si abre a pantalla completa o sin el botón Ampliar. Espera las 102 de 120 firmas del acuerdo #5 de la base local, que se cargaron con un `seed.sql` que **nunca se commiteó**: sin él la barra sale casi vacía. Absorbido del repo, con `runSql` asíncrono |
+| Respel > Reportes > Dashboard | `modules/respel/dashboards/capture.mjs` | `respel-dashboards` (menú Dashboard › Operaciones y Comercial, permisos de los dashboards en Agregar Rol y aviso sin dashboards: `Respel/Maestros/General/dashboard.md`). Con `--escena completo\|sin-dashboards`; cada escena necesita un usuario propio pasado por `AIO_TEST_EMAIL` / `AIO_TEST_PASSWORD` (ver su cabecera). No guarda nada |
 
 La navegación del wizard —abrir la pestaña Planes, abrir el wizard de una fila, saltar entre
 pasos— vive en `modules/maintenance/plans/wizard.mjs`, compartida por los dos flujos. Ninguno de
