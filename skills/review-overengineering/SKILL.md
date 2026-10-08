@@ -26,12 +26,15 @@ otra cosa (un archivo, lo que esta en `staged`, un MR), se revisa eso.
 2. Pasar cada funcion, clase, dependencia o componente nuevo por la escalera de `CLAUDE.md`
    ("Antes de escribir codigo"). Para el escalon 2, buscar el concepto en el repo con `grep` y
    revisar las memorias de estandar del proyecto (en AIO, `buscar-antes-de-crear`).
-3. Antes de marcar algo con `borrar`, buscar el simbolo en todo el repo, incluidas las pruebas y
+3. Mirar tambien las lineas **quitadas**: por cada llamada, clave de traduccion, import o campo que
+   el diff dejo de usar, buscar si el simbolo que la servia quedo huerfano. Eso es `borrar`, aunque
+   el archivo donde vive no aparezca en el diff.
+4. Antes de marcar algo con `borrar`, buscar el simbolo en todo el repo, incluidas las pruebas y
    las referencias por string.
-4. Al terminar, registrar la revision para que el aviso del hook `overengineering-notice` se calle:
+5. Al terminar, registrar la revision para que el aviso del hook `overengineering-notice` se calle:
    `node ~/.claude/brain/lib/review-state.mjs mark <repo>`. Se registra aunque haya hallazgos; si
    despues el codigo cambia, el aviso vuelve una vez.
-5. Por cada hallazgo `reusar` cuya pieza no este en `brain/projects/<proyecto>/standards/reuse.md`,
+6. Por cada hallazgo `reusar` cuya pieza no este en `brain/projects/<proyecto>/standards/reuse.md`,
    proponer la linea para agregarla, ya redactada. Asi la proxima vez se sabe desde el plan.
 
 ## Etiquetas

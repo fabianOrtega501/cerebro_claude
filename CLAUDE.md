@@ -389,6 +389,12 @@ punta a punta. Despues se para en el primer escalon que lo resuelva:
 Antes de editar se buscan todos los que llaman a la funcion y se corrige una vez, en la compartida:
 corregir solo el camino del ticket deja rotos a los demas.
 
+**Lo que el cambio deja sin uso se borra en el mismo cambio.** Al reemplazar o quitar una llamada,
+se busca en todo el repo el metodo, la clave de traduccion, el import, el tipo o el campo que la
+servia; si nadie mas lo usa, se elimina ahi mismo. El codigo muerto no rompe nada y por eso nadie
+lo nota hasta que lo marca la revision del MR. Lo pidio Fabian el 2026-10-08, tras dos comentarios
+del MR del ticket 11254 (un `getAllNoPagination` y una clave de traduccion huerfanos).
+
 **Lo minimo nunca recorta** la validacion en el request, el manejo de errores que evita perder
 datos, los permisos ni lo que la HU pide. **Tampoco pasa por encima del estandar del repo**: si el
 equipo ya tiene la pieza (`BaseService`, `CommonFormRequest`), usarla es el escalon 2.
