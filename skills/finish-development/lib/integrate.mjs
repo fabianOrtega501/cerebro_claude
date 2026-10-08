@@ -56,7 +56,7 @@ if (!git(repo, ["rev-parse", "--verify", "--quiet", target]).ok) {
 const incoming = git(repo, ["log", "--oneline", `HEAD..${target}`]).out;
 
 if (!incoming) {
-	console.log(JSON.stringify({ ok: true, merged: false, reason: `Ya estas al dia con ${target}.`, commits: [] }, null, 2));
+	console.log(JSON.stringify({ ok: true, merged: false, reason: `Ya estas al dia con ${target}.`, commits: [], i18nNotAtEnd: i18nNotAtEnd() }, null, 2));
 	process.exit(0);
 }
 
@@ -69,8 +69,18 @@ if (dryRun) {
 
 const merge = git(repo, ["merge", "--no-edit", target]);
 
+/** Branch i18n keys that the merge left before keys of the base, per locale file (empty if none). */
+function i18nNotAtEnd() {
+	try {
+		execFileSync("node", [`${process.env.HOME}/.claude/brain/lib/i18n-tail.mjs`, "--repo", repo, "--base", target], { encoding: "utf8" });
+		return [];
+	} catch (error) {
+		return JSON.parse(error.stdout || "{}").files ?? [];
+	}
+}
+
 if (merge.ok) {
-	console.log(JSON.stringify({ ok: true, merged: true, commits, output: merge.out }, null, 2));
+	console.log(JSON.stringify({ ok: true, merged: true, commits, i18nNotAtEnd: i18nNotAtEnd(), output: merge.out }, null, 2));
 	process.exit(0);
 }
 

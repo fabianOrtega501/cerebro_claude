@@ -155,6 +155,27 @@ reescribe commits que otro pueda tener.
 **Si hay conflictos, el merge se queda a medias a propósito.** Resolverlos con el usuario, archivo
 por archivo, entendiendo los dos lados. Nunca quedarse con "el mío" por comodidad.
 
+**Las traducciones de la rama tienen que seguir al final después del merge.** Si la base también
+agregó claves al final, git deja las suyas debajo de las de la rama, y las nuestras quedan en medio
+sin que ningún hook lo vea: el `i18n-keys-guard` solo revisa las ediciones, no los merges. Por eso
+`integrate.mjs` devuelve `i18nNotAtEnd` con las claves desplazadas por archivo. Si no viene vacío:
+
+```bash
+node ~/.claude/brain/lib/i18n-tail.mjs --repo <repo> --base origin/<base> --fix
+```
+
+Mueve solo las líneas de las claves de la rama al final, en el mismo orden en todos los locales, y
+deja byte por byte las demás. Se commitea aparte y se vuelve a verificar.
+
+**Solo se mueven las claves propias que todavía no están en la base**, y solo cuando el merge trajo
+claves de otras personas que quedaron después. Las que ya están en la base —por ejemplo, porque el
+MR anterior del mismo ticket ya se mezcló— no se mueven nunca, aunque hayan quedado en medio:
+moverlas sería tocar líneas que ya son de todos. El script ya decide así; no hay que filtrar a mano.
+
+**Vale también para todo
+merge hecho a mano** —el que cierra un conflicto o el de "pon al día la rama"—: después de
+cerrarlo se corre el mismo comando sin `--fix` para comprobar.
+
 ## Fase 6 — Volver a verificar
 
 **La fase que todo el mundo se salta.** Repetir la fase 2 completa después del merge.

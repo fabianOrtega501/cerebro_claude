@@ -81,6 +81,13 @@ git aparte, local.
   su orden. **Lo hace cumplir el hook `i18n-keys-guard`**: deniega la edicion que deja una clave
   intercalada, y tambien la que crea una clave con un texto que ya existe bajo otra.
   Si de verdad hacen falta dos claves con el mismo texto porque van a divergir, se pide y se agrega.
+  **El hook no ve los merges**: si la base tambien agrego claves al final, git deja las suyas debajo
+  de las de la rama. Despues de **cada** merge con la base —por `finish-development` o a mano— se
+  corre `node ~/.claude/brain/lib/i18n-tail.mjs --repo <repo> --base origin/<base>`. Si al mezclar
+  llegan claves de otras personas y tenemos claves propias que **todavia no estan en la base**, las
+  nuestras se pasan al final con `--fix`. Las que ya estan en la base no se mueven nunca, aunque
+  hayan quedado en medio: moverlas seria tocar lineas que ya son de todos. Paso tres veces en el
+  ticket 10615 y lo pidio Fabian el 2026-10-08.
 - **Los commits no llevan trailer de coautoria.** Nada de `Co-Authored-By: Claude...` ni ninguna
   otra firma de la herramienta, en ningun repo: ni los de trabajo ni el cerebro. El historial es
   del equipo y una atribucion a la herramienta ahi no le sirve a nadie; ademas ensucia el
