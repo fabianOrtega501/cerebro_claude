@@ -5,7 +5,7 @@
 - [Buscar consumidores de un endpoint](buscar-consumidores-de-un-endpoint.md) — en los tres repos (status-frontend, sipa y el monolito) y por fragmento de ruta.
 - [Mensaje de commit: qué y dónde](mensaje-de-commit-que-y-donde.md) — qué se hizo y en qué módulo, sin mencionar AIO.
 - [Convenciones temporales del ticket 7433](convenciones-temporales-ticket-7433.md) — status al cerrar cada grupo y retoque visual de toda vista tocada; borrar al cerrar el ticket.
-- [SIPA y status-api](sipa-roto-por-la-migracion.md) — en local SIPA ya apunta a status-api (rama 7433); en desa/prod depende del despliegue. Inventario de ajustes.
+- [SIPA y status-api](sipa-roto-por-la-migracion.md) — SIPA desa ya trae el contrato de status-api (7433); el despliegue espera a producción con status-api. Inventario de ajustes.
 - [Vigilar en cada prueba exhaustiva](vigilar-en-cada-prueba-exhaustiva.md) — el dueño de /carguepdf y los valores con que se llama GenerateSHP.
 - [SQL crudo en GestorTransaccional](sql-crudo-en-gestor-transaccional.md) — mapa de los 40 puntos: 11 cerrados, 29 sin riesgo externo.
 - [Reglas al escribir un Form Request](reglas-al-escribir-un-form-request.md) — las saca la tabla, no el controlador viejo; y boolean rompe lo que llega por FormData.

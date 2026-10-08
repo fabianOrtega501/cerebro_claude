@@ -1,6 +1,6 @@
 ---
 name: sipa-roto-por-la-migracion
-description: "Inventario de lo que habra que ajustar en SIPA al apuntar a status-api. En local ya apunta (rama 7433); en desa/prod depende de VUE_APP_API del despliegue."
+description: "Inventario de ajustes de SIPA para status-api. El 7433 ya esta en desa; los servidores dependen de VUE_APP_API y no se despliega hasta salir a produccion con status-api."
 metadata: 
   node_type: memory
   type: project
@@ -11,11 +11,11 @@ metadata:
 ## Estado al 2026-10-08
 
 - **Local**: el `.env` de SIPA (no versionado) apunta a `http://localhost:8087/api`, status-api.
-  El ajuste del front al contrato nuevo vive en la rama `feature/7433-...ConexionConStatusApi`
-  de SIPA, que aun no entra a `desa`.
-- **desa / prod**: la URL sale de `VUE_APP_API` del despliegue (`docker/40-runtime-config.sh`);
-  no se ve en el repo. Mientras el 7433 no este desplegado, se asume que siguen en el monolito,
-  asi que un cambio hecho solo en status-api no llega al usuario de SIPA hasta entonces.
+  El ajuste del front al contrato nuevo (rama 7433) ya esta en `desa` de SIPA (merge `887ced6`).
+- **Servidores desa / prod**: la URL sale de `VUE_APP_API` del despliegue
+  (`docker/40-runtime-config.sh`); no se ve en el repo. Los cambios de SIPA que lean el contrato
+  de status-api no se despliegan hasta que SIPA salga a produccion con status-api: Fabian se lo
+  avisa a los encargados de despliegue (decidido el 2026-10-08, ticket 11180).
 
 ## Lo que se vio el 2026-09-22 (ya no vale en local)
 
