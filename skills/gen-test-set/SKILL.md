@@ -146,6 +146,7 @@ Fuentes de casos, según lo que el diff muestre:
 | Un filtro o buscador | Filtro sin resultados, y filtros combinados que se contradicen |
 | Una carga de archivo | Formato no permitido, archivo vacío, archivo grande |
 | Cualquier listado con paginación | Última página, y la pantalla sin datos |
+| Un dato que se guarda o se edita | Su ciclo completo en cada lugar desde donde se edita: guardar y cerrar sin la acción de al lado, que siga tras scroll o filtro sin recargar, dejarlo vacío, y que la ventana de edición abra con el valor existente. Detalle en la sección del `CLAUDE.md` del cerebro "Un dato que se guarda se prueba en todo su ciclo" |
 
 En un sistema multiempresa, el caso de permisos incluye **el usuario de otra empresa**: no debe ver
 los datos del desarrollo. Es la falla más cara de todas las que aquí se pueden detectar.

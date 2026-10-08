@@ -290,6 +290,25 @@ previo.
 La misma cautela vale para las banderas que prometen simular: hay proyectos donde
 `migrate --pretend` **ejecuta** los cambios.
 
+## Un dato que se guarda se prueba en todo su ciclo, en pantalla, antes de entregar
+
+Que el build pase, que las pruebas automaticas pasen y que "se guarde" una vez no prueba nada. En el
+ticket 11254 la observacion por tecnico paso todo eso y el MR volvio con cuatro fallas que solo se
+veian en pantalla. Lo pidio Fabian el 2026-10-08. Por cada dato que el desarrollo guarda o edita, se
+prueba en la vista, y se confirma contra la base o recargando:
+
+| Caso | Que se comprueba | La falla que lo hizo regla |
+|---|---|---|
+| **Persistir sin la accion de al lado** | Se guarda y se cierra sin hacer nada mas (sin procesar, sin marcar, sin el boton del formulario padre). Recargando, el dato esta | En el masivo la observacion solo viajaba si la actividad tenia una accion marcada |
+| **Sobrevivir a lo que vuelve a pintar** | Tras guardar, sin recargar: scroll, cargar mas, filtrar, cambiar de pestana, reabrir. El dato sigue | El panel actualizaba una copia que el scroll reconstruia desde los datos viejos |
+| **Borrar** | Se guarda un valor, se deja vacio y se guarda. Queda vacio, no con el anterior | Un vacio convertido en `undefined` se omitia y el backend conservaba lo viejo |
+| **Reabrir y precargar** | Toda ventana o formulario que edite el dato abre con el valor que ya existe | Finalizar abria la observacion vacia aunque el tecnico ya la tuviera |
+| **Todos los caminos al mismo dato** | Si se edita desde varios lugares (vista, masivo, finalizar, celular), los casos de arriba en cada uno | Cada camino tenia su propia falla |
+
+Un dato puede pasar uno de estos casos y fallar otro: no se salta ninguno por haber pasado el
+anterior. El set de pruebas (`gen-test-set`) los incluye como casos, y antes de dar un desarrollo por
+terminado se corren yo mismo en pantalla.
+
 ## La VPN solo hace falta desde fuera, y no afecta las bases locales
 
 **Primero: en que red esta el usuario.** En la **red corporativa** el GitLab interno
