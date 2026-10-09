@@ -14,8 +14,8 @@
       "id": "docblock-length",
       "kind": "docblock-length",
       "files": "\\.(php|ts|js|mjs|vue)$",
-      "max": 3,
-      "message": "Docblock con mas de 3 renglones de prosa. Que hace y sus entradas y salidas en 3 renglones; @param y @return no cuentan.",
+      "max": 2,
+      "message": "Docblock con mas de 2 renglones de prosa. Que hace y sus entradas y salidas en 2 renglones; @param y @return no cuentan.",
       "source": "~/.claude/CLAUDE.md, seccion Documentar funciones",
       "exceptions": []
     },

@@ -299,7 +299,7 @@ node ~/.claude/skills/sync-brain/lib/settle.mjs dismissed [repo]   # no interesa
 
 - **Idioma:** nombres de skill, archivo, funcion y variable **en ingles**; comentarios, JSDoc y el
   cuerpo del `SKILL.md`, **en espanol**.
-- **Documentar funciones: maximo 3 renglones.** Que hace, y entradas y salidas cuando la firma no
+- **Documentar funciones: maximo 2 renglones.** Que hace, y entradas y salidas cuando la firma no
   las explique. El detalle esta en `CLAUDE.md`. *(El codigo que ya existe no cumple esta regla; se
   escribio antes. No lo tomes como ejemplo.)*
 - Una skill es un **procedimiento con pasos**. Si es conocimiento sin pasos, va en `CLAUDE.md` o en

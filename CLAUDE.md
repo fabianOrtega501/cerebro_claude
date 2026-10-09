@@ -430,7 +430,7 @@ Se tomo de Ponytail el 2026-10-05 sin instalar el plugin, que choca con el modo 
 de comentarios y con las suites de pruebas. Para revisar un diff con este criterio esta la skill
 `review-overengineering`.
 
-## Documentar funciones: maximo 3 renglones, en todas partes
+## Documentar funciones: maximo 2 renglones, en todas partes
 
 **Rige en todo lo que se escriba**: el codigo propio de `~/.claude` y tambien los repos de
 trabajo. No hay excepcion por repo ni por lenguaje, salvo la de Swagger que se explica abajo.
@@ -457,7 +457,7 @@ nuevo nace sin PHPDoc en sus metodos de endpoint; si dependiera de tener ya el b
 habria que escribir PHPDoc para borrarlo despues.
 
 **No cubre al metodo que ninguna ruta alcanza.** Un ayudante privado, o uno publico que solo
-llaman otros metodos de la clase, nunca va a tener `@OA`, asi que sus tres renglones son su unica
+llaman otros metodos de la clase, nunca va a tener `@OA`, asi que sus dos renglones son su unica
 documentacion. No es un caso marginal: en status-api son 762 metodos, mas que los 723 que si
 atienden rutas. La pregunta para decidir no es "¿ya tiene `@OA`?" sino "¿llega aqui una ruta?".
 
@@ -475,12 +475,13 @@ Lo decidio Fabian el 2026-09-16.
 - **Documentacion tecnica.** Ningun numero de ticket, ni de Mantis, ni de GLPI, ni referencia a
   una historia de usuario. El codigo se lee sin ese contexto.
 - **`@param` y `@return` siempre**, uno por argumento, salvo en los metodos de endpoint con
-  Swagger. No cuentan dentro de los tres renglones.
+  Swagger. No cuentan dentro de los dos renglones.
 
-**Tres renglones de prosa por funcion. Ni uno mas.** El limite es duro y no admite "es que esta funcion
-es especial": si no cabe, el problema es la funcion, no el limite.
+**Dos renglones de prosa por funcion. Ni uno mas.** El limite es duro y no admite "es que esta funcion
+es especial": si no cabe, el problema es la funcion, no el limite. Lo bajo Fabian de 3 a 2 el
+2026-10-09, tras la revision de pares del ticket 11041, que pidio docblocks mas cortos.
 
-En esos tres renglones va, en este orden de prioridad:
+En esos dos renglones va, en este orden de prioridad:
 
 1. **Que hace**, concreto. Que devuelve o que cambia, no una categoria. `Corre git y devuelve la
    salida limpia` sirve; `Gestiona la ejecucion de comandos` no dice nada.
@@ -505,7 +506,7 @@ lineas que el lector ya sabia. Documentacion de mas no es cautela, es ruido.
 **El codigo que ya existe en el cerebro NO cumple esta regla.** Se escribio con la regla anterior
 y el 25% de sus lineas son comentarios; hay bloques de quince renglones. Se dejo asi a proposito,
 no es que nadie se haya dado cuenta. **No lo tomes como ejemplo ni copies su estilo** al tocar un
-archivo viejo: lo que se escriba de nuevo va a 3 renglones, aunque quede al lado de un bloque
+archivo viejo: lo que se escriba de nuevo va a 2 renglones, aunque quede al lado de un bloque
 largo. Si de paso puedes recortar el bloque que ya estabas editando, mejor; no abras una limpieza
 por tu cuenta.
 

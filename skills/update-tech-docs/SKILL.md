@@ -72,7 +72,7 @@ quien abre el archivo dentro de seis meses.
 archivos que el ticket no toca. Reescribir documentación ajena infla el MR y entierra el cambio
 real entre ruido.
 
-**Qué va dentro: máximo 3 renglones de prosa, más `@param` y `@return`.** Qué hace la pieza,
+**Qué va dentro: máximo 2 renglones de prosa, más `@param` y `@return`.** Qué hace la pieza,
 concreto —qué devuelve o qué cambia—, y sus entradas y salidas cuando la firma no las explique
 sola. Nada interno: ni el porqué de una condición, ni cómo funciona un operador, ni el orden de
 dos instrucciones.
@@ -98,7 +98,7 @@ public function nearbyAddress($visit)
 **Dónde va el porqué: ni en el docblock ni en un comentario suelto dentro del código.** Si la
 razón de que algo esté resuelto así importa, va en el `.md` de `docs/`.
 
-**Esa es la frontera entre los dos pasos de esta skill.** El docblock son 3 renglones y dice *qué
+**Esa es la frontera entre los dos pasos de esta skill.** El docblock son 2 renglones y dice *qué
 hace*. El `.md` de `docs/` no tiene ese límite y es justamente donde va el *por qué*: para eso
 existen las fases 4 y 5. Confundirlos es lo que produce docblocks de ocho renglones que tapan el
 código y `docs/` vacíos.
@@ -107,7 +107,7 @@ código y `docs/` vacíos.
 se negocia; el estilo de las anotaciones sí lo pone el estándar del repo.
 
 **Sentido común con lo trivial.** Un constructor que solo inyecta dependencias, o un getter de una
-línea, no gastan los tres renglones: una frase basta, o ninguna. El script los lista porque no sabe
+línea, no gastan los dos renglones: una frase basta, o ninguna. El script los lista porque no sabe
 distinguir; distinguir es tu trabajo. Documentar lo obvio es tan dañino como no documentar lo
 importante: enseña a saltarse los docblocks.
 
