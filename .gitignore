@@ -27,6 +27,8 @@
 # organizacion: un bucket con nombre aleatorio y un manifest de reclamos pendientes.
 # Es estado de esta maquina, no cerebro; en el repo solo generaria ruido y conflictos.
 /skills/synced/
+# `skills/.trash/` es la papelera donde Claude Code deja las skills de fabrica que retira.
+/skills/.trash/
 !/agents/
 !/hooks/
 !/brain/

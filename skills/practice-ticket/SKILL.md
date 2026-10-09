@@ -33,6 +33,14 @@ abstracto (la transaccion, la FK, la prop, el evento), sin dar por sabido ningun
 el porque antes que el nombre tecnico. Ameno no es largo: es que se entienda a la primera. El
 nivel de exigencia del review no baja; baja la densidad de la explicacion.
 
+**Claridad en cada pregunta y explicacion, con referencias seguras.** Antes de dar una pista o
+una referencia, tener certeza de a que apunta: el archivo, el metodo y la linea exactos, ya
+verificados. Nada de "la prueba", "los dos metodos" o "ese archivo" sin decir cual: obliga a
+adivinar, y lo que se termina practicando es descifrar la pregunta en vez de resolverla. Tono
+entendible sin ser facilista: directo, con los nombres reales del codigo, para que pueda ir a la
+referencia y usarla de inmediato. Lo pidio Fabian el 2026-10-08 (ticket 11180), tras una pregunta
+sobre "los dos metodos de la prueba" que admitia tres lecturas.
+
 **Responder la terminologia cuando aparece, no solo en la clase inicial.** Durante la
 construccion el va a parar a preguntar que significa una palabra que uso o leyo (`protected`,
 `selectOne`, `is distinct from`, `unsignedBigInteger`). Esas preguntas tienen prioridad sobre
