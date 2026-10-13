@@ -69,7 +69,7 @@ cerebro y las secciones de `~/.claude/CLAUDE.md` que tocan Status.
 - Correo: `CorreoService::enviarCorreo()` (`app/Services/Common/Base/CorreoService.php`).
 
 ### Seeders, objetos SQL y pruebas
-- Menú y permisos: en el monolito `MenuDinamicSeeder` (`database/seeds/MenuDinamicSeeder.php`) con su JSON; en status-api `database/seeders/MenusSeeder.php` y `ModulosSeeder.php`, que leen `database/initialData/menus/<modulo>.json` y `modulos.json` (una pantalla nueva es una entrada en el JSON de su módulo).
+- Menú y permisos: en el monolito `MenuDinamicSeeder` (`database/seeds/MenuDinamicSeeder.php`) con su JSON; en status-api `database/seeders/MenusSeeder.php` y `ModulosSeeder.php`, que leen un JSON por módulo en `database/initialData/menus/` (por ejemplo `aprovechamiento.json`) y `modulos.json` (una pantalla nueva es una entrada en el JSON de su módulo).
 - Objetos SQL: `DbObjectsSeeder`.
 - Pruebas de status-api: `usuarioActivo()` y `superUsuario()` (`tests/TestCase.php`), datos de trámite (`tests/Support/GestionTramites/CreaTramitesDePrueba.php`).
 
