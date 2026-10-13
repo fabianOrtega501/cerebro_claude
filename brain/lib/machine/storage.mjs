@@ -95,7 +95,7 @@ export function run() {
 		reclaim.push([`Papelera: ${size(trash)}`, "Vaciar la papelera desde Archivos"]);
 
 	if (oldSnaps)
-		reclaim.push([`${oldSnaps} revision(es) viejas de snaps`, "snap list --all | awk '/disabled/{print $1, $3}' | while read n r; do sudo snap remove \"$n\" --revision=\"$r\"; done"]);
+		reclaim.push([`${oldSnaps} revision(es) viejas de snaps`, "LANG=C LANGUAGE=C LC_ALL=C snap list --all | awk '/disabled/{print $1, $3}' | while read n r; do sudo snap remove \"$n\" --revision=\"$r\"; done"]);
 
 	if (crashes.length)
 		reclaim.push([`${crashes.length} reporte(s) de fallos en /var/crash`, "sudo rm /var/crash/*.crash  (antes mirar de que app son)"]);
