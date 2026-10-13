@@ -74,7 +74,7 @@
     },
     "laravel-servicios": {
       "label": "Separar la logica de negocio en servicios, fuera del controlador",
-      "level": "pendiente",
+      "level": "visto",
       "keywords": [
         "servicio",
         "logica de negocio",
@@ -82,9 +82,17 @@
         "refactor",
         "proceso"
       ],
-      "lastPracticed": null,
+      "lastPracticed": "2026-10-13",
       "cleanStreak": 0,
-      "tickets": [],
+      "tickets": [
+        {
+          "ticket": "11180",
+          "project": "status",
+          "date": "2026-10-13",
+          "hint": 3,
+          "blocking": 0
+        }
+      ],
       "recurringErrors": []
     },
     "api-endpoints": {
@@ -215,7 +223,7 @@
     },
     "sql-consultas": {
       "label": "SQL a mano: agregaciones, subconsultas y rendimiento",
-      "level": "pendiente",
+      "level": "practicado",
       "keywords": [
         "sql",
         "consulta",
@@ -226,9 +234,17 @@
         "lento",
         "indice"
       ],
-      "lastPracticed": null,
-      "cleanStreak": 0,
-      "tickets": [],
+      "lastPracticed": "2026-10-13",
+      "cleanStreak": 1,
+      "tickets": [
+        {
+          "ticket": "11180",
+          "project": "status",
+          "date": "2026-10-13",
+          "hint": 2,
+          "blocking": 0
+        }
+      ],
       "recurringErrors": []
     },
     "depuracion": {
@@ -274,7 +290,7 @@
     },
     "lectura-de-codigo": {
       "label": "Ubicarse en un repo ajeno: encontrar el patron que ya existe y copiarlo",
-      "level": "pendiente",
+      "level": "visto",
       "keywords": [
         "patron",
         "similar",
@@ -283,9 +299,17 @@
         "como se hace",
         "modulo parecido"
       ],
-      "lastPracticed": null,
+      "lastPracticed": "2026-10-13",
       "cleanStreak": 0,
-      "tickets": [],
+      "tickets": [
+        {
+          "ticket": "11180",
+          "project": "status",
+          "date": "2026-10-13",
+          "hint": 4,
+          "blocking": 0
+        }
+      ],
       "recurringErrors": []
     },
     "offline-first-sincronizacion": {
