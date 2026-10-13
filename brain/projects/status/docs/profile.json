@@ -1,0 +1,32 @@
+{
+  "//": "Perfil de documentacion tecnica de status-api para la skill transversal update-tech-docs.",
+  "//alcance": "Solo backend (status-api). El monolito status no se documenta aqui. Lo que el usuario ve va al manual de usuario.",
+
+  "label": "status-api",
+  "repo": "/datos/proyectos/status-full/status-api",
+
+  "//standard": "El estandar NO se define aqui: vive en el repo y es del equipo. La skill lo lee.",
+  "standard": "docs/README.md",
+
+  "docsRoot": "docs",
+  "modulesDir": "docs/modules",
+  "architectureDir": "docs",
+
+  "//sourceGlobs": "Carpetas cuyo cambio puede alterar una regla de negocio. Controllers quedan fuera: su contrato lo documenta Swagger. DBobjects entra porque parte de Aprovechamiento vive en funciones SQL.",
+  "sourceGlobs": [
+    "app/Services",
+    "app/Rules",
+    "app/Jobs",
+    "database/DBobjects"
+  ],
+
+  "//moduleFrom": "El modulo es el segmento que sigue a Services/ (Sipa, Status).",
+  "moduleFrom": "Services/([^/]+)/",
+
+  "modules": {
+    "Sipa": "sipa",
+    "Status": "status"
+  },
+
+  "ignoreModules": ["Common", "Configuracion"]
+}
