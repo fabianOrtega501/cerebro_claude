@@ -1,0 +1,19 @@
+#!/bin/sh
+# Captura con flameshot, guarda una copia en PNG y la deja en el portapapeles.
+# Funciona en Wayland y en X11, con una o varias pantallas.
+DIR="$HOME/Imágenes/Capturas de pantalla"
+TMP=$(mktemp --suffix=.png)
+mkdir -p "$DIR"
+
+QT_QPA_PLATFORM=xcb flameshot gui --raw > "$TMP"
+
+# Si se cancela la captura la salida viene vacia: no se guarda ni se pisa el portapapeles.
+if [ -s "$TMP" ]; then
+    cp "$TMP" "$DIR/$(date +%Y-%m-%d_%H-%M-%S).png"
+    if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+        wl-copy --type image/png < "$TMP"
+    else
+        xclip -selection clipboard -target image/png -i "$TMP"
+    fi
+fi
+rm -f "$TMP"

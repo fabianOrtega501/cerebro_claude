@@ -32,6 +32,8 @@
 !/agents/
 !/hooks/
 !/brain/
+# Manuales de instalacion y configuracion del computador, aparte de los desarrollos.
+!/pc-linux/
 
 # 2c) El snapshot del `.claude/` de cada repo es una foto del trabajo del EQUIPO, no del
 #     cerebro: skills que escribieron ellos. `upstream.mjs` lo regenera cuando hace falta y

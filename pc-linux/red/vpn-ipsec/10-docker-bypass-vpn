@@ -1,0 +1,6 @@
+#!/bin/sh
+# Manda las redes de Docker a la tabla main antes de que strongSwan (tabla 220) las capture.
+# Se excluye 172.17.0.0/16 (docker0, sin uso) porque ahi vive una base de desarrollo de la empresa.
+for net in 172.16.0.0/16 172.18.0.0/15 172.20.0.0/14 172.24.0.0/13; do
+  ip rule show | grep -q "to $net lookup main" || ip rule add to "$net" lookup main priority 200
+done

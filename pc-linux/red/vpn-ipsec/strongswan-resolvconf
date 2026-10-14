@@ -1,0 +1,8 @@
+#!/bin/sh
+# Reemplazo de resolvconf para strongSwan: -a pone los DNS de la VPN en la interfaz de salida,
+# -d devuelve los que NetworkManager tiene para esa interfaz.
+IFACE=$(/usr/sbin/ip -4 route show default | /usr/bin/awk '{print $5; exit}')
+case "$1" in
+  -a) exec /usr/bin/resolvectl dns "$IFACE" $(/usr/bin/awk '/^nameserver/ {print $2}') ;;
+  -d) exec /usr/bin/resolvectl dns "$IFACE" $(/usr/bin/nmcli -g IP4.DNS device show "$IFACE" | /usr/bin/tr '|' ' ') ;;
+esac

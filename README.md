@@ -150,6 +150,7 @@ Muestra **modelo │ proyecto │ rama**. Opus sale en amarillo y Sonnet en verd
 | `brain/lib/` | Motores compartidos: proyectos, secretos, upstream, enchufe |
 | `brain/lib/machine-check.mjs` | El diagnostico del computador, con sus modulos en `brain/lib/machine/`. Solo lee, sin sudo |
 | `brain/machine/history/` | Una foto por diagnostico, para comparar. **Fuera del control de versiones** |
+| `pc-linux/` | Manuales para instalar y configurar el computador. **Aparte de los desarrollos** |
 | `brain/projects/<proy>/` | Perfiles: `manual/`, `stack/`, `docs/`, `skills/local-*` |
 | `brain/upstream/` | Foto del `.claude/` de cada repo en su ultima revision |
 | `brain/projects/<proy>/exploration/` | Mapa tecnico por modulo: donde esta cada endpoint, permiso y servicio |
