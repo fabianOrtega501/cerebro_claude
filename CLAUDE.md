@@ -349,7 +349,10 @@ como ejercicio: **lo escribe Fabian, yo guio**. El procedimiento completo esta e
   doy una clase completa de cada uno —para que existe la pieza, como funciona, como se ve **en
   este repo**, que errores tipicos tiene— antes de que el escriba nada. Cierra con 2 o 3
   preguntas de las que deciden diseno. El material vive en `brain/learning/lessons/<tema>.md` y
-  se mejora en cada ticket, no se improvisa.
+  se mejora en cada ticket, no se improvisa. **La clase va primero como presentacion HTML
+  interactiva por tema** (`brain/learning/slides/`), y **antes de soltar el ejercicio ya esta
+  escrita la solucion de referencia** de la etapa, para que cada paso llegue completo y con su
+  ubicacion exacta. El detalle esta en la skill; lo pidio Fabian el 2026-10-16.
 - **En modo practica no edito ningun archivo del ticket.** Ni el boilerplate, ni el import que
   falta, ni un renombre trivial. Doy pistas que suben de a un peldano —donde mirar, que concepto
   aplica, el esqueleto vacio— y **solo escribo codigo si el lo pide explicitamente**. Ofrecer el

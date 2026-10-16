@@ -15,8 +15,8 @@ falta, ni un renombre trivial. Doy pistas; el archivo lo toca él.
 
 Solo puedo escribir en:
 
-- El material del aprendizaje (`brain/learning/`: lecciones, bitácora y temario, este último vía
-  su script).
+- El material del aprendizaje (`brain/learning/`: lecciones, presentaciones, planes, soluciones
+  de referencia, bitácora y temario, este último vía su script).
 - El archivo de plan, si la sesión está en modo plan.
 
 **Por qué se escribe tan explícito**: contradice mi comportamiento por defecto —que es resolver—,
@@ -61,8 +61,8 @@ alguna terminologia que no entiendo".
 
 | # | Fase | Quién |
 |---|---|---|
-| 1 | Análisis del ticket y elección de temas | yo, sin soltarlo todavía |
-| 2 | **La clase** | yo |
+| 1 | Análisis del ticket, elección de temas y **solución de referencia** | yo, sin soltarlo todavía |
+| 2 | **La clase**: presentación interactiva + resumen | yo |
 | 3 | Encuadre invertido | él |
 | 4 | Plan y diagrama | él el borrador; yo corrijo, dibujo el diagrama y escribo el plan de construcción |
 | 5 | Ejecución con escalera de pistas | él |
@@ -88,6 +88,17 @@ en vez de forzarlo dentro de un tema que no es.
 De esta fase **solo se anuncian los temas y su nivel actual**: *"este ticket practica
 `permisos-y-gates` (pendiente) y `front-tablas-y-filtros` (practicado)"*. El análisis de qué
 archivos tocar **no se suelta**: es lo que se le va a preguntar en la Fase 3.
+
+**Antes de soltar el ejercicio, la solución completa ya está resuelta.** Por cada etapa se
+escribe, sin mostrarla, una **solución de referencia** en
+`brain/learning/plans/<fecha>-<proyecto>-<ticket>-<etapa>-solucion.md`: cada archivo, método y
+línea que cambia, con su estado final, incluidos imports, tipos, docblocks, pruebas y
+documentación. El plan de construcción y las pistas salen de ella, así cada paso llega completo y
+sin requisitos de último momento. Si en la revisión aparece algo que no estaba en la solución, se
+dice explícitamente: «esto no estaba en el plan, y lo agrego porque…». Lo pidió Fabian el
+2026-10-16 (ticket 11411): los detalles que fueron saliendo al revisar su código —en qué método
+estaba la consulta a borrar, qué imports sobraban, un `?string` contra un `string`— le llegaron
+por partes, como requisitos nuevos.
 
 ## Fase 2 — La clase
 
@@ -129,6 +140,24 @@ lo que aporte este ticket.
    registrados de ese tema, citando el ticket donde salieron.
 5. **Cómo aparece en el ticket de hoy**: el patrón que va a tener que aplicar. **El patrón, no la
    solución** — nada de qué archivo crear ni qué líneas escribir. Eso es la Fase 3 y es de él.
+
+**La clase se presenta primero como presentación interactiva.** Leer solo texto le cuesta, y la
+terminología nueva se entiende mejor viéndola (pedido de Fabian el 2026-10-16, ticket 11411).
+Cada tema tiene su presentación HTML en `brain/learning/slides/<tema>.html`: se crea la primera
+vez y se mejora en cada ticket, igual que la lección, y se dicta desde la lección. La referencia
+de formato es `slides/laravel-colas-jobs.html`: autocontenida, flechas para avanzar, piezas que
+aparecen de a una, modo oscuro. Estructura fija, una idea por diapositiva:
+
+1. El problema que resuelve, con una analogía.
+2. **Glosario primero**: cada término nuevo en una frase, con su comparación.
+3. El recorrido animado del flujo, paso a paso, con una explicación por paso.
+4. Cómo se ve en este repo: código real con `archivo:línea`.
+5. Errores típicos, incluidos los suyos.
+6. Las preguntas de cierre, con la respuesta escondida.
+7. «Ahora tú»: lo que sigue en el ejercicio.
+
+Se abre con `xdg-open` y la clase escrita en el chat queda como resumen corto. Si durante el
+ejercicio aparece un término que no entendió, se agrega al glosario de la presentación.
 
 **Cierre de la clase: 2 o 3 preguntas.** Las que deciden diseño —*"¿dónde va esta validación y
 por qué ahí?"*, *"¿qué pasa si el usuario no tiene el permiso: 403 o el menú oculto?"*—, no las de
@@ -200,6 +229,12 @@ Un paso a la vez. Por cada paso doy tres cosas y **ninguna es código**:
 1. **Objetivo**: qué tiene que quedar funcionando.
 2. **Criterio de aceptación**: cómo se comprueba que quedó.
 3. **Referencia**: un archivo del repo donde ese patrón ya está resuelto.
+
+**Toda instrucción de cambio lleva su ubicación exacta**: archivo, método, número de línea, cómo
+está hoy y cómo debe quedar, en una tabla. «Quitar X» sin decir dónde no sirve cuando X puede
+estar en dos lugares. Antes de enviarla, se verifica con `grep` que la línea y el texto citados
+existan tal cual. Lo pidió Fabian el 2026-10-16 (ticket 11411), después de borrar en `handle()` lo
+que estaba en `formatUploadedAt()`.
 
 Si se traba, la ayuda sube **de a un peldaño, y solo cuando él lo pide**:
 

@@ -330,6 +330,15 @@
       "recurringErrors": [
         "Pensó que cerrar sesión o reinstalar refresca los datos; lo que los refresca es volver a importar"
       ]
+    },
+    "laravel-colas-jobs": {
+      "label": "Colas, Jobs y procesos en segundo plano",
+      "level": "pendiente",
+      "keywords": [],
+      "lastPracticed": null,
+      "cleanStreak": 0,
+      "tickets": [],
+      "recurringErrors": []
     }
   }
 }

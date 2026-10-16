@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jobs y colas</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#1d2329; --muted:#5d6b76; --line:#dfe3e6;
+  --accent:#1f6f8b; --accent-soft:#e3f0f5; --ok:#2e7d4f; --ok-soft:#e5f3ea;
+  --warn:#a45d00; --warn-soft:#fbf0de; --bad:#a52020; --bad-soft:#fbe6e6;
+  --code:#f1f3f5; --code-ink:#24292f;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161a; --card:#1b2127; --ink:#e7ecef; --muted:#9aa8b2; --line:#2c353d;
+    --accent:#5cb3d1; --accent-soft:#183440; --ok:#6cc58f; --ok-soft:#173326;
+    --warn:#e0a650; --warn-soft:#3a2b14; --bad:#ef7d7d; --bad-soft:#3d1c1c;
+    --code:#0f1418; --code-ink:#d6dde3;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161a; --card:#1b2127; --ink:#e7ecef; --muted:#9aa8b2; --line:#2c353d;
+  --accent:#5cb3d1; --accent-soft:#183440; --ok:#6cc58f; --ok-soft:#173326;
+  --warn:#e0a650; --warn-soft:#3a2b14; --bad:#ef7d7d; --bad-soft:#3d1c1c;
+  --code:#0f1418; --code-ink:#d6dde3;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+.deck{height:100%;display:flex;align-items:center;justify-content:center;padding:16px}
+.slide{display:none;width:min(1100px,100%);max-height:calc(100vh - 90px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:36px 44px}
+.slide.on{display:block;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:2.2em;margin:.1em 0 .3em}
+h2{font-size:1.5em;margin:0 0 .6em;color:var(--accent)}
+.kicker{color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.78em;margin-bottom:.4em}
+p{margin:.4em 0 .8em}
+.muted{color:var(--muted)}
+code{background:var(--code);color:var(--code-ink);padding:.08em .35em;border-radius:5px;font-size:.92em}
+pre{background:var(--code);color:var(--code-ink);padding:14px 16px;border-radius:10px;overflow:auto;font-size:.86em;line-height:1.5;margin:.5em 0}
+pre .hl{background:var(--accent-soft);display:inline-block;width:100%}
+.ref{font-size:.8em;color:var(--muted);font-family:ui-monospace,monospace}
+.f{opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
+.f.show{opacity:1;transform:none}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.box{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--bg)}
+.box h3{margin:0 0 .3em;font-size:1.02em}
+.term{font-weight:700;color:var(--accent)}
+.tag{display:inline-block;font-size:.75em;padding:.1em .55em;border-radius:20px;font-weight:600}
+.t-ok{background:var(--ok-soft);color:var(--ok)}
+.t-warn{background:var(--warn-soft);color:var(--warn)}
+.t-bad{background:var(--bad-soft);color:var(--bad)}
+.t-acc{background:var(--accent-soft);color:var(--accent)}
+.analogy{border-left:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:.6em 0}
+/* Recorrido animado */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.node{border:2px solid var(--line);border-radius:10px;padding:10px;text-align:center;font-size:.86em;background:var(--bg);transition:all .35s}
+.node b{display:block;font-size:1.05em;margin-bottom:2px}
+.node.active{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.04);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.node.done{border-color:var(--ok);opacity:.75}
+.lane{font-size:.75em;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.caption{min-height:3.4em;border:1px dashed var(--line);border-radius:10px;padding:10px 14px;background:var(--bg)}
+.ticket{display:inline-block;background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:0 .4em;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:.92em}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.bar{position:fixed;left:0;top:0;height:4px;background:var(--accent);transition:width .3s}
+.nav{position:fixed;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:10px;align-items:center;font-size:.85em;color:var(--muted)}
+.nav button{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 14px;cursor:pointer;font:inherit}
+.nav button:hover{border-color:var(--accent)}
+.q{border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:10px 0}
+.q summary{cursor:pointer;font-weight:600}
+.q div{margin-top:8px;color:var(--muted)}
+@media (max-width:640px){
+  .slide{padding:22px 16px;max-height:calc(100vh - 80px)}
+  body{font-size:15px}
+  h1{font-size:1.7em}
+}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<main class="deck">
+
+<!-- 1 -->
+<section class="slide">
+  <div class="kicker">Modo práctica · laravel-colas-jobs · AIO</div>
+  <h1>Jobs y colas</h1>
+  <p class="muted">Cómo AIO hace trabajo pesado sin hacer esperar al usuario, contado con la marca de agua de las fotos del PQR (ticket 11411).</p>
+  <p class="f">Usa <code>→</code> o <code>espacio</code> para avanzar, <code>←</code> para volver. Las piezas aparecen de a una.</p>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker">1 · El problema</div>
+  <h2>¿Por qué no marcar la foto ahí mismo?</h2>
+  <p>El ciudadano radica un PQR con 3 fotos. Marcar cada foto es lento: abrirla, dibujarle el texto, volverla a comprimir.</p>
+  <div class="grid g2">
+    <div class="box f"><h3><span class="tag t-bad">Sin cola</span></h3>
+      <p>La petición espera a que se marquen las 3 fotos. El ciudadano ve el botón congelado.</p>
+      <p>Si la marca falla, <b>falla la radicación entera</b>: se pierde el PQR por una foto.</p></div>
+    <div class="box f"><h3><span class="tag t-ok">Con cola</span></h3>
+      <p>Se guarda el PQR y se deja una <b>nota de pendiente</b> por foto. El ciudadano recibe su radicado de una vez.</p>
+      <p>Otro proceso marca las fotos después. Si una falla, el PQR ya está a salvo.</p></div>
+  </div>
+  <div class="analogy f"><b>Analogía:</b> el mesero no cocina en la mesa. Toma el pedido, deja la <b>comanda</b> en la cocina y vuelve a atender. El cocinero la prepara a su ritmo.</div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker">2 · Glosario</div>
+  <h2>Las palabras, una por una</h2>
+  <div class="grid g3">
+    <div class="box f"><span class="term">Job</span><p>Una tarea guardada para hacerse después. Es una clase con un método <code>handle()</code>.</p><p class="muted">La comanda.</p></div>
+    <div class="box f"><span class="term">Cola (queue)</span><p>La fila de Jobs pendientes. En AIO es la tabla <code>jobs</code> de PostgreSQL. Tiene <b>nombre</b>, por ejemplo <code>applyWatermark</code>.</p><p class="muted">El gancho donde se cuelgan las comandas.</p></div>
+    <div class="box f"><span class="term">Despachar (dispatch)</span><p>Meter un Job en la cola: <code>Job::dispatch($id)</code>.</p><p class="muted">Colgar la comanda.</p></div>
+    <div class="box f"><span class="term">Worker</span><p>Un proceso que no para de mirar la cola, toma un Job y llama a su <code>handle()</code>. Comando: <code>queue:work</code>.</p><p class="muted">El cocinero.</p></div>
+    <div class="box f"><span class="term">Supervisor</span><p>El programa del servidor que mantiene vivos a los workers y los revive si se caen. Se configura en <code>docker/laravel-worker*.conf</code>.</p><p class="muted">El jefe de cocina.</p></div>
+    <div class="box f"><span class="term">Serializar</span><p>Convertir el Job en texto para guardarlo en la tabla, y rearmarlo después. Por eso al Job se le pasa un <b>id</b>, no la foto.</p><p class="muted">La comanda dice «mesa 4», no lleva el plato.</p></div>
+    <div class="box f"><span class="term">Transacción · commit · rollback</span><p>Un grupo de escrituras de «todo o nada». <b>Commit</b>: se confirman. <b>Rollback</b>: se deshacen todas.</p></div>
+    <div class="box f"><span class="term">afterCommit()</span><p>«Despacha este Job solo si la transacción se confirma». Si hay rollback, el Job no existe.</p></div>
+    <div class="box f"><span class="term">Idempotente</span><p>Que hacerlo dos veces deja lo mismo que hacerlo una. La marca de agua <b>no</b> lo es: dos veces = dos marcas.</p></div>
+  </div>
+</section>
+
+<!-- 4: recorrido animado -->
+<section class="slide" data-flow="9">
+  <div class="kicker">3 · El recorrido</div>
+  <h2>Del botón «Radicar» a la foto marcada</h2>
+  <div class="lane">Petición del ciudadano (rápida)</div>
+  <div class="flow">
+    <div class="node" data-n="1"><b>Portal</b>POST create-public-pqr</div>
+    <div class="node" data-n="2"><b>Transacción</b>abre «todo o nada»</div>
+    <div class="node" data-n="3"><b>INSERT</b>pqrs + pqr_attachments</div>
+    <div class="node" data-n="4"><b>dispatch</b>un Job por foto</div>
+    <div class="node" data-n="5"><b>commit</b>y respuesta 200</div>
+  </div>
+  <div class="lane">En segundo plano (cuando el worker pueda)</div>
+  <div class="flow">
+    <div class="node" data-n="6"><b>Tabla jobs</b>cola applyWatermark</div>
+    <div class="node" data-n="7"><b>Worker</b>toma el Job</div>
+    <div class="node" data-n="8"><b>handle()</b>busca adjunto y PQR</div>
+    <div class="node" data-n="9"><b>Marca y guarda</b>sobre la misma fila</div>
+  </div>
+  <div class="caption" id="cap">Avanza para recorrerlo.</div>
+  <template id="caps">
+    <p>1 · El ciudadano llena <code>report-complaint</code> y envía. Llega a <code>CustomPqrsController::createPublicPqr</code>.</p>
+    <p>2 · <code>createWithAttachments</code> abre <code>DB::transaction</code>: o se guarda todo, o nada.</p>
+    <p>3 · Se crea el PQR y una fila por foto en <code>operation.pqr_attachments</code>, todavía <b>sin marca</b>.</p>
+    <p>4 · Por cada foto: <code>ProcessPqrAttachmentJob::dispatch($id)->afterCommit()</code>. Solo viaja el <b>id</b>.</p>
+    <p>5 · Commit. El ciudadano recibe su radicado. <b>Hasta aquí esperó; lo demás no lo espera.</b></p>
+    <p>6 · El Job queda como una fila en <code>jobs</code>, en la cola <code>applyWatermark</code>.</p>
+    <p>7 · El worker del carril <code>media</code> (supervisor) la toma. Puede ser un segundo o una hora después.</p>
+    <p>8 · <code>handle()</code> recibe sus herramientas (servicios) y busca el adjunto por el id que traía la nota.</p>
+    <p>9 · Arma la marca con la <b>fecha de carga</b> (<code>created_at</code>), la dirección, las coordenadas y la empresa, y reescribe <code>file</code>.</p>
+  </template>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kicker">4 · Constructor vs handle()</div>
+  <h2>Datos en la nota, herramientas en la cocina</h2>
+  <pre>public function __construct(<span class="hl">private int $attachmentId</span>)   <span class="muted">// ← se GUARDA en la tabla jobs</span>
+{
+    $this->onQueue(QueueNames::APPLY_WATERMARK);
+}
+
+public function handle(
+    <span class="hl">ErrorLoggingService $errorLoggingService,</span>           <span class="muted">// ← Laravel los arma</span>
+    <span class="hl">ImageWatermarkService $watermarkService,</span>            <span class="muted">//   frescos en el worker</span>
+    <span class="hl">OsmService $osmService</span>
+): void</pre>
+  <p class="ref">app/Jobs/Modules/Operation/PqrAttachment/ProcessPqrAttachmentJob.php:27-38</p>
+  <div class="grid g2">
+    <div class="box f"><h3>Constructor → datos</h3><p>Lo que recibe se serializa y se guarda. Por eso, solo cosas chicas: un id.</p></div>
+    <div class="box f"><h3>handle() → herramientas</h3><p>Los servicios se piden aquí. Un servicio guardado en la tabla traería conexiones y estado de otra petición.</p></div>
+  </div>
+  <p class="f">Por eso <code>CustomCompanyService</code> va como <b>cuarto parámetro de <code>handle()</code></b>, y se le pasa a <code>formatUploadedAt</code> como argumento, igual que <code>$osmService</code> a <code>resolveAddress</code>.</p>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kicker">5 · afterCommit()</div>
+  <h2>¿Y si la transacción se revierte?</h2>
+  <pre>ProcessPqrAttachmentJob::dispatch($pqrAttachment->id)<span class="hl">->afterCommit();</span></pre>
+  <p class="ref">app/Services/Modules/Operation/Pqrs/CustomPqrsService.php:401 · config/queue.php:42 (after_commit =&gt; false)</p>
+  <table>
+    <tr><th>Driver de cola</th><th>Sin afterCommit()</th><th>Con afterCommit()</th></tr>
+    <tr class="f"><td><b>database (AIO hoy)</b><br><span class="muted">tabla jobs, misma base</span></td><td>El INSERT del Job queda dentro de la transacción: el worker no lo ve antes del commit y el rollback lo borra. <span class="tag t-ok">no se rompe</span></td><td>Igual de seguro.</td></tr>
+    <tr class="f"><td><b>Redis u otra base</b><br><span class="muted">fuera de la transacción</span></td><td>El Job sale de una vez. Si después hay rollback, el worker busca una foto que nunca existió. <span class="tag t-bad">falla</span></td><td>El Job sale solo tras el commit. <span class="tag t-ok">seguro</span></td></tr>
+  </table>
+  <div class="analogy f">Es un cinturón de seguridad: hoy no hay choque, pero el día que cambie el driver, el código ya está bien. La HU lo pide.</div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="kicker">6 · Cómo vive en AIO</div>
+  <h2>Nombre de cola, worker y reintentos</h2>
+  <div class="grid g2">
+    <div class="box f"><h3>El nombre sale de un enum</h3>
+      <pre>const APPLY_WATERMARK = 'applyWatermark';</pre>
+      <p class="ref">app/Enums/QueueNames.php:38</p>
+      <p>Nunca el texto escrito a mano: si se escribe distinto, el Job cae en una cola que nadie escucha.</p></div>
+    <div class="box f"><h3>El worker ya existe</h3>
+      <pre>queue:work database --queue=attachments,applyWatermark --tries=1</pre>
+      <p class="ref">docker/laravel-worker.conf:45 · laravel-worker_swarm.conf:87</p>
+      <p>Carril <code>media</code>, en los <b>dos</b> archivos. Por eso no hubo que crear cola ni worker.</p></div>
+    <div class="box f"><h3><code>--tries=1</code></h3><p>Si falla, no se reintenta. Reintentar una marca que ya se estampó a medias la dejaría marcada dos veces.</p></div>
+    <div class="box f"><h3>Prohibido <code>public $queue</code></h3><p>El trait <code>Queueable</code> ya declara esa propiedad: redeclararla es un error fatal de PHP. Se usa <code>$this->onQueue()</code>.</p></div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="kicker">7 · La fecha de la marca</div>
+  <h2>¿Qué hora va en la foto?</h2>
+  <div class="grid g2">
+    <div class="box f"><h3><span class="tag t-bad">now()</span></h3><p>La hora en que corrió el Job. Si la cola estaba llena, la foto diría una hora en que nadie la subió.</p></div>
+    <div class="box f"><h3><span class="tag t-ok">created_at del adjunto</span></h3><p>La hora en que se subió, que es lo que pide RN-05. Y una foto agregada al editar trae la suya propia.</p></div>
+  </div>
+  <p class="f">Esa fecha está en <b>UTC</b>. Para pasarla a la hora de la empresa ya existe una función:</p>
+  <pre class="f">$companyService->formatDateByCountryCompany($attachment->created_at, $companyId);</pre>
+  <p class="ref f">app/Services/Modules/Settings/Company/CustomCompanyService.php:171</p>
+  <div class="analogy f"><b>Ojo:</b> los Jobs viejos de marca de agua (Item, Censo) calculan esa hora a mano con <code>Company</code> y <code>addHours</code>. Funcionan, pero son anteriores a la regla. <b>Una referencia también se revisa antes de copiarla.</b></div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="kicker">8 · Errores típicos</div>
+  <h2>Lo que más se rompe</h2>
+  <table>
+    <tr class="f"><td><span class="tag t-bad">silencioso</span></td><td>Cola escrita a mano o sin worker en los dos archivos de supervisor: los Jobs se acumulan en la tabla y nadie se entera.</td></tr>
+    <tr class="f"><td><span class="tag t-bad">fatal</span></td><td><code>public $queue = ...</code> en el Job.</td></tr>
+    <tr class="f"><td><span class="tag t-warn">dato falso</span></td><td><code>now()</code> para fechar algo que ocurrió antes.</td></tr>
+    <tr class="f"><td><span class="tag t-warn">pesado</span></td><td>Pasarle al constructor la foto o un modelo enorme, en vez del id.</td></tr>
+    <tr class="f"><td><span class="tag t-warn">local</span></td><td>No reiniciar el worker tras cambiar el código (<code>queue:restart</code>): sigue corriendo la versión vieja.</td></tr>
+    <tr class="f"><td><span class="tag t-acc">tuyo · 11411</span></td><td>Copiar <code>ProcessItemAttachmentJob</code> con su conversión de hora a mano.</td></tr>
+  </table>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="kicker">9 · Comprueba que quedó</div>
+  <h2>Tres preguntas</h2>
+  <details class="q"><summary>1. ¿Por qué el Job recibe el id del adjunto y no el archivo?</summary><div>Porque lo que recibe el constructor se serializa en la tabla <code>jobs</code>. Un id pesa nada; una foto, megas por fila.</div></details>
+  <details class="q"><summary>2. El Job corre 10 minutos después de subir la foto. ¿Qué fecha va en la marca y de dónde sale?</summary><div><code>created_at</code> del adjunto, pasado a la hora de la empresa con <code>CustomCompanyService::formatDateByCountryCompany</code>, inyectado en <code>handle()</code>.</div></details>
+  <details class="q"><summary>3. ¿Por qué el carril de marca de agua corre con <code>--tries=1</code>?</summary><div>Porque la marca no es idempotente: reintentar un Job que alcanzó a guardar estamparía la información dos veces.</div></details>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="kicker">Ahora tú</div>
+  <h2>Correcciones del Job</h2>
+  <ol>
+    <li class="f"><b>formatUploadedAt</b>: <code>CustomCompanyService</code> como parámetro de <code>handle()</code>, pasado como argumento; quitar la consulta a <code>Company</code>, el <code>addHours</code> y el <code>?? now()</code>.</li>
+    <li class="f"><b>Docblocks</b>: 2 renglones con <code>@param</code> y <code>@return</code> en los métodos privados, y los <code>@param</code> de <code>handle()</code>.</li>
+    <li class="f"><b>Pruebas</b>: <code>./vendor/bin/sail artisan test tests/Feature/Modules/Operation/Pqrs/</code> en verde.</li>
+  </ol>
+  <p class="muted f">Si una palabra no quedó clara, dila: se agrega al glosario de esta presentación.</p>
+</section>
+
+</main>
+<div class="nav"><button id="prev" aria-label="Anterior">←</button><span id="count"></span><button id="next" aria-label="Siguiente">→</button></div>
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var caps=document.getElementById('caps');
+  var capList=caps?[].slice.call(caps.content.querySelectorAll('p')).map(function(p){return p.innerHTML}):[];
+  var i=0, step=0;
+  function frags(s){return [].slice.call(s.querySelectorAll('.f'))}
+  function maxStep(s){return s.dataset.flow?+s.dataset.flow:frags(s).length}
+  function render(){
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    var s=slides[i];
+    if(s.dataset.flow){
+      [].slice.call(s.querySelectorAll('.node')).forEach(function(n){
+        var k=+n.dataset.n; n.classList.toggle('active',k===step); n.classList.toggle('done',k<step);
+      });
+      document.getElementById('cap').innerHTML=step?capList[step-1]:'Avanza para recorrerlo.';
+    } else {
+      frags(s).forEach(function(f,k){f.classList.toggle('show',k<step)});
+    }
+    document.getElementById('count').textContent=(i+1)+' / '+slides.length;
+    document.getElementById('bar').style.width=((i+1)/slides.length*100)+'%';
+    try{location.hash=i+1}catch(e){}
+  }
+  function next(){var s=slides[i]; if(step<maxStep(s)){step++}else if(i<slides.length-1){i++;step=0} render()}
+  function prev(){if(step>0){step--}else if(i>0){i--;step=maxStep(slides[i])} render()}
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','PageDown',' ','Enter'].indexOf(e.key)>=0){e.preventDefault();next()}
+    if(['ArrowLeft','PageUp','Backspace'].indexOf(e.key)>=0){e.preventDefault();prev()}
+  });
+  document.getElementById('next').onclick=next;
+  document.getElementById('prev').onclick=prev;
+  var h=parseInt((location.hash||'').slice(1),10); if(h>0&&h<=slides.length){i=h-1}
+  render();
+})();
+</script>
+</body>
+</html>
