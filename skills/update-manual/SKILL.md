@@ -1,6 +1,6 @@
 ---
 name: update-manual
-description: Actualizar el manual de usuario de cualquier proyecto (AIO, Epsilon, …) cuando se hacen cambios de interfaz: genera las capturas de pantalla reales manejando Chrome headless por CDP, las copia al repo del manual y actualiza los .md. Úsala también para OFRECER la actualización del manual cada vez que termines un ajuste que cambie lo que el usuario ve (vistas, tablas, modales, popups, mensajes, textos, flujos). Es la versión del cerebro y sustituye a las copias `update-web-manual` que traen los repos.
+description: Actualizar el manual de usuario de cualquier proyecto (AIO, Epsilon, …) cuando se hacen cambios de interfaz: genera las capturas de pantalla reales manejando Chrome headless por CDP, las copia al repo del manual y actualiza los .md. Úsala también para OFRECER la actualización del manual cada vez que termines un ajuste que cambie lo que el usuario ve (vistas, tablas, modales, popups, mensajes, textos, flujos). Es la versión del cerebro y sustituye a las copias `update-web-manual` que traen los repos. También es la que se usa cuando un hook o un mensaje pide `/manuals:update-manual` y el plugin `manuals@main-brain` no está instalado en esta máquina.
 ---
 
 # Manual de usuario — motor transversal
