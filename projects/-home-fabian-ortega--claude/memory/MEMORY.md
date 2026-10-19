@@ -1,3 +1,4 @@
 - [python-sin-pip-en-esta-maquina](python-sin-pip-en-esta-maquina.md) — Python sin pip ni ensurepip; librerías del cerebro solo stdlib, paquetes externos piden sudo apt
 - [apagados-forzados-del-dueno-anterior](apagados-forzados-del-dueno-anterior.md) — Los 867 apagados forzados del disco son del dueño anterior; solo importa si el número crece
 - [vpn-dns-strongswan-wrapper](vpn-dns-strongswan-wrapper.md) — La VPN fabrica instala su DNS con un wrapper propio; si con VPN no hay nombres, revisar resolvectl dns
+- [pruebas-del-cerebro-con-node-test](pruebas-del-cerebro-con-node-test.md) — Pruebas del cerebro: node:test necesita --experimental-test-module-mocks; comando de regresion y trampas de los mocks
