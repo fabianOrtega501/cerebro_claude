@@ -4,7 +4,7 @@
  * Never confirms an annulment. Apply `seed.sql` first.
  *
  * Usage:
- *   node modules/operations/pqrs/capture.mjs --salida <carpeta> [--empresa "Empresa Demo"]
+ *   node modules/operations/pqrs/capture.mjs --salida <carpeta> [--empresa "Empresa Demo"] [--solo contacto]
  */
 
 import { clearHighlights, clickAt, closeBrowser, evaluate, highlight, screenshot, wait, waitUntil } from "../../../lib/browser.mjs";
@@ -124,7 +124,7 @@ async function captureContactSection() {
 		await wait(4000);
 		await evaluate(cdp, `window.scrollTo(0, document.querySelector('#cp-complaint-contact').getBoundingClientRect().top + window.scrollY - 40)`);
 		await wait(800);
-		await highlight(cdp, "input[placeholder='CC - Pasaporte - Otros']", { label: "1", padding: 6 });
+		await highlight(cdp, "input[placeholder='Cédula - Pasaporte - Otros']", { label: "1", padding: 6 });
 		await highlight(cdp, "input[placeholder^='Ingrese Número de Cliente']", { label: "2", padding: 6 });
 		await wait(300);
 		const clip = await evaluate(
@@ -142,6 +142,13 @@ async function captureContactSection() {
 }
 
 const main = async () => {
+	if (arg("solo") === "contacto") {
+		await captureContactSection();
+		console.log(`\nCapturas en ${outputDir}`);
+
+		return;
+	}
+
 	const { cdp, chrome } = await openSession({ base, ...testCredentials(), company, module: "Operaciones" });
 
 	try {

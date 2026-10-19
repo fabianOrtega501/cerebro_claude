@@ -196,6 +196,8 @@ Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra r
 | Algo del cerebro debe compartirse con el equipo | `contribute-main-brain` | La pides tu |
 | Se cierra una sincronizacion o se va a commitear el cerebro | `brain-doctor` | Solo, desde `settle.mjs`; o la pides |
 | El codigo ya funciona y toca subirlo | `finish-development` | La pides tu. Es la pareja de `start-development` |
+| Antes del commit de cierre | `peer-review` (modo propio) | Siempre, desde la Fase 1b de `finish-development` |
+| Hay que revisar el desarrollo de un companero | `peer-review` | La pides tu, con el numero del ticket |
 | Hay que entregar el control de cambios | `gen-changes-controls` | Solo manual |
 | Hay que entregar el set de pruebas | `gen-test-set` | Solo manual. Lee la cola de `brain/testing/pending.md` |
 | Se cierra el sprint | `gen-sprint-summary` | Solo manual |

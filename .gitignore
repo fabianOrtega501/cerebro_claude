@@ -76,5 +76,9 @@
 # comparar una medicion con la anterior; en el repo solo seria ruido y datos del equipo.
 /brain/machine/history/
 
+# Informes de revision de pares: son sobre el codigo de otros desarrolladores y no viajan al
+# respaldo de GitHub. Los escribe la skill peer-review.
+/brain/peer-reviews/
+
 # Bytecode de Python de los conectores de brain/lib/tickets: se regenera solo.
 __pycache__/

@@ -3,10 +3,23 @@
   "installed": [],
   "equivalents": {
     "core:ping": [],
-    "manuals:update-manual": ["skills/update-manual", "brain/projects/aio/manual"],
-    "development:develop-ticket": ["skills/start-development", "skills/fullstack-ticket", "skills/finish-development", "skills/review-overengineering", "skills/practice-ticket"],
-    "development:peer-review": [],
-    "aio:check-contract": ["brain/projects/aio/stack/check-contract.mjs"]
+    "manuals:update-manual": [
+      "skills/update-manual",
+      "brain/projects/aio/manual"
+    ],
+    "development:develop-ticket": [
+      "skills/start-development",
+      "skills/fullstack-ticket",
+      "skills/finish-development",
+      "skills/review-overengineering",
+      "skills/practice-ticket"
+    ],
+    "development:peer-review": [
+      "skills/peer-review"
+    ],
+    "aio:check-contract": [
+      "brain/projects/aio/stack/check-contract.mjs"
+    ]
   },
   "contributions": []
 }

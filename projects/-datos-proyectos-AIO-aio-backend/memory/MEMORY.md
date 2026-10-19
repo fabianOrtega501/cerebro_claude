@@ -27,3 +27,4 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [no-usar-stash-para-comparar-con-la-base](no-usar-stash-para-comparar-con-la-base.md) — No usar git stash para comparar la rama contra su base; aplica stashes ajenos y deja conflictos en archivos de otros tickets
 - [solo-lo-pedido](solo-lo-pedido.md) — No agregar trabajo, validaciones ni protecciones que no se pidieron; lo que parezca necesario se propone, no se agrega
 - [push-antes-de-documentar](push-antes-de-documentar.md) — Al cerrar, el push de las ramas de código va antes del control de cambios, el set de pruebas y el manual
+- [revision-de-pares-propia](revision-de-pares-propia.md) — Antes del commit, revisar el diff con la lista de 12 fallas que devolvió la revisión de pares del 11411

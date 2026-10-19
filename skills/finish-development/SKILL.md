@@ -82,6 +82,21 @@ Después, **correr siempre** la skill `review-overengineering` sobre el diff de 
 obligatoria, aunque el resultado sea "Nada que quitar". Se muestran los hallazgos y solo se aplican
 los que el usuario elija. No se pasa a la Fase 2 sin haberla corrido.
 
+## Fase 1b — Revisión de pares propia
+
+Después de `review-overengineering`, **correr siempre** la skill `peer-review` en su **modo propio**
+sobre cada repo del ticket: la rama actual con lo que está sin commit, contra las reglas del repo, las
+del equipo y las del usuario, incluida la lista de la memoria del proyecto (en AIO,
+`revision-de-pares-propia`) punto por punto. Se le muestran a Fabian los hallazgos por nivel; **lo que
+«Impide aprobar» o «Debe corregirse» se corrige, o él lo acepta de forma explícita, antes de pasar a la
+Fase 2**. No se propone el commit sin esta revisión, aunque salga sin hallazgos.
+
+Y antes de cada `git add` se mira el diff de ese archivo: si trae líneas que no son del desarrollo, se
+pregunta.
+
+Lo pidió Fabian el 2026-10-19, tras un MR devuelto con 9 hallazgos y un commit que llevó cambios
+ajenos sin que se notara.
+
 ## Fase 2 — Verificar
 
 ```bash
