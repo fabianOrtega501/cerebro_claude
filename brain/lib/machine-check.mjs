@@ -14,8 +14,29 @@ const MODULES = { performance, updates, hardware, system, storage };
 const ORDER = { error: 0, aviso: 1, info: 2 };
 const LABEL = { error: "ERROR", aviso: "AVISO", info: "info " };
 
+/** Readable text of any thrown value, whether or not it is an `Error` with a `message`. */
+function describe(thrown) {
+	if (thrown instanceof Error)
+		return thrown.message || thrown.name;
+
+	try {
+		return typeof thrown === "string" ? thrown : JSON.stringify(thrown) ?? String(thrown);
+	}
+	catch {
+		return "error sin descripcion";
+	}
+}
+
 const args = process.argv.slice(2);
-const only = args.includes("--only") ? args[args.indexOf("--only") + 1].split(",") : Object.keys(MODULES);
+const onlyAt = args.indexOf("--only");
+const onlyValue = onlyAt === -1 ? null : args[onlyAt + 1];
+
+if (onlyAt !== -1 && (!onlyValue || onlyValue.startsWith("--"))) {
+	console.error(`Falta la lista de modulos despues de --only. Disponibles: ${Object.keys(MODULES).join(", ")}`);
+	process.exit(2);
+}
+
+const only = onlyValue ? onlyValue.split(",") : Object.keys(MODULES);
 const unknown = only.filter(name => !MODULES[name]);
 
 if (unknown.length) {
@@ -42,12 +63,28 @@ findings.sort((a, b) => ORDER[a.level] - ORDER[b.level]);
 
 const changes = compare(metrics);
 const snapshot = { date: new Date().toISOString(), modules: only, metrics, findings };
-const file = args.includes("--no-save") ? null : save(snapshot);
 const count = level => findings.filter(f => f.level === level).length;
+let file = null;
+let saveFailed = false;
+let saveError = "";
+
+if (!args.includes("--no-save")) {
+	try {
+		file = save(snapshot);
+	}
+	catch (error) {
+		saveFailed = true;
+		saveError = describe(error);
+	}
+}
 
 if (args.includes("--json")) {
 	console.log(JSON.stringify({ ...snapshot, changes, saved: file }, null, 2));
-	process.exit(0);
+
+	if (saveFailed)
+		console.error(`No se pudo guardar en el historial: ${saveError}`);
+
+	process.exit(saveFailed ? 1 : 0);
 }
 
 console.log(`Diagnostico del computador (${only.join(", ")}): ${count("error")} error(es), ${count("aviso")} aviso(s), ${count("info")} info`);
@@ -73,3 +110,8 @@ else
 
 if (file)
 	console.log(`\nGuardado en ${file}`);
+
+if (saveFailed) {
+	console.error(`\nNo se pudo guardar en el historial: ${saveError}`);
+	process.exit(1);
+}

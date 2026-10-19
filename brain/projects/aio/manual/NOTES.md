@@ -389,6 +389,20 @@ Para fotografiar permisos concretos en **Configuración > Usuarios > Roles y Per
   cambia para todos. Se crea en local un usuario y un rol propios, con los permisos de la escena, y
   se borran al terminar (tokens, permisos, `role_users`, rol y usuario).
 
+### Recortar una sección más alta que la ventana
+
+El `clip` de `screenshot` va en **coordenadas de la página**, no de la ventana: si la página está
+desplazada, el `top` de `getBoundingClientRect()` hay que sumarlo con `window.scrollY`, o la captura
+sale con la franja de arriba en blanco. Para una sección más alta que la ventana (los datos de
+contacto del portal), además se abre la página con `height` mayor (1400) en `openPublicPage`.
+
+### `seed.mjs` se corre desde el repo de AIO
+
+El seed busca el proyecto por el directorio actual: lanzado desde la carpeta del perfil dice que el
+repo no está registrado y no aplica nada. Se corre con `cd` a `aio-app` o `aio-backend`, pasando la
+ruta absoluta del `seed.sql`. Lo mismo vale para `copy-to-manual.mjs` y `prepare-branch.mjs`, que
+además piden `AIO_MANUAL_WEB` si el repo no la tiene en su `settings.local.json`.
+
 ## Al terminar, en este repo
 
 **Levantar el dev server reescribe `components.d.ts`**, que regenera `unplugin-vue-components` al
@@ -438,6 +452,7 @@ grep -o "[a-z0-9_-]*\.png" docs/AIO/<ruta>/<Documento>.md | sort -u
 | Mantenimiento > Órdenes de trabajo | `modules/maintenance/work-orders/capture-search.mjs` | `work-order-search` (formulario de búsqueda con el criterio **Estado**: `WorkOrder.md`). Con `--estado`, que debe existir en los datos y no estar en todas las órdenes: el flujo comprueba que el filtro acote el listado. Absorbido del repo |
 | Operaciones > Despachos | `modules/operations/dispatches/capture-massive-closure.mjs` | `massive-closure` (cierre masivo: botón, panel de candidatos, tripulación y modal de fecha: `Despachos.md`). Solo entran despachos sin vehículo y en operación, así que la empresa tiene que tener alguno. Absorbido del repo |
 | AVL | `modules/avl/capture-route-search.mjs` | `route-search` (buscador de rutas). Absorbido del repo; trae su `seed-route-search.sql` |
+| Operaciones > PQR | `modules/operations/pqrs/capture.mjs` | `pqrs` (botón **Portal Ciudadano**, diálogo **Anular PQR** con el motivo vacío y diligenciado, aviso de PQR anulado en **Ver**: `Pqrs.md`; y los datos de contacto del portal con el placeholder y el número de cliente: `ReportarPQRS.md`). Trae su `seed.sql`, que pone datos presentables a dos PQR de Empresa Demo por radicado (`LQKH-2026-074996` anulado y `MLKA-2026-727005` abierto): si en otra base no existen, crearlos antes. **No confirma la anulación** |
 | Operaciones > Rutas | `modules/operations/routes/capture-geometry.mjs` | `route-geometry` (consulta geográfica: `rutas.md` y `routesGeometries.md`) |
 | Operaciones > Rutas | `modules/operations/routes/capture-read-only.mjs` | `route-read-only` (wizard en modo consulta: `rutas.md`) |
 | Móvil > Censo | `modules/mobile/visits/capture.mjs` | `census` (tabla de visitas y pestaña Información Visitas: `Censo.md`) |

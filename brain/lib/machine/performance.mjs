@@ -102,12 +102,29 @@ function containers() {
 	}));
 }
 
+/** Parses the text of /proc/loadavg; `null` or malformed input never throws.
+ * @param {string|null} text
+ * @returns {{valid: true, load1: number, load5: number, load15: number}|{valid: false}} */
+export function parseLoadavg(text) {
+	const fields = typeof text === "string" ? text.trim().split(/\s+/).slice(0, 3) : [];
+
+	if (fields.length < 3 || !fields.every(f => /^\d+(\.\d+)?$/.test(f)))
+		return { valid: false };
+
+	const [load1, load5, load15] = fields.map(Number);
+
+	if (![load1, load5, load15].every(Number.isFinite))
+		return { valid: false };
+
+	return { valid: true, load1, load5, load15 };
+}
+
 /** Findings and metrics of the module. Takes about `SAMPLE_SECONDS` to sample CPU usage. */
 export function run() {
 	const findings = [];
 	const metrics = {};
 	const cores = cpus().length;
-	const [load1, load5] = (read("/proc/loadavg") ?? "0 0").split(" ").map(Number);
+	const load = parseLoadavg(read("/proc/loadavg"));
 
 	const before = processTable();
 	const started = Date.now();
@@ -121,15 +138,21 @@ export function run() {
 		cpu: before.has(pid) ? Math.max(0, p.ticks - before.get(pid).ticks) / CLK_TCK / elapsed * 100 : 0,
 	}));
 
-	metrics.load5 = metric("Carga promedio de 5 min", load5);
-	metrics.load5PerCore = metric("Carga de 5 min por nucleo", load5 / cores);
+	if (!load.valid)
+		findings.push(finding("aviso", AREA, "No se pudo medir la carga del sistema: /proc/loadavg no se pudo leer o tiene un formato invalido."));
+	else {
+		const { load1, load5 } = load;
 
-	if (load5 / cores > 2)
-		findings.push(finding("error", AREA, `Carga de ${load5} con ${cores} nucleos: hay el doble de trabajo en cola del que el CPU puede atender.`));
-	else if (load5 / cores > 1)
-		findings.push(finding("aviso", AREA, `Carga de ${load5} con ${cores} nucleos: hay mas trabajo en cola que nucleos.`));
-	else
-		findings.push(finding("info", AREA, `Carga de ${load1} (1 min) y ${load5} (5 min) con ${cores} nucleos.`));
+		metrics.load5 = metric("Carga promedio de 5 min", load5);
+		metrics.load5PerCore = metric("Carga de 5 min por nucleo", load5 / cores);
+
+		if (load5 / cores > 2)
+			findings.push(finding("error", AREA, `Carga de ${load5} con ${cores} nucleos: hay el doble de trabajo en cola del que el CPU puede atender.`));
+		else if (load5 / cores > 1)
+			findings.push(finding("aviso", AREA, `Carga de ${load5} con ${cores} nucleos: hay mas trabajo en cola que nucleos.`));
+		else
+			findings.push(finding("info", AREA, `Carga de ${load1} (1 min) y ${load5} (5 min) con ${cores} nucleos.`));
+	}
 
 	if (vm) {
 		const busy = 100 - vm.id;
@@ -146,20 +169,36 @@ export function run() {
 	}
 
 	const mem = meminfo();
-	const availablePct = mem.MemAvailable / mem.MemTotal * 100;
-	const swapUsed = mem.SwapTotal - mem.SwapFree;
+	const valid = (...values) => values.every(v => Number.isFinite(v) && v >= 0);
+	const ramValid = valid(mem.MemAvailable, mem.MemTotal) && mem.MemTotal > 0 && mem.MemAvailable <= mem.MemTotal;
+	const swapValid = valid(mem.SwapTotal, mem.SwapFree) && mem.SwapFree <= mem.SwapTotal;
+	const swapUsed = swapValid ? mem.SwapTotal - mem.SwapFree : null;
+	const swapText = swapValid ? `swap en uso ${size(swapUsed)} de ${size(mem.SwapTotal)}` : null;
 
-	metrics.memAvailablePct = metric("RAM disponible", availablePct, "%");
-	metrics.swapUsed = metric("Swap en uso", swapUsed / 1024 ** 3, "GB");
-
-	const memText = `RAM: ${size(mem.MemAvailable)} disponibles de ${size(mem.MemTotal)} (${availablePct.toFixed(0)}%); swap en uso ${size(swapUsed)} de ${size(mem.SwapTotal)}.`;
-
-	if (availablePct < 5)
-		findings.push(finding("error", AREA, memText + " La memoria esta agotada.", "Cerrar lo que mas consume (ver lista de procesos) o bajar contenedores que no se usan."));
-	else if (availablePct < 10)
-		findings.push(finding("aviso", AREA, memText + " Queda poca memoria."));
+	if (swapValid)
+		metrics.swapUsed = metric("Swap en uso", swapUsed / 1024 ** 3, "GB");
 	else
-		findings.push(finding("info", AREA, memText));
+		findings.push(finding("aviso", AREA, "No se pudo medir el uso de swap: /proc/meminfo no trae SwapTotal y SwapFree validos."));
+
+	if (ramValid) {
+		const availablePct = mem.MemAvailable / mem.MemTotal * 100;
+		const memText = `RAM: ${size(mem.MemAvailable)} disponibles de ${size(mem.MemTotal)} (${availablePct.toFixed(0)}%)${swapText ? `; ${swapText}` : ""}.`;
+
+		metrics.memAvailablePct = metric("RAM disponible", availablePct, "%");
+
+		if (availablePct < 5)
+			findings.push(finding("error", AREA, memText + " La memoria esta agotada.", "Cerrar lo que mas consume (ver lista de procesos) o bajar contenedores que no se usan."));
+		else if (availablePct < 10)
+			findings.push(finding("aviso", AREA, memText + " Queda poca memoria."));
+		else
+			findings.push(finding("info", AREA, memText));
+	}
+	else {
+		findings.push(finding("aviso", AREA, "No se pudo medir la memoria RAM: /proc/meminfo no trae MemTotal y MemAvailable validos."));
+
+		if (swapText)
+			findings.push(finding("info", AREA, `Swap: ${swapText}.`));
+	}
 
 	for (const [resource, label, someLimit, fullLimit] of [["cpu", "CPU", 40, null], ["memory", "memoria", 10, 5], ["io", "disco", 20, 10]]) {
 		const p = pressure(resource);

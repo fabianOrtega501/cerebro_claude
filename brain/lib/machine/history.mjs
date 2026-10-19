@@ -37,15 +37,16 @@ export function compare(metrics) {
 	return changes;
 }
 
-/** Writes the snapshot and prunes beyond `KEEP`. Returns the file path. */
+/** Writes the snapshot and prunes the oldest others beyond `KEEP`; the new one is never pruned. Returns the file path. */
 export function save(snapshot) {
 	mkdirSync(DIR, { recursive: true });
 
-	const file = join(DIR, `${snapshot.date.replace(/[:.]/g, "-")}.json`);
+	const name = `${snapshot.date.replace(/[:.]/g, "-")}.json`;
+	const file = join(DIR, name);
 
 	writeFileSync(file, JSON.stringify(snapshot, null, 2));
 
-	for (const old of list(DIR).filter(f => f.endsWith(".json")).sort().reverse().slice(KEEP))
+	for (const old of list(DIR).filter(f => f.endsWith(".json") && f !== name).sort().reverse().slice(KEEP - 1))
 		unlinkSync(join(DIR, old));
 
 	return file;

@@ -5,9 +5,12 @@ import { finding, has, list, metric, read, sh } from "./context.mjs";
 
 const AREA = "updates";
 
-/** Upgradable apt packages as `{name, security}`, from the local package lists. */
+/** Upgradable apt packages as `{name, security}`, from the local package lists, or `null` if apt could not answer. */
 function aptPending() {
-	const out = sh("apt", ["list", "--upgradable"], { timeout: 30000 }) ?? "";
+	const out = sh("apt", ["list", "--upgradable"], { timeout: 30000 });
+
+	if (out === null)
+		return null;
 
 	return out.split("\n")
 		.filter(l => l.includes("[upgradable from"))
@@ -52,22 +55,27 @@ export function run() {
 	findings.push(finding("info", AREA, `Sistema: ${read("/etc/os-release")?.match(/PRETTY_NAME="(.+)"/)?.[1] ?? "?"}, kernel ${release()}.`));
 
 	const apt = aptPending();
-	const security = apt.filter(p => p.security);
 	const cache = "/var/cache/apt/pkgcache.bin";
 	const listsAge = existsSync(cache) ? (Date.now() - statSync(cache).mtimeMs) / 86400000 : null;
 
-	metrics.aptPending = metric("Paquetes apt pendientes", apt.length);
-	metrics.aptSecurity = metric("Paquetes apt de seguridad pendientes", security.length);
+	if (apt === null)
+		findings.push(finding("aviso", AREA, "No se pudo consultar apt: no se sabe si hay paquetes pendientes.", "apt list --upgradable"));
+	else {
+		const security = apt.filter(p => p.security);
 
-	if (security.length)
-		findings.push(finding("aviso", AREA, `${security.length} actualizacion(es) de seguridad de apt pendientes: ${security.slice(0, 8).map(p => p.name).join(", ")}${security.length > 8 ? "…" : ""}.`,
-			"sudo apt update && sudo apt upgrade"));
+		metrics.aptPending = metric("Paquetes apt pendientes", apt.length);
+		metrics.aptSecurity = metric("Paquetes apt de seguridad pendientes", security.length);
 
-	if (apt.length)
-		findings.push(finding(apt.length > 50 ? "aviso" : "info", AREA, `${apt.length} paquete(s) de apt por actualizar: ${apt.slice(0, 10).map(p => p.name).join(", ")}${apt.length > 10 ? "…" : ""}.`,
-			"sudo apt update && sudo apt upgrade"));
-	else
-		findings.push(finding("info", AREA, "apt: no hay paquetes pendientes segun la ultima lista descargada."));
+		if (security.length)
+			findings.push(finding("aviso", AREA, `${security.length} actualizacion(es) de seguridad de apt pendientes: ${security.slice(0, 8).map(p => p.name).join(", ")}${security.length > 8 ? "…" : ""}.`,
+				"sudo apt update && sudo apt upgrade"));
+
+		if (apt.length)
+			findings.push(finding(apt.length > 50 ? "aviso" : "info", AREA, `${apt.length} paquete(s) de apt por actualizar: ${apt.slice(0, 10).map(p => p.name).join(", ")}${apt.length > 10 ? "…" : ""}.`,
+				"sudo apt update && sudo apt upgrade"));
+		else
+			findings.push(finding("info", AREA, "apt: no hay paquetes pendientes segun la ultima lista descargada."));
+	}
 
 	if (listsAge !== null && listsAge > 3)
 		findings.push(finding("aviso", AREA, `La lista de paquetes de apt tiene ${listsAge.toFixed(0)} dias: lo pendiente puede ser mas de lo que se ve.`, "sudo apt update"));
@@ -88,12 +96,18 @@ export function run() {
 	}
 
 	if (has("flatpak")) {
-		const flatpaks = (sh("flatpak", ["remote-ls", "--updates", "--columns=application"], { timeout: 30000 }) ?? "").trim().split("\n").filter(Boolean);
+		const out = sh("flatpak", ["remote-ls", "--updates", "--columns=application"], { timeout: 30000 });
 
-		metrics.flatpakPending = metric("Flatpaks pendientes", flatpaks.length);
+		if (out === null)
+			findings.push(finding("aviso", AREA, "No se pudo consultar flatpak: no se sabe si hay aplicaciones por actualizar.", "flatpak remote-ls --updates"));
+		else {
+			const flatpaks = out.trim().split("\n").filter(Boolean);
 
-		if (flatpaks.length)
-			findings.push(finding("info", AREA, `${flatpaks.length} flatpak(s) por actualizar: ${flatpaks.join(", ")}.`, "flatpak update"));
+			metrics.flatpakPending = metric("Flatpaks pendientes", flatpaks.length);
+
+			if (flatpaks.length)
+				findings.push(finding("info", AREA, `${flatpaks.length} flatpak(s) por actualizar: ${flatpaks.join(", ")}.`, "flatpak update"));
+		}
 	}
 
 	if (has("fwupdmgr")) {

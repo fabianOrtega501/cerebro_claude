@@ -230,6 +230,25 @@ Un paso a la vez. Por cada paso doy tres cosas y **ninguna es código**:
 2. **Criterio de aceptación**: cómo se comprueba que quedó.
 3. **Referencia**: un archivo del repo donde ese patrón ya está resuelto.
 
+**Las pruebas automatizadas se construyen con taller guiado.** Escribir una prueba desde cero es
+lo que más le cuesta (pedido de Fabian el 2026-10-16, ticket 11411, tras un `PqrWatermarkTest` que
+salió con el namespace del Job y un `assertTrue(true)`). Cuando un paso crea o amplía un archivo de
+pruebas, no basta con objetivo, criterio y referencia: se le entrega un **taller** en este orden.
+
+1. **Anatomía del archivo**, pieza por pieza: `namespace`, `use`, la clase y su `TestCase`, los
+   traits (`RefreshDatabase`, `WithoutMiddleware`), las constantes, `setUp()`, los ayudantes
+   (dobles, fábricas de datos) y las pruebas. De cada pieza: **qué es, por qué está y qué se
+   rompe sin ella**, con la línea donde se ve en la prueba de referencia del repo.
+2. **Cada prueba en tres tiempos** —preparar, ejecutar, comprobar— dicho en palabras para *esa*
+   prueba: qué datos se crean y con qué valores, qué se ejecuta exactamente, y qué aserción
+   demuestra el criterio de la HU. Una aserción que siempre pasa (`assertTrue(true)`) no prueba
+   nada y se marca como bloqueante.
+3. **Los dobles**, cuando hagan falta: qué servicio se reemplaza, por qué (red, Imagick, correo) y
+   cómo se captura lo que recibió para comprobarlo.
+4. **Él escribe de a una prueba**, la corre, y se revisa antes de la siguiente. La escalera de
+   pistas aplica igual: el código completo solo si lo pide.
+5. Al terminar, las piezas que le costaron se agregan a la lección `laravel-pruebas`.
+
 **Toda instrucción de cambio lleva su ubicación exacta**: archivo, método, número de línea, cómo
 está hoy y cómo debe quedar, en una tabla. «Quitar X» sin decir dónde no sirve cuando X puede
 estar en dos lugares. Antes de enviarla, se verifica con `grep` que la línea y el texto citados
