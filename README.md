@@ -29,7 +29,8 @@ cerebro solo enlaza, no copia.
 | Saber si el cerebro esta sano | `/brain-doctor` |
 | Saber por que el computador esta lento, o como van actualizaciones y componentes | `/diagnose-machine` |
 | Trabajar contra desa, qa, pre o prod | `/ambiente qa lectura` (volver: `/ambiente local`) |
-| Ver que trajo el equipo en su `.claude/` | `/sync-brain` |
+| Ver que trajo el equipo en su `.claude/` o en main-brain | `/sync-brain` |
+| Enviar una skill, agente o correccion a main-brain | `/contribute-main-brain` |
 
 Nada mas hay que configurar. Todo lo de abajo es para cuando quieras **cambiar** como funciona.
 
@@ -75,7 +76,8 @@ escribe codigo ni documentacion; avisa y se aparta.
 | `exploration-memory` | El mapa tecnico de un modulo, para no releer el mismo codigo cada ticket | `<proy>/exploration/` |
 | `explore-module` | Decide si vale la pena mapear un modulo y coordina al explorador | `<proy>/exploration/` |
 | `manage-memory` | Decide si un hecho se guarda, si es del equipo o propio, y donde | — |
-| `sync-brain` | Contrastar el `.claude/` de un repo contra el cerebro y decidir que absorber; cierra con Doctor | — |
+| `sync-brain` | Contrastar el `.claude/` de un repo, o los plugins de main-brain (rama de `projects.json`), contra el cerebro y decidir que absorber; cierra con Doctor | `brain/upstream/` |
+| `contribute-main-brain` | Llevar un aporte del cerebro a main-brain: rama desde `origin/qa`, limpieza de lo personal, version, validacion, commit y push con permiso, y el texto del MR | `brain/main-brain.json` |
 | `brain-doctor` | Diagnostico del cerebro: hooks, README, secretos, memorias, repos y ambientes. No corrige nada | — |
 | `diagnose-machine` | Diagnostico del computador: rendimiento, actualizaciones, bateria, disco y espacio; compara con la medicion anterior. Solo lee | `brain/machine/history/` |
 | `ambiente` | Muestra o cambia el ambiente (local, desa, qa, pre, prod) y el modo. Solo la invocas tu; unica via a produccion | `brain/environments.json` |
@@ -87,7 +89,7 @@ tres `gen-*` son **manuales**: no se disparan solas nunca.
 
 | Hook | Cuando | Que hace |
 |---|---|---|
-| `claude-upstream-notice` | Despues de `git pull`/`merge`/`rebase` | Si el `.claude/` del repo cambio, lo avisa y arranca `sync-brain` |
+| `claude-upstream-notice` | Despues de `git pull`/`merge`/`rebase`, y de `fetch` en main-brain | Si el `.claude/` del repo, o la rama vigilada de main-brain, cambio, lo avisa y arranca `sync-brain` |
 | `docs-on-push` | Despues de `git push` | Avisa si quedo documentacion sin actualizar, tecnica o de manual |
 | `brain-unpushed-notice` | Al terminar una respuesta | Avisa si el cerebro tiene algo sin commitear o sin subir a `backup`/`github`; calla si esa respuesta ya ofrecio el commit |
 | `i18n-keys-guard` | Antes y despues de editar un locale | **Deniega** la clave intercalada y la que repite un texto que ya existe; avisa de JSON roto y de paridad |
@@ -152,7 +154,8 @@ Muestra **modelo │ proyecto │ rama**. Opus sale en amarillo y Sonnet en verd
 | `brain/machine/history/` | Una foto por diagnostico, para comparar. **Fuera del control de versiones** |
 | `pc-linux/` | Manuales para instalar y configurar el computador. **Aparte de los desarrollos** |
 | `brain/projects/<proy>/` | Perfiles: `manual/`, `stack/`, `docs/`, `skills/local-*` |
-| `brain/upstream/` | Foto del `.claude/` de cada repo en su ultima revision |
+| `brain/upstream/` | Foto del `.claude/` de cada repo, y de los plugins de main-brain, en su ultima revision |
+| `brain/main-brain.json` | Plugins instalados, equivalencias entre skills del equipo y piezas propias, y aportes pendientes |
 | `brain/projects/<proy>/exploration/` | Mapa tecnico por modulo: donde esta cada endpoint, permiso y servicio |
 | `brain/learning/` | Modo practica: lecciones, temario, bitacoras y la marca de la practica en curso |
 | `brain/sprints/` | El texto de la retrospectiva de cada sprint |
@@ -287,11 +290,17 @@ El hook `claude-upstream-notice` lo detecta y arranca `sync-brain`, que clasific
 va en una sola direccion: repo -> cerebro. La unica cosa que viaja al reves son las memorias del
 equipo, y para eso esta `manage-memory`.
 
+**main-brain** se revisa igual, con `node ~/.claude/skills/sync-brain/lib/report.mjs main-brain`: hace
+`fetch` y compara `plugins/` y `.claude-plugin/` de la rama de `upstream.ref` en `brain/projects.json`
+(`origin/qa` mientras sea la base, despues `origin/prod`). Lo que va del cerebro a main-brain lo lleva
+`contribute-main-brain`, siempre por una rama `feature/*` desde `origin/qa` y un MR hacia `qa`.
+
 Al terminar hay que cerrar la revision, o el aviso se repite:
 
 ```bash
 node ~/.claude/skills/sync-brain/lib/settle.mjs reviewed [repo]    # decidido
 node ~/.claude/skills/sync-brain/lib/settle.mjs dismissed [repo]   # no interesa esta version
+node ~/.claude/skills/sync-brain/lib/settle.mjs reviewed main-brain  # lo mismo para main-brain
 ```
 
 ---

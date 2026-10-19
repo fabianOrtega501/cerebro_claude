@@ -1,0 +1,12 @@
+{
+  "_comment": "Relacion del cerebro con main-brain. installed: plugins instalados en esta maquina (se actualizan, no se absorben). equivalents: que pieza del cerebro corresponde a cada skill o agente del equipo (plugin:nombre). contributions: aportes propios enviados por contribute-main-brain, para reconocerlos cuando vuelvan en la rama vigilada. La rama vigilada esta en projects.json (main-brain.upstream.ref).",
+  "installed": [],
+  "equivalents": {
+    "core:ping": [],
+    "manuals:update-manual": ["skills/update-manual", "brain/projects/aio/manual"],
+    "development:develop-ticket": ["skills/start-development", "skills/fullstack-ticket", "skills/finish-development", "skills/review-overengineering", "skills/practice-ticket"],
+    "development:peer-review": [],
+    "aio:check-contract": ["brain/projects/aio/stack/check-contract.mjs"]
+  },
+  "contributions": []
+}

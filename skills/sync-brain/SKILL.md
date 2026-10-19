@@ -1,17 +1,25 @@
 ---
 name: sync-brain
-description: Usar cuando el `.claude/` de un repo de trabajo trae cambios que no se han contrastado contra el cerebro propio (~/.claude) — tipicamente despues de un `git pull` de `desa`, cuando el hook lo avisa, o cuando el usuario pide revisar que trajo el equipo en su configuracion de Claude. Clasifica lo que llego, recomienda que vale la pena absorber y solo mezcla lo que el usuario apruebe.
+description: Usar cuando el `.claude/` de un repo de trabajo o los plugins de main-brain traen cambios que no se han contrastado contra el cerebro propio (~/.claude) — tipicamente despues de un `git pull` de `desa` o de un `fetch` de main-brain, cuando el hook lo avisa, o cuando el usuario pide revisar que trajo el equipo ("sincroniza el cerebro", "que hay nuevo en main-brain"). Baja los cambios de main-brain, clasifica lo que llego, recomienda que vale la pena absorber y solo mezcla lo que el usuario apruebe. Para enviar cambios propios a main-brain esta `contribute-main-brain`.
 ---
 
 # sync-brain
 
-Contrastar el `.claude/` de un repo contra el cerebro propio y decidir que se absorbe.
+Contrastar lo que trae el equipo contra el cerebro propio y decidir que se absorbe. Hay dos fuentes:
+
+| Fuente | Que se vigila | Donde se declara |
+|---|---|---|
+| El `.claude/` de cada repo de trabajo | Memorias, flujos del manual, skills propias del proyecto, hooks, `settings.json`: lo que el estandar del equipo deja en el repo | Todos los repos de `brain/projects.json` |
+| **main-brain** (`/datos/proyectos/main-brain`) | `plugins/` y `.claude-plugin/` de la rama del remoto en `upstream.ref`: **`origin/qa` mientras sea la base, despues `origin/prod`** | El proyecto `main-brain` de `brain/projects.json` |
+
+**Se sigue trabajando en el cerebro.** main-brain es una fuente de cambios a revisar, no un reemplazo.
 
 ## Principio que no se negocia
 
 **El cerebro propio (`~/.claude`) manda siempre.** Lo del repo es una propuesta, no una orden.
-El flujo es en una sola direccion: **repo -> cerebro**. Nunca se escribe dentro del `.claude/`
-de un repo de trabajo desde aqui, y nunca se absorbe nada sin aprobacion explicita.
+El flujo de esta skill es en una sola direccion: **repo o main-brain -> cerebro**. Nunca se escribe
+dentro del `.claude/` de un repo de trabajo ni en main-brain desde aqui, y nunca se absorbe nada sin
+aprobacion explicita. Lo que va del cerebro a main-brain es trabajo de `contribute-main-brain`.
 
 Si algo del repo choca con algo propio, gana lo propio por defecto. Solo se cambia si el usuario
 lo dice despues de ver la comparacion.
@@ -21,16 +29,26 @@ lo dice despues de ver la comparacion.
 ### 1. Levantar los hechos
 
 ```bash
-node ~/.claude/skills/sync-brain/lib/report.mjs [ruta-del-repo]
+node ~/.claude/skills/sync-brain/lib/report.mjs [ruta-del-repo]   # el .claude/ de un repo
+node ~/.claude/skills/sync-brain/lib/report.mjs main-brain        # baja y revisa main-brain
 ```
 
-Sin argumento usa el directorio actual. Devuelve JSON con:
+Sin argumento usa el directorio actual. **Cuando el usuario pide sincronizar sin decir que,
+se revisa main-brain y ademas el repo actual si tiene cambios.** Devuelve JSON con:
 
-- `status`: `changed` (hay algo sin revisar), `clean`, `dismissed` o `unwatched` (repo sin
-  linea base todavia).
+- `watch`: que se vigila (`ref`, `paths`) y si es una rama del remoto (`remote`).
+- `fetched`: en main-brain el informe hace `git fetch` antes de comparar. `true` si bajo bien;
+  `false` si fallo (sin red o sin VPN): se compara contra lo ultimo que se bajo y se dice. `fetch`
+  no toca el directorio de trabajo del clon.
+- `status`: `changed` (hay algo sin revisar), `clean`, `dismissed` o `unwatched` (sin linea base).
 - `entries[]`: un registro por archivo que difiere de la ultima revision, con `change`
-  (`added` / `modified` / `removed`) y `overridden_by_brain` (el cerebro ya tiene una skill
-  con ese nombre, o sea que compiten).
+  (`added` / `modified` / `removed`), `piece` (la skill o el agente: `nombre` en un repo,
+  `plugin:nombre` en main-brain) y `overridden_by_brain`. En un repo, el cerebro tiene una skill
+  con ese nombre; en main-brain, `brain_equivalents` lista que piezas del cerebro le corresponden
+  segun `brain/main-brain.json`.
+- `plugins[]` (solo main-brain): por plugin tocado, `installed`, `version_before`, `version_now`
+  y `changelog_added`, las lineas nuevas del CHANGELOG.
+- `merged_contributions[]` (solo main-brain): aportes propios que ya entraron en la rama vigilada.
 - `git_changes`: el `--name-status` de git desde la ultima revision, util para dar contexto.
 
 Si `status` es `unwatched`, el repo no tiene linea base: es la primera vez. Dilo claramente
@@ -66,6 +84,16 @@ completos salvo que los pida.
 
 Cierra con una recomendacion clara: que absorberias tu y que no. No presentes un menu neutro.
 
+**En main-brain, ademas, se agrupa por plugin** y se dice primero su version y el CHANGELOG
+nuevo: es el resumen que el autor escribio de su cambio. Despues, segun el caso:
+
+| Caso | Que se hace |
+|---|---|
+| **Plugin instalado** (`installed: true`) | No se copia nada: se ofrece actualizarlo. Solo llega si subio `version`; si cambio el codigo sin subirla, se dice, porque nadie lo va a recibir |
+| **Plugin no instalado** | Se leen los cambios y se clasifican con la tabla de arriba contra `brain_equivalents`. Lo aprobado se lleva **a mano** a las piezas del cerebro |
+| **Plugin o skill nueva** | Se presenta para decidir: instalar, absorber ideas o ignorar. Si se absorbe o se instala, se agrega a `equivalents` |
+| **Aporte propio que volvio** (`merged_contributions`) | Se reconoce como propio y no se propone absorberlo |
+
 ### 4. Absorber solo lo aprobado
 
 Espera la decision. Cuando el usuario diga que si a algo concreto:
@@ -77,6 +105,20 @@ Espera la decision. Cuando el usuario diga que si a algo concreto:
   que el hook no dependa de rutas del repo; si depende, adaptarlo o descartarlo.
 - Regla o convencion que no es codigo -> a `~/.claude/CLAUDE.md`.
 
+En main-brain, con el mismo cuidado:
+
+- **Plugin instalado** -> `claude plugin marketplace update main-brain` y
+  `claude plugin update <plugin>@main-brain`; el cambio se ve en una sesion nueva o con
+  `/reload-plugins`.
+- **Plugin no instalado** -> se edita la pieza propia, tomando solo la idea. Nunca se copia un
+  archivo del plugin encima de uno propio.
+- **Aporte propio** -> en `brain/main-brain.json`, su `status` pasa de `pending` a `merged`.
+- **Mapa de equivalencias** -> si una skill del equipo empieza a corresponder a una pieza propia,
+  se agrega en `equivalents`, para que la proxima revision la relacione sola.
+- **La rama local del clon** queda donde estaba: el informe compara contra la rama del remoto.
+  Si el usuario quiere el clon al dia, se le ofrece `git -C /datos/proyectos/main-brain pull --ff-only`
+  y solo con el clon limpio y en esa rama.
+
 Despues de copiar, **probar que no rompe nada**: `node --check` sobre cada `.mjs` absorbido.
 
 ### 5. Cerrar la revision
@@ -85,11 +127,14 @@ Siempre, aunque no se haya absorbido nada:
 
 ```bash
 # el usuario decidio (absorbio algo o dijo que nada); esta version pasa a ser la linea base
-node ~/.claude/skills/sync-brain/lib/settle.mjs reviewed [ruta-del-repo]
+node ~/.claude/skills/sync-brain/lib/settle.mjs reviewed [ruta-del-repo | main-brain]
 
 # no le interesa esta version pero quiere seguir comparando contra la revision anterior
-node ~/.claude/skills/sync-brain/lib/settle.mjs dismissed [ruta-del-repo]
+node ~/.claude/skills/sync-brain/lib/settle.mjs dismissed [ruta-del-repo | main-brain]
 ```
+
+En main-brain la foto se toma de la rama vigilada, no del directorio de trabajo: las ramas
+`feature/*` que el usuario tenga abiertas en el clon nunca cuentan como cambios del equipo.
 
 Sin este paso el hook vuelve a avisar en el proximo pull. Es a proposito: una revision a medias
 no debe darse por hecha.
@@ -139,3 +184,9 @@ remotos se ofrece aparte y tambien espera su si.
   sin hacer nada.
 - **Nunca metas nada del cerebro en un commit del repo de trabajo.** Si un cambio se te fue al
   staging del repo, sacalo antes de seguir.
+- **La primera revision de main-brain** sale `unwatched` y con todo como nuevo: es su linea base,
+  no 30 cambios de hoy. Se resume por plugin y se fija con `settle.mjs reviewed main-brain`.
+- **Pasar de `qa` a `prod`** es cambiar `upstream.ref` en `brain/projects.json` y fijar la linea
+  base de nuevo: lo que estaba en `qa` y aun no en `prod` ya se reviso.
+- **Una skill de un plugin no pisa a una propia**: se cargan las dos, con el prefijo del plugin.
+  Por eso un plugin que duplica una skill propia no se instala sin decidir cual se retira.

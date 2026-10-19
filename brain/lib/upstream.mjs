@@ -14,8 +14,8 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { basename, join } from "node:path";
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { basename, join, relative } from "node:path";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 
@@ -28,6 +28,9 @@ const UPSTREAM_DIR = join(BRAIN_DIR, "upstream");
 /** Subcarpeta del repo que se vigila. Es la unica que interesa. */
 const WATCHED_DIR = ".claude";
 
+/** Local-only files never compared or copied. */
+const IGNORED = ["settings.local.json", "node_modules", ".DS_Store"];
+
 /**
  * Corre git en un repo y devuelve la salida limpia.
  *
@@ -35,16 +38,99 @@ const WATCHED_DIR = ".claude";
  *   (no es repo, la referencia no existe, `.claude/` no esta versionado). Nunca lanza:
  *   quien llama esta casi siempre en un hook, donde reventar seria peor que no avisar.
  */
-function git(repoPath, args) {
+function git(repoPath, args, { raw = false } = {}) {
   try {
-    return execFileSync("git", ["-C", repoPath, ...args], {
+    const out = execFileSync("git", ["-C", repoPath, ...args], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
+      maxBuffer: 64 * 1024 * 1024,
+    });
+
+    return raw ? out : out.trim();
   }
   catch {
     return null;
   }
+}
+
+/** Registered projects from `projects.json`, or `{}` if it cannot be read. */
+function projects() {
+  try {
+    return JSON.parse(readFileSync(join(BRAIN_DIR, "projects.json"), "utf8")).projects ?? {};
+  }
+  catch {
+    return {};
+  }
+}
+
+/** How a repo is watched: its project's `upstream` block (`ref`, `paths`), or `HEAD` and `.claude/`.
+ * `remote` is true when the watch follows a branch instead of the working tree. */
+export function watchOf(repoRoot) {
+  const project = Object.values(projects()).find(p => p.upstream && p.repos?.includes(repoRoot));
+
+  return project
+    ? { ref: project.upstream.ref, paths: project.upstream.paths, remote: true }
+    : { ref: "HEAD", paths: [WATCHED_DIR], remote: false };
+}
+
+/** Repo to review: the first repo of project `target` if it declares `upstream`, else the git root of `target`. */
+export function resolveTarget(target) {
+  const project = target ? projects()[target] : null;
+
+  return project?.upstream ? project.repos[0] : findRepoRoot(target ?? process.cwd());
+}
+
+/** Fetches the remote of a branch-watched repo. `null` if the repo follows its working tree, else whether it worked. */
+export function fetchWatched(repoRoot) {
+  const { ref, remote } = watchOf(repoRoot);
+
+  return remote ? git(repoRoot, ["fetch", "--quiet", ref.split("/")[0]]) !== null : null;
+}
+
+/** Files under `root` as relative paths, sorted, skipping local-only noise. */
+export function listFiles(root) {
+  if (!existsSync(root))
+    return [];
+
+  const out = [];
+  const walk = dir => {
+    for (const entry of readdirSync(dir)) {
+      if (IGNORED.some(bad => entry.includes(bad)))
+        continue;
+
+      const full = join(dir, entry);
+
+      statSync(full).isDirectory() ? walk(full) : out.push(relative(root, full));
+    }
+  };
+
+  walk(root);
+
+  return out.sort();
+}
+
+/** Watched files now, relative to the snapshot root: the working `.claude/`, or the paths in the watched ref. */
+export function liveFiles(repoRoot) {
+  const { ref, paths, remote } = watchOf(repoRoot);
+
+  if (!remote)
+    return listFiles(join(repoRoot, WATCHED_DIR));
+
+  const out = git(repoRoot, ["ls-tree", "-r", "--name-only", ref, "--", ...paths]);
+
+  return out ? out.split("\n").filter(f => !IGNORED.some(bad => f.includes(bad))).sort() : [];
+}
+
+/** Current content of a watched file, or `""` if it does not exist. */
+export function readLive(repoRoot, file) {
+  const { ref, remote } = watchOf(repoRoot);
+
+  if (remote)
+    return git(repoRoot, ["show", `${ref}:${file}`], { raw: true }) ?? "";
+
+  const path = join(repoRoot, WATCHED_DIR, file);
+
+  return existsSync(path) ? readFileSync(path, "utf8") : "";
 }
 
 /**
@@ -86,12 +172,19 @@ export function upstreamPaths(repoRoot) {
  * @returns El sha, o `null` si `.claude/` no esta versionado en ese repo.
  */
 export function currentTree(repoRoot) {
-  return git(repoRoot, ["rev-parse", `HEAD:${WATCHED_DIR}`]);
+  const { ref, paths, remote } = watchOf(repoRoot);
+
+  if (!remote)
+    return git(repoRoot, ["rev-parse", `HEAD:${WATCHED_DIR}`]);
+
+  const listing = git(repoRoot, ["ls-tree", ref, "--", ...paths]);
+
+  return listing ? createHash("sha1").update(listing).digest("hex") : null;
 }
 
-/** Sha del commit en HEAD, para poder pedirle a git el diff contra la ultima revision. */
+/** Sha del commit vigilado (HEAD, o la rama declarada), para pedirle a git el diff contra la ultima revision. */
 export function currentCommit(repoRoot) {
-  return git(repoRoot, ["rev-parse", "HEAD"]);
+  return git(repoRoot, ["rev-parse", watchOf(repoRoot).ref]);
 }
 
 /**
@@ -163,14 +256,16 @@ export function inspect(repoRoot) {
  * @returns Lineas tipo `A\tarchivo` / `M\tarchivo` / `D\tarchivo`. Vacio si no hay nada.
  */
 export function changedFiles(repoRoot, since) {
+  const { ref, paths } = watchOf(repoRoot);
+
   if (since) {
-    const diff = git(repoRoot, ["diff", "--name-status", since, "HEAD", "--", WATCHED_DIR]);
+    const diff = git(repoRoot, ["diff", "--name-status", since, ref, "--", ...paths]);
 
     if (diff !== null)
       return diff ? diff.split("\n") : [];
   }
 
-  const all = git(repoRoot, ["ls-tree", "-r", "--name-only", "HEAD", WATCHED_DIR]);
+  const all = git(repoRoot, ["ls-tree", "-r", "--name-only", ref, "--", ...paths]);
 
   return all ? all.split("\n").map(f => `?\t${f}`) : [];
 }
@@ -189,7 +284,13 @@ export function markReviewed(repoRoot) {
   rmSync(snapshot, { recursive: true, force: true });
   mkdirSync(snapshot, { recursive: true });
 
-  if (existsSync(source))
+  if (watchOf(repoRoot).remote) {
+    for (const file of liveFiles(repoRoot)) {
+      mkdirSync(join(snapshot, file, ".."), { recursive: true });
+      writeFileSync(join(snapshot, file), readLive(repoRoot, file));
+    }
+  }
+  else if (existsSync(source))
     cpSync(source, snapshot, { recursive: true, filter: src => !src.includes("settings.local.json") });
 
   writeState(repoRoot, {

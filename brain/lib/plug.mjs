@@ -25,7 +25,7 @@
 
 import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, readlinkSync, rmSync, symlinkSync, writeFileSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
-import { BRAIN_DIR, currentTree, inspect, markReviewed } from "./upstream.mjs";
+import { BRAIN_DIR, currentTree, inspect, markReviewed, watchOf } from "./upstream.mjs";
 import { syncDirectories } from "./sync-directories.mjs";
 
 /** Prefijo obligatorio de toda skill privada. Es lo que la hace invisible para git. */
@@ -209,7 +209,7 @@ for (const [project, config] of entries) {
 
     // Un repo sin `.claude/` versionado no tiene upstream que vigilar; registrarlo solo
     // llenaria el cerebro de fotos vacias.
-    if (!statusOnly && currentTree(repo) && inspect(repo).status === "unwatched") {
+    if (!statusOnly && !watchOf(repo).remote && currentTree(repo) && inspect(repo).status === "unwatched") {
       markReviewed(repo);
       notes.push("linea base de upstream fijada");
     }

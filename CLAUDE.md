@@ -34,6 +34,26 @@ demas del `.claude/` de un repo sigue siendo del equipo y no se toca desde aqui.
 Los cambios del cerebro **no se commitean jamas al repo de trabajo**. Este directorio es un repo
 git aparte, local.
 
+### main-brain: el marketplace de plugins del equipo
+
+`main-brain` (`/datos/proyectos/main-brain`, registrado en `brain/projects.json`) publica como
+plugins lo que el equipo comparte entre proyectos. El estandar esta en su `README.md` y en
+`docs/Claude/` del manual tecnico: lo personal en `~/.claude`, lo que describe el codigo de un
+proyecto en su `.claude/`, lo que sirve igual en varios proyectos en main-brain. **Se sigue
+trabajando en el cerebro**: main-brain no lo reemplaza. Modelo mixto, lo decidio Fabian el 2026-10-19.
+
+- **Bajar**: `sync-brain` hace `fetch` y revisa `plugins/` y `.claude-plugin/` de la rama de
+  `upstream.ref` en `projects.json`. **`origin/qa` mientras sea la base; despues, solo `origin/prod`.**
+  Un plugin instalado se actualiza; de uno no instalado se absorben ideas a mano, como de un repo.
+- **Enviar**: **solo con `contribute-main-brain`**, en una rama `feature/*` desde `origin/qa` y con
+  MR hacia `qa`, que abre Fabian. Nunca se escribe en `qa` ni en `prod`, nunca se mergea, y crear
+  la rama, el commit y el push piden cada uno su si. Es la unica escritura permitida fuera del
+  cerebro ademas de las memorias de los repos.
+- **Relacion entre piezas**: `brain/main-brain.json` dice que plugins estan instalados, que pieza
+  del cerebro corresponde a cada skill del equipo y que aportes propios estan pendientes.
+- **Plugins instalados**: una skill de un plugin no pisa a una propia, se cargan las dos. No se
+  instala un plugin que duplica una pieza propia sin decidir cual se retira.
+
 ## Preferencias de trabajo
 
 - Explicaciones en espanol, directas y sin relleno.

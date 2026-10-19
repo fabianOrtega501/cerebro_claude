@@ -16,7 +16,7 @@ import { readProjects } from "../../../brain/lib/projects.mjs";
 
 // El manual no es un desarrollo: documenta uno que ya se cuenta en su propio proyecto. Se recupera
 // con `--incluir-manuales` o pidiendolo con `--proyecto`.
-const EXCLUDED = new Set(["manuales"]);
+const EXCLUDED = new Set(["manuales", "main-brain"]);
 
 /** Corre git en un repo. `ok` dice si tuvo exito; nunca lanza. */
 function git(repo, args) {

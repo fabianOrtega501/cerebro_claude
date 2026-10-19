@@ -1,95 +1,117 @@
 /**
- * Genera el informe crudo de que trae el `.claude/` de un repo frente al cerebro propio.
- *
- * El script **no juzga ni mezcla**: solo reune los hechos (que archivos entraron, cuales
- * cambiaron, cuales ya tienen una version propia que los reemplaza) y los imprime como JSON.
- * La clasificacion en "vale la pena / no vale la pena" la hace Claude leyendo esto, porque
- * requiere entender el contenido, no solo compararlo.
- *
- * Uso: `node report.mjs [ruta-del-repo]`  (por defecto, el directorio actual)
+ * Informe crudo de lo que cambio en lo vigilado de un repo (su `.claude/`, o la rama de main-brain) frente a la ultima revision.
+ * Uso: `node report.mjs [ruta-del-repo | clave-de-proyecto]`. No juzga ni mezcla: la clasificacion la hace Claude.
  */
 
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { changedFiles, findRepoRoot, inspect, upstreamPaths } from "../../../brain/lib/upstream.mjs";
+import { join } from "node:path";
+import { changedFiles, fetchWatched, inspect, listFiles, liveFiles, readLive, resolveTarget, upstreamPaths, watchOf } from "../../../brain/lib/upstream.mjs";
 
-/** Skills del cerebro propio. Son las que tienen prioridad sobre las del repo. */
-const BRAIN_SKILLS = join(homedir(), ".claude", "skills");
+const CLAUDE_DIR = join(homedir(), ".claude");
 
-/** Ruido que nunca se compara: es local por definicion y no se versiona. */
-const IGNORED = ["settings.local.json", "node_modules", ".DS_Store"];
-
-/** Lista recursiva de archivos de una carpeta, en rutas relativas a ella. */
-function listFiles(root) {
-  if (!existsSync(root))
-    return [];
-
-  const out = [];
-  const walk = (dir) => {
-    for (const entry of readdirSync(dir)) {
-      if (IGNORED.some(bad => entry.includes(bad)))
-        continue;
-
-      const full = join(dir, entry);
-
-      statSync(full).isDirectory() ? walk(full) : out.push(relative(root, full));
-    }
-  };
-
-  walk(root);
-
-  return out.sort();
+/** Parsed JSON file, or `fallback` if it is missing or invalid. */
+function readJson(path, fallback) {
+  try {
+    return JSON.parse(readFileSync(path, "utf8"));
+  }
+  catch {
+    return fallback;
+  }
 }
 
-/** Lee un archivo, o cadena vacia si no existe. Evita ramificar en cada comparacion. */
+/** File content, or `""` if it does not exist. */
 function read(path) {
   return existsSync(path) ? readFileSync(path, "utf8") : "";
 }
 
-/**
- * Extrae el nombre de la skill del repo a la que pertenece un archivo.
- *
- * @returns El nombre de la skill (`skills/<nombre>/...`), o `null` si el archivo no vive
- *   dentro de una skill (un hook, el settings.json, un script suelto).
- */
-function skillOf(relPath) {
-  const match = relPath.match(/^skills\/([^/]+)\//);
+/** Skill or agent a file belongs to: `name` in a repo `.claude/`, `plugin:name` in main-brain; `null` otherwise. */
+function pieceOf(file, remote) {
+  const match = remote
+    ? file.match(/^plugins\/([^/]+)\/(?:skills\/([^/]+)\/|agents\/([^/]+)\.md$)/)
+    : file.match(/^(?:skills\/([^/]+)\/|agents\/([^/]+)\.md$)/);
 
-  return match ? match[1] : null;
+  if (!match)
+    return null;
+
+  return remote ? `${match[1]}:${match[2] ?? match[3]}` : match[1] ?? match[2];
 }
 
-const repoRoot = findRepoRoot(process.argv[2] ?? process.cwd());
+/** Plugins installed here: those listed in `main-brain.json` plus the ones Claude Code reports for main-brain. */
+function installedPlugins(config) {
+  const registry = readJson(join(CLAUDE_DIR, "plugins", "installed_plugins.json"), {});
+  const fromClaude = Object.keys(registry.plugins ?? {}).filter(k => k.endsWith("@main-brain")).map(k => k.split("@")[0]);
+
+  return new Set([...(config.installed ?? []), ...fromClaude]);
+}
+
+/** Version, new CHANGELOG lines and install state of each plugin touched by the entries. */
+function pluginSummary(repoRoot, snapshot, entries, config) {
+  const installed = installedPlugins(config);
+  const names = [...new Set(entries.map(e => e.file.match(/^plugins\/([^/]+)\//)?.[1]).filter(Boolean))];
+
+  return names.map(name => {
+    const manifest = `plugins/${name}/.claude-plugin/plugin.json`;
+    const changelog = `plugins/${name}/CHANGELOG.md`;
+    const before = new Set(read(join(snapshot, changelog)).split("\n"));
+
+    return {
+      plugin: name,
+      installed: installed.has(name),
+      version_before: JSON.parse(read(join(snapshot, manifest)) || "{}").version ?? null,
+      version_now: JSON.parse(readLive(repoRoot, manifest) || "{}").version ?? null,
+      changelog_added: readLive(repoRoot, changelog).split("\n").filter(l => l.trim() && !before.has(l)),
+    };
+  });
+}
+
+/** Own contributions with a commit already contained in the watched ref. */
+function mergedContributions(repoRoot, ref, config) {
+  return (config.contributions ?? []).filter(c => c.status === "pending" && c.commit).filter(c => {
+    try {
+      execFileSync("git", ["-C", repoRoot, "merge-base", "--is-ancestor", c.commit, ref], { stdio: "ignore" });
+
+      return true;
+    }
+    catch {
+      return false;
+    }
+  });
+}
+
+const repoRoot = resolveTarget(process.argv[2]);
 
 if (!repoRoot) {
-  console.error("No estas dentro de un repositorio git.");
+  console.error("No estas dentro de un repositorio git, ni el argumento es un proyecto con upstream.");
   process.exit(1);
 }
 
+const watch = watchOf(repoRoot);
+const fetched = fetchWatched(repoRoot);
 const { snapshot } = upstreamPaths(repoRoot);
-const live = join(repoRoot, ".claude");
 const { status, since } = inspect(repoRoot);
-
-const seen = new Set([...listFiles(live), ...listFiles(snapshot)]);
+const config = watch.remote ? readJson(join(CLAUDE_DIR, "brain", "main-brain.json"), {}) : {};
 const entries = [];
 
-for (const file of [...seen].sort()) {
-  const now = read(join(live, file));
+for (const file of [...new Set([...liveFiles(repoRoot), ...listFiles(snapshot)])].sort()) {
+  const now = readLive(repoRoot, file);
   const before = read(join(snapshot, file));
 
   if (now === before)
     continue;
 
-  const skill = skillOf(file);
+  const piece = pieceOf(file, watch.remote);
+  const equivalents = watch.remote ? config.equivalents?.[piece] ?? [] : [];
 
   entries.push({
     file,
-    // "added" incluye el primer registro del repo: sin foto previa, todo se ve como nuevo.
     change: !before ? "added" : !now ? "removed" : "modified",
-    skill,
-    // Si el cerebro ya tiene una skill con ese nombre, lo del repo es un competidor, no un
-    // regalo: hay que mirar si aporta algo o si duplica lo que ya resolviste a tu manera.
-    overridden_by_brain: Boolean(skill && existsSync(join(BRAIN_SKILLS, skill))),
+    piece,
+    overridden_by_brain: watch.remote
+      ? equivalents.length > 0
+      : Boolean(piece && existsSync(join(CLAUDE_DIR, "skills", piece))),
+    brain_equivalents: equivalents,
     bytes_now: Buffer.byteLength(now),
     bytes_before: Buffer.byteLength(before),
   });
@@ -97,9 +119,13 @@ for (const file of [...seen].sort()) {
 
 console.log(JSON.stringify({
   repo: repoRoot,
+  watch,
+  fetched,
   status,
   reviewed_since: since,
   has_snapshot: existsSync(snapshot),
   git_changes: changedFiles(repoRoot, since),
+  plugins: watch.remote ? pluginSummary(repoRoot, snapshot, entries, config) : undefined,
+  merged_contributions: watch.remote ? mergedContributions(repoRoot, watch.ref, config) : undefined,
   entries,
 }, null, 2));

@@ -22,7 +22,7 @@
  * Se registra en `~/.claude/settings.json`, en `PostToolUse` con matcher `Bash`.
  */
 
-import { changedFiles, findRepoRoot, inspect } from "../brain/lib/upstream.mjs";
+import { changedFiles, findRepoRoot, inspect, watchOf } from "../brain/lib/upstream.mjs";
 
 /** Cuantos archivos se nombran en el aviso antes de resumir con "y N mas". */
 const FILES_TO_LIST = 8;
@@ -60,7 +60,14 @@ function integratesHistory(command) {
   if (/--dry-run|\bmerge-base\b|\bls-files\b/.test(command))
     return false;
 
-  return /\bgit\s+(pull|merge|rebase)\b/.test(command) || /\bgit\s+checkout\s+\S/.test(command);
+  return /\bgit\s+(?:-C\s+\S+\s+)?(pull|merge|rebase|fetch)\b/.test(command) || /\bgit\s+(?:-C\s+\S+\s+)?checkout\s+\S/.test(command);
+}
+
+/** Directory the git command ran in: its `-C <path>` if present, else the session cwd. */
+function commandDir(command, cwd) {
+  const path = command.match(/\bgit\s+-C\s+("[^"]+"|'[^']+'|\S+)/)?.[1]?.replace(/^["']|["']$/g, "");
+
+  return path ? path.replace(/^~(?=\/|$)/, process.env.HOME ?? "~") : cwd;
 }
 
 const payload = await readPayload();
@@ -73,9 +80,12 @@ const command = payload.tool_input?.command ?? "";
 if (!integratesHistory(command))
   quiet();
 
-const repoRoot = findRepoRoot(payload.cwd ?? process.cwd());
+const repoRoot = findRepoRoot(commandDir(command, payload.cwd ?? process.cwd()));
 
 if (!repoRoot)
+  quiet();
+
+if (/\bfetch\b/.test(command) && !/\bpull\b/.test(command) && !watchOf(repoRoot).remote)
   quiet();
 
 const { status, since } = inspect(repoRoot);
@@ -91,8 +101,11 @@ if (!files.length)
 const shown = files.slice(0, FILES_TO_LIST).map(line => `  ${line}`).join("\n");
 const rest = files.length > FILES_TO_LIST ? `\n  ...y ${files.length - FILES_TO_LIST} archivo(s) mas` : "";
 
+const { remote, ref, paths } = watchOf(repoRoot);
+const watched = remote ? `${paths.join(", ")} de ${ref}` : "`.claude/`";
+
 const context = [
-  `El comando que acabas de correr trajo cambios en el \`.claude/\` de ${repoRoot}`,
+  `El comando que acabas de correr trajo cambios en ${watched} de ${repoRoot}`,
   "que todavia no se han contrastado contra el cerebro propio (~/.claude).",
   "",
   "Archivos afectados desde la ultima revision:",
@@ -104,6 +117,6 @@ const context = [
 ].join("\n");
 
 process.stdout.write(`${JSON.stringify({
-  systemMessage: `El .claude/ de ${repoRoot.split("/").pop()} cambio (${files.length} archivo(s)). Revisando contra tu cerebro...`,
+  systemMessage: `${remote ? ref : "El .claude/"} de ${repoRoot.split("/").pop()} cambio (${files.length} archivo(s)). Revisando contra tu cerebro...`,
   hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: context },
 })}\n`);

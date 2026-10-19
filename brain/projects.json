@@ -49,6 +49,17 @@
         "/datos/proyectos/manual-tecnico"
       ]
     },
+    "main-brain": {
+      "label": "main-brain — marketplace de plugins de Claude Code del equipo",
+      "//": "No es un aplicativo: sync-brain lo vigila en la rama de upstream.ref (qa por ahora, despues prod) y contribute-main-brain le aporta por MR a qa.",
+      "repos": [
+        "/datos/proyectos/main-brain"
+      ],
+      "upstream": {
+        "ref": "origin/qa",
+        "paths": ["plugins", ".claude-plugin"]
+      }
+    },
     "infra": {
       "label": "Infraestructura — imagenes Docker y base de datos local",
       "//": "No es un aplicativo: publica las imagenes base de PHP del CI y el stack de postgres local que usan todos los demas proyectos.",

@@ -192,6 +192,8 @@ Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra r
 | Cambio una regla de negocio del back | `update-tech-docs` | Hook del push, o la pides |
 | Cambio algo que el usuario ve | `update-manual` | Hook del push, o al cerrar `fullstack-ticket` |
 | Un pull trajo cambios en `.claude/` | `sync-brain` | Hook del pull |
+| Un `fetch` de main-brain trajo cambios en sus plugins | `sync-brain` | Hook del fetch, o la pides |
+| Algo del cerebro debe compartirse con el equipo | `contribute-main-brain` | La pides tu |
 | Se cierra una sincronizacion o se va a commitear el cerebro | `brain-doctor` | Solo, desde `settle.mjs`; o la pides |
 | El codigo ya funciona y toca subirlo | `finish-development` | La pides tu. Es la pareja de `start-development` |
 | Hay que entregar el control de cambios | `gen-changes-controls` | Solo manual |
@@ -207,6 +209,7 @@ Lo que **no** hace: no commitea, no empuja, no resuelve divergencias, no borra r
 - **Generar el manual en un push.** Necesita Chrome, dev server, backend con datos y **revisar las
   capturas**. Tarda de 2 a 4 minutos y una corrida puede salir con el mapa a medio dimensionar.
 - **Absorber cambios del equipo.** `sync-brain` clasifica y recomienda; aprobar es tuyo.
+- **Abrir el merge request en main-brain.** `contribute-main-brain` deja la rama subida y el texto; el MR lo abres tu y lo mergea un Maintainer.
 - **Commitear.** Ninguna skill commitea en un repo de trabajo sin que lo pidas.
 - **Aprender por ti.** En modo practica hay clase antes del codigo, pero el codigo lo escribes tu:
   la skill da pistas graduadas y revisa, y no teclea. Salirse del modo lo decides tu, en cualquier

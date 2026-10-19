@@ -15,10 +15,10 @@
 import { spawnSync } from "node:child_process";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { findRepoRoot, markDismissed, markReviewed } from "../../../brain/lib/upstream.mjs";
+import { markDismissed, markReviewed, resolveTarget } from "../../../brain/lib/upstream.mjs";
 
 const [action, target] = process.argv.slice(2);
-const repoRoot = findRepoRoot(target ?? process.cwd());
+const repoRoot = resolveTarget(target);
 
 if (!repoRoot) {
   console.error("No estas dentro de un repositorio git.");
@@ -34,7 +34,7 @@ else if (action === "dismissed") {
   console.log(`Version descartada para ${repoRoot}. No se vuelve a avisar por esta version.`);
 }
 else {
-  console.error("Uso: node settle.mjs <reviewed|dismissed> [ruta-del-repo]");
+  console.error("Uso: node settle.mjs <reviewed|dismissed> [ruta-del-repo | clave-de-proyecto]");
   process.exit(1);
 }
 

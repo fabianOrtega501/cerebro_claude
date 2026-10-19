@@ -32,6 +32,7 @@ export function run(ctx) {
 	const filled = new Set([...secrets.matchAll(/^\s*([A-Z0-9_]+)\s*=\s*\S/gm)].map(m => m[1]));
 
 	const without = Object.keys(ctx.projects)
+		.filter(key => !ctx.projects[key].upstream)
 		.filter(key => !filled.has(`${key.toUpperCase()}_TEST_EMAIL`) || !filled.has(`${key.toUpperCase()}_TEST_PASSWORD`));
 
 	if (without.length)
