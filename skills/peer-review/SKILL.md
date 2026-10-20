@@ -123,8 +123,13 @@ simple, con respeto, directo y sin jerga innecesaria; cada comentario se entiend
 
 - Empieza por **lo que pasa o lo que se ve**, en palabras simples, y después el detalle técnico.
 - Sin jerga de framework cuando no aporta; si un término hace falta, se explica en una línea.
-- Nada de hashes, números de línea de diagnósticos ni códigos de reglas en el texto. El archivo basta
-  como ubicación; la línea, solo si el archivo es largo.
+- **Corto pero detallado.** *Qué noté*: máximo 2 o 3 frases: qué hace hoy el código, en qué caso concreto
+  falla (un dato o entrada de ejemplo) y qué ve el usuario o el sistema. *Por qué*: una frase con la regla y
+  su fuente. *Cómo podría quedar*: el cambio puntual. Nada de historia del módulo, precedentes ni
+  alternativas: lo que solo decide el usuario va en el chat.
+- Nada de hashes ni códigos de reglas en el texto. **Cada comentario lleva archivo y línea**:
+  `ruta/archivo.ext:42`, o `:42-51` si es un bloque. La línea es la del archivo en la rama revisada
+  (`git show origin/<rama>:<archivo> | grep -n`); si el MR ya se mezcló, la del commit del merge.
 - Ejemplos de código solo cuando el cambio no se entiende sin verlos, cortos y sin comentarios dentro.
 - **Sin datos privados**: IPs, hosts y URLs internas, tokens, contraseñas, contenido de `.env`, nombres
   de contenedores o bases, ni datos personales.
@@ -144,9 +149,9 @@ simple, con respeto, directo y sin jerga innecesaria; cada comentario se entiend
 ## Impide aprobar
 
 ### 1. <título corto en lenguaje claro>
-**Dónde:** `ruta/archivo.ext` (y otras ubicaciones si se repite)
-**Qué noté:** <el problema y el efecto concreto, en palabras simples>
-**Por qué hay que corregirlo:** <la regla y de dónde sale>
+**Dónde:** `ruta/archivo.ext:línea` (una por renglón si se repite)
+**Qué noté:** <2–3 frases: qué hace hoy, el caso concreto en que falla y su efecto>
+**Por qué hay que corregirlo:** <una frase: la regla y de dónde sale>
 **Cómo podría quedar:**
 ```<lenguaje>
 <antes y después, corto>
@@ -193,7 +198,7 @@ Lo corre `finish-development` en su Fase 1b, **siempre**, después de `review-ov
    `~/.claude/CLAUDE.md` (docblocks, comentarios, claves i18n al final, nombres de 5 palabras, solo
    lecturas al probar) y la lista de la memoria del proyecto (en AIO, `revision-de-pares-propia`), punto
    por punto, diciendo qué se verificó y cómo.
-5. **Entrega en el chat**, sin informe: la tabla de conteos por nivel y cada hallazgo con archivo, qué
+5. **Entrega en el chat**, sin informe: la tabla de conteos por nivel y cada hallazgo con archivo y línea, qué
    pasa, la regla y la corrección propuesta. **Lo que «Impide aprobar» o «Debe corregirse» se corrige, o
    el usuario lo acepta de forma explícita, antes de proponer el commit.** `finish-development` no sigue
    hasta que eso quede resuelto.
@@ -254,7 +259,7 @@ En este orden. Cada comentario cita **de dónde sale la regla**; sin respaldo, e
 | **Mejora sugerida** | Mejora claridad, reutilización o rendimiento, pero lo actual es aceptable |
 | **Pregunta** | No queda clara la intención; se pregunta en vez de suponer |
 
-Un mismo problema en varios archivos es **un** comentario con todas sus ubicaciones. Un arreglo sin
+Un mismo problema en varios archivos es **un** comentario con todas sus ubicaciones, cada una con su línea. Un arreglo sin
 prueba que lo proteja es «Debe corregirse»; un cambio de alcance global fuera del caso, «Impide
 aprobar». **Cada cita se verifica antes de escribirla.**
 
