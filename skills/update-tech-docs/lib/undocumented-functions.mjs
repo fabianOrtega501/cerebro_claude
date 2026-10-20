@@ -69,8 +69,42 @@ function addedLines(repo, from, to, file) {
 	return lines;
 }
 
+/** Text of the docblock that ends at line `end`, or `null` if that line does not close one. */
+function docblockEndingAt(lines, end) {
+	if (end < 0 || !lines[end].trim().endsWith("*/")) return null;
+
+	let start = end;
+
+	while (start > 0 && !lines[start].includes("/**")) start--;
+
+	return lines.slice(start, end + 1).join("\n");
+}
+
+/** Number of parameters in the signature that starts at `index`, which may span several lines. */
+function parameterCount(lines, index) {
+	let signature = "";
+
+	for (let i = index; i < lines.length && !signature.includes(")"); i++) signature += lines[i];
+
+	const inside = signature.slice(signature.indexOf("(") + 1, signature.indexOf(")"));
+
+	return (inside.match(/\$\w+/g) ?? []).length;
+}
+
+/** What a docblock lacks: `@return`, or one `@param` per argument. Swagger endpoints (`@OA\`) need neither. */
+function missingTags(doc, name, params) {
+	if (doc.includes("@OA\\")) return [];
+
+	const missing = [];
+
+	if (name !== "__construct" && !/@return\b/.test(doc)) missing.push("@return");
+	if ((doc.match(/@param\b/g) ?? []).length < params) missing.push("@param");
+
+	return missing;
+}
+
 /**
- * Funciones declaradas en un archivo PHP, con si llevan docblock justo encima.
+ * Funciones declaradas en un archivo PHP, con si llevan docblock justo encima y que etiquetas le faltan.
  * Se ignoran las anonimas (`function (`) y los `fn()`: no son unidades documentables.
  */
 function functionsIn(source) {
@@ -87,7 +121,14 @@ function functionsIn(source) {
 
 		while (cursor >= 0 && (lines[cursor].trim() === "" || lines[cursor].trim().startsWith("#["))) cursor--;
 
-		found.push({ name: match[1], line: index + 1, hasDoc: cursor >= 0 && lines[cursor].trim().endsWith("*/") });
+		const doc = docblockEndingAt(lines, cursor);
+
+		found.push({
+			name: match[1],
+			line: index + 1,
+			hasDoc: doc !== null,
+			missing: doc === null ? [] : missingTags(doc, match[1], parameterCount(lines, index)),
+		});
 	});
 
 	return found;
@@ -128,29 +169,39 @@ const pending = tip === "HEAD"
 	].filter(Boolean)
 	: [];
 
-const globs = profile.sourceGlobs ?? [];
+/*
+ * Docblocks apply to every PHP file, not only to business logic: tests and migrations need them too.
+ * `docGlobs` in the profile overrides the default; `sourceGlobs` stays for check-docs.mjs.
+ */
+const globs = profile.docGlobs ?? ["app", "database/migrations", "database/seeders", "tests"];
 const files = [...new Set([...committed, ...pending])]
 	.filter(f => f.endsWith(".php") && globs.some(g => f.startsWith(g)))
 	.filter(f => existsSync(join(repo, f)));
 
 const report = [];
+const label = f => `${f.name} (linea ${f.line})`;
+const withMissing = f => `${label(f)}: falta ${f.missing.join(" y ")}`;
 
 for (const file of files) {
 	// Con tip=HEAD interesa tambien lo pendiente: una funcion recien escrita aun no esta commiteada.
 	const added = addedLines(repo, forkPoint, tip === "HEAD" ? null : tip, file);
-	const funcs = functionsIn(readFileSync(join(repo, file), "utf8")).filter(f => !f.hasDoc);
+	const funcs = functionsIn(readFileSync(join(repo, file), "utf8"));
+	const undocumented = funcs.filter(f => !f.hasDoc);
+	const incomplete = funcs.filter(f => f.hasDoc && f.missing.length);
 
-	if (!funcs.length) continue;
+	if (!undocumented.length && !incomplete.length) continue;
 
 	report.push({
 		file,
-		nuevas: funcs.filter(f => added.has(f.line)).map(f => `${f.name} (linea ${f.line})`),
-		sinDoc: funcs.filter(f => !added.has(f.line)).map(f => `${f.name} (linea ${f.line})`),
+		nuevas: undocumented.filter(f => added.has(f.line)).map(label),
+		sinDoc: undocumented.filter(f => !added.has(f.line)).map(label),
+		incompletasNuevas: incomplete.filter(f => added.has(f.line)).map(withMissing),
+		incompletas: incomplete.filter(f => !added.has(f.line)).map(withMissing),
 	});
 }
 
-const totalNuevas = report.reduce((n, r) => n + r.nuevas.length, 0);
-const totalSinDoc = report.reduce((n, r) => n + r.sinDoc.length, 0);
+const totalNuevas = report.reduce((n, r) => n + r.nuevas.length + r.incompletasNuevas.length, 0);
+const totalSinDoc = report.reduce((n, r) => n + r.sinDoc.length + r.incompletas.length, 0);
 
 if (asJson) {
 	console.log(JSON.stringify({ repo, branch, base, archivos: report, totalNuevas, totalSinDoc }, null, 2));
@@ -167,10 +218,12 @@ if (!report.length) {
 for (const entry of report) {
 	console.log(`  ${entry.file}`);
 	for (const fn of entry.nuevas) console.log(`    NUEVA sin documentar:  ${fn}`);
+	for (const fn of entry.incompletasNuevas) console.log(`    NUEVA incompleta:      ${fn}`);
 	for (const fn of entry.sinDoc) console.log(`    ya existia sin doc:    ${fn}`);
+	for (const fn of entry.incompletas) console.log(`    ya existia incompleta: ${fn}`);
 	console.log("");
 }
 
-console.log(`${totalNuevas} funcion(es) nueva(s) sin documentar, ${totalSinDoc} preexistente(s) en archivos que tocas.`);
+console.log(`${totalNuevas} funcion(es) nueva(s) sin documentar o incompleta(s), ${totalSinDoc} preexistente(s) en archivos que tocas.`);
 
 process.exit(totalNuevas ? 1 : 0);

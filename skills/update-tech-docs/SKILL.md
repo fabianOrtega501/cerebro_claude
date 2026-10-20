@@ -34,9 +34,11 @@ node ~/.claude/skills/update-tech-docs/lib/undocumented-functions.mjs --project 
 El primero compara la rama actual contra el punto donde se separó de su base y dice **qué módulos
 tienen lógica cambiada y no tienen documentación tocada**. Sale 1 si hay pendientes.
 
-El segundo lista **las funciones sin docblock de los archivos que toca la rama**, separando las
-`nuevas` (declaradas en líneas añadidas) de las que `ya existían sin doc`. Sale 1 si hay funciones
-nuevas sin documentar.
+El segundo lista **las funciones sin docblock, o con el docblock incompleto (sin `@return` o con
+menos `@param` que argumentos), de los archivos PHP que toca la rama**, separando las `nuevas`
+(declaradas en líneas añadidas) de las que ya existían. Revisa `app/`, `database/migrations/`,
+`database/seeders/` y `tests/`, o lo que diga `docGlobs` en el perfil; los métodos con `@OA` no
+exigen etiquetas. Sale 1 si hay funciones nuevas sin documentar o incompletas.
 
 Opciones: `--base <rama>` si el nombre de la rama no codifica su origen, `--branch <rama>` para
 revisar otra sin cambiarse a ella, `--json` para procesar.
@@ -72,7 +74,7 @@ quien abre el archivo dentro de seis meses.
 archivos que el ticket no toca. Reescribir documentación ajena infla el MR y entierra el cambio
 real entre ruido.
 
-**Qué va dentro: máximo 2 renglones de prosa, más `@param` y `@return`.** Qué hace la pieza,
+**Qué va dentro: máximo 1,5 renglones de prosa, más `@param` y `@return`.** Qué hace la pieza,
 concreto —qué devuelve o qué cambia—, y sus entradas y salidas cuando la firma no las explique
 sola. Nada interno: ni el porqué de una condición, ni cómo funciona un operador, ni el orden de
 dos instrucciones.
@@ -98,7 +100,7 @@ public function nearbyAddress($visit)
 **Dónde va el porqué: ni en el docblock ni en un comentario suelto dentro del código.** Si la
 razón de que algo esté resuelto así importa, va en el `.md` de `docs/`.
 
-**Esa es la frontera entre los dos pasos de esta skill.** El docblock son 2 renglones y dice *qué
+**Esa es la frontera entre los dos pasos de esta skill.** El docblock es renglón y medio y dice *qué
 hace*. El `.md` de `docs/` no tiene ese límite y es justamente donde va el *por qué*: para eso
 existen las fases 4 y 5. Confundirlos es lo que produce docblocks de ocho renglones que tapan el
 código y `docs/` vacíos.
@@ -107,7 +109,7 @@ código y `docs/` vacíos.
 se negocia; el estilo de las anotaciones sí lo pone el estándar del repo.
 
 **Sentido común con lo trivial.** Un constructor que solo inyecta dependencias, o un getter de una
-línea, no gastan los dos renglones: una frase basta, o ninguna. El script los lista porque no sabe
+línea, no gastan el renglón y medio: una frase basta, o ninguna. El script los lista porque no sabe
 distinguir; distinguir es tu trabajo. Documentar lo obvio es tan dañino como no documentar lo
 importante: enseña a saltarse los docblocks.
 
