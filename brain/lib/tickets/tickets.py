@@ -2,8 +2,8 @@
 """Trae un ticket de Mantis/GLPI con su HU, la convierte a Markdown y la deja en cache.
 
 Uso:
-  tickets.py fetch <mantis> [--glpi <codigo>] [--pick <fuente:id>]   # baja todo de nuevo
-  tickets.py fetch --glpi <codigo> [--pick <fuente:id>]               # sin ticket de Mantis
+  tickets.py fetch <mantis> [--glpi <codigo>] [--pick <fuente:id>[,<fuente:id>]]   # baja todo de nuevo
+  tickets.py fetch --glpi <codigo> [--pick <fuente:id>[,<fuente:id>]]               # sin ticket de Mantis
   tickets.py check <clave>          # la HU del cache sigue siendo la vigente?
   tickets.py current [<dir>]        # clave del ticket segun la rama del repo
   tickets.py assigned               # tickets de Mantis asignados al usuario del token
@@ -35,6 +35,9 @@ HU_PATTERN = re.compile(r"TI-PR-0005-F02", re.I)
 
 # Si la misma HU viene en varios formatos, se lee la primera de esta lista.
 READ_PREFERENCE = [".docx", ".pdf"]
+
+# Attachments with no text converter: hu.md only lists them so they are read as images.
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
 
 BRANCH_TICKET = re.compile(r"^(?:feature|hotfix)/(\d+)-")
 
@@ -77,8 +80,8 @@ def _ticket_md(issue):
     return "\n".join(lines) + "\n"
 
 
-def _candidates(mantis_id, issue, glpi_code):
-    """HU candidatas de las dos fuentes: [{source, id, name}] y el titulo del caso de GLPI."""
+def _candidates(mantis_id, issue, glpi_code, pick=None):
+    """HU candidates from both sources and the GLPI case title; with `pick`, every attachment is a candidate."""
     found, op, case_title, all_docs = [], None, None, []
     if glpi_code:
         op = glpi.session()
@@ -92,7 +95,7 @@ def _candidates(mantis_id, issue, glpi_code):
     if not all_docs:
         raise Stop(3, "El ticket no tiene adjuntos. La HU puede estar en un caso relacionado o el requerimiento "
                       "vive solo en la descripcion: pide la HU al usuario si la descripcion no alcanza.")
-    found = [d for d in all_docs if HU_PATTERN.search(d["name"])]
+    found = all_docs if pick else [d for d in all_docs if HU_PATTERN.search(d["name"])]
     if not found:
         raise Stop(4, "Hay adjuntos pero ninguno parece una HU (TI-PR-0005-F02).", attachments=all_docs)
     return found, op, case_title
@@ -101,8 +104,9 @@ def _candidates(mantis_id, issue, glpi_code):
 def _choose(found, pick):
     """Las HU a bajar: la elegida con --pick, o todas si son la misma HU en varios formatos."""
     if pick:
-        chosen = [d for d in found if f"{d['source']}:{d['id']}" == pick]
-        if not chosen:
+        picks = {p.strip() for p in pick.split(",") if p.strip()}
+        chosen = [d for d in found if f"{d['source']}:{d['id']}" in picks]
+        if len(chosen) != len(picks):
             raise Stop(5, f"--pick {pick} no esta entre las candidatas.", candidates=found)
         return chosen
     if len({_stem(d["name"]) for d in found}) > 1:
@@ -111,18 +115,29 @@ def _choose(found, pick):
     return found
 
 
+def _reset_folder(folder):
+    """Empties the ticket cache folder: only this run's files count."""
+    if folder.exists():
+        shutil.rmtree(folder)
+    folder.mkdir(parents=True, mode=0o700)
+
+
 def fetch(mantis_id, glpi_code, pick):
     issue = mantis.issue(mantis_id) if mantis_id else None
     if issue and not glpi_code:
         glpi_code = str(mantis.custom_fields(issue).get("Codigo GLPI", "")).strip() or None
     key = str(mantis_id) if mantis_id else f"glpi-{glpi_code}"
-    found, op, case_title = _candidates(mantis_id, issue, glpi_code)
-    chosen = _choose(found, pick)
-
     folder = CACHE / key
-    if folder.exists():
-        shutil.rmtree(folder)  # solo cuenta la HU de esta ejecucion
-    folder.mkdir(parents=True, mode=0o700)
+    try:
+        found, op, case_title = _candidates(mantis_id, issue, glpi_code, pick)
+    except Stop as stop:
+        if issue and stop.code in (3, 4):
+            _reset_folder(folder)
+            (folder / "ticket.md").write_text(_ticket_md(issue), encoding="utf-8")
+            stop.data["ticket_md"] = str(folder / "ticket.md")
+        raise
+    chosen = _choose(found, pick)
+    _reset_folder(folder)
 
     files = []
     for doc in chosen:
@@ -136,7 +151,12 @@ def fetch(mantis_id, glpi_code, pick):
 
     files.sort(key=lambda f: READ_PREFERENCE.index(Path(f["file"]).suffix)
                if Path(f["file"]).suffix in READ_PREFERENCE else 99)
-    markdown, info = convert(files[0]["file"])
+    images = [f["file"] for f in files if Path(f["file"]).suffix in IMAGE_EXTENSIONS]
+    if len(images) == len(files):
+        markdown = "# Adjuntos sin HU\n\nSon imagenes: se leen con Read.\n\n" + "".join(f"- {p}\n" for p in images)
+        info = {"engine": "none", "images": images}
+    else:
+        markdown, info = convert(next(f["file"] for f in files if f["file"] not in images))
     pdfs = [f["file"] for f in files if f["file"].endswith(".pdf")]
     if pdfs and "pages_with_images" not in info:
         # El DOCX no tiene paginas: las imagenes se ubican en el PDF de la misma HU.
@@ -151,7 +171,8 @@ def fetch(mantis_id, glpi_code, pick):
     meta = {"key": key, "mantis": mantis_id, "glpi": glpi_code, "glpi_title": case_title,
             "mantis_updated_at": issue.get("updated_at") if issue else None,
             "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "hu": files, "candidates_seen": found, "read_from": files[0]["file"], "conversion": info}
+            "hu": files, "candidates_seen": found, "picked": bool(pick), "read_from": files[0]["file"],
+            "conversion": info}
     (folder / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
     emit(0, key=key, folder=str(folder), hu_md=str(folder / "hu.md"),
          ticket_md=str(folder / "ticket.md") if issue else None,
@@ -171,7 +192,7 @@ def check(key):
         now += [{"source": "glpi", "id": d, "name": n} for d, n in glpi.attachments(op, meta["glpi"])]
     if issue:
         now += [{"source": "mantis", "id": d, "name": n} for d, n in mantis.attachments(issue)]
-    now = {(d["source"], d["id"]) for d in now if HU_PATTERN.search(d["name"])}
+    now = {(d["source"], d["id"]) for d in now if meta.get("picked") or HU_PATTERN.search(d["name"])}
     before = {(d["source"], d["id"]) for d in meta.get("candidates_seen", meta["hu"])}
     changes = []
     if now != before:

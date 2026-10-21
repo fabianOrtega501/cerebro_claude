@@ -47,7 +47,7 @@ Segun el `code` que devuelva:
 | 0 | Listo | Seguir al paso 3 |
 | 2 | El caso no abre (no existe o sin permiso) | Decirlo: casi siempre el `Codigo GLPI` del ticket esta mal. Pedir el correcto |
 | 3 | Sin adjuntos | Trabajar con `ticket.md` si alcanza; si no, **pedir la HU al usuario** |
-| 4 | Hay adjuntos, ninguno es HU | Mostrar la lista y preguntar cual es. No elegir |
+| 4 | Hay adjuntos, ninguno es HU | El `ticket.md` ya queda en cache: leerlo. Mostrar la lista y preguntar cuales usar, sin elegir. Relanzar con `--pick` sobre cualquier adjunto, varios separados por coma (`--pick glpi:1,glpi:2`). Si son imagenes, `hu.md` las lista para leerlas con Read |
 | 5 | Varias HU candidatas | Mostrar las candidatas y preguntar; relanzar con `--pick fuente:id` |
 | 6 | Falta una credencial | Decir la linea exacta que falta en `secrets.env`. **No inventarla ni reusar otra** |
 | 7 | Sin conexion o login rechazado | Si es timeout y el usuario esta fuera de la red corporativa, preguntar por la VPN |
