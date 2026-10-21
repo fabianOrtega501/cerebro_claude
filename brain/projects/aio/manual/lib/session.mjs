@@ -15,6 +15,7 @@ import {
 	connectPage,
 	evaluate,
 	injectOnLoad,
+	insertText,
 	launchChrome,
 	pressEscape,
 	requestCount,
@@ -931,4 +932,80 @@ export async function goTo(cdp, base, path, { selector = null, text = null } = {
 	await wait(1500);
 	if (selector) await waitForSelector(cdp, selector, { timeout: 90000 });
 	if (text) await waitForText(cdp, text, { timeout: 90000 });
+}
+
+/**
+ * Hace clic real en el botón del diálogo abierto que termina en `text`, llevándolo antes a la vista.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @param {string} text - Final del texto del botón, por ejemplo "Editar" o "Cerrar"
+ * @returns {Promise<void>}
+ * @throws {Error} Si no hay diálogo visible o el botón no está en él
+ */
+export async function clickDialogButton(cdp, text) {
+	const point = await evaluate(
+		cdp,
+		`(() => { const dialog = [...document.querySelectorAll('.v-dialog')].filter(e => e.getClientRects().length).pop();
+      const btn = dialog && [...dialog.querySelectorAll('button')].filter(b => b.offsetParent)
+        .find(b => b.textContent.trim().replace(/\\s+/g, ' ').endsWith(${JSON.stringify(text)}));
+      if (!btn) return null;
+      btn.scrollIntoView({ block: 'center' });
+      const r = btn.getBoundingClientRect();
+      return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) }; })()`,
+	);
+
+	if (!point) throw new Error(`No está el botón "${text}" en el diálogo abierto. Pantalla:\n${await describeScreen(cdp)}`);
+
+	await wait(300);
+	await clickAt(cdp, point.x, point.y);
+}
+
+/**
+ * Cierra el menú abierto de un select con un clic en el título del diálogo; sin diálogo, con Escape.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @returns {Promise<void>}
+ */
+export async function closeSelectMenu(cdp) {
+	const point = await evaluate(
+		cdp,
+		`(() => { const titles = [...document.querySelectorAll('.v-dialog .v-card-title, .v-dialog .v-card-item')]
+        .filter(e => e.offsetParent);
+      const title = titles.pop(); if (!title) return null;
+      const r = title.getBoundingClientRect();
+      return { x: Math.round(r.left + 20), y: Math.round(r.top + r.height / 2) }; })()`,
+	);
+
+	if (point) await clickAt(cdp, point.x, point.y);
+	else await pressEscape(cdp);
+
+	await wait(500);
+}
+
+/**
+ * Escribe `term` en un `AppAutocomplete`, devuelve las opciones que quedan y deja el buscador vacío.
+ *
+ * @param {object} cdp - Conexión devuelta por `connectPage`
+ * @param {string} inputSelector - Selector del input; usar `appField(id)`
+ * @param {string} term - Texto a buscar
+ * @returns {Promise<string[]>} Textos del menú; `["No data available"]` si nada coincide
+ */
+export async function searchSelectOptions(cdp, inputSelector, term) {
+	await openSelect(cdp, inputSelector);
+	await insertText(cdp, term);
+	await wait(1200);
+
+	const found = await evaluate(
+		cdp,
+		`[...document.querySelectorAll('.v-overlay--active .v-list-item')].map(e => e.textContent.trim())`,
+	);
+
+	await evaluate(
+		cdp,
+		`(() => { const input = [...document.querySelectorAll(${JSON.stringify(inputSelector)})].filter(e => e.offsetParent).pop();
+      if (input) { input.value = ''; input.dispatchEvent(new Event('input', { bubbles: true })); } })()`,
+	);
+	await closeSelectMenu(cdp);
+
+	return found;
 }
