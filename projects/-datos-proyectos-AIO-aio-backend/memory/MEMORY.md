@@ -30,3 +30,4 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [revision-de-pares-propia](revision-de-pares-propia.md) — Antes del commit, revisar el diff con la lista de 12 fallas que devolvió la revisión de pares del 11411
 - [vscode-autoguardado-pisa-cambios](vscode-autoguardado-pisa-cambios.md) — El autoguardado de VS Code deshace los cambios hechos con git checkout o git apply; confirmar con git diff antes del add
 - [glpi-es-el-codigo-glpi-de-mantis](glpi-es-el-codigo-glpi-de-mantis.md) — El GLPI de un ticket es solo el campo "Codigo GLPI" de Mantis; el id de un adjunto es un docid, no un caso
+- [cierre-con-todas-las-documentaciones](cierre-con-todas-las-documentaciones.md) — Al cerrar un desarrollo se hacen siempre manual, control de cambios y set de pruebas, sin preguntar cuáles
