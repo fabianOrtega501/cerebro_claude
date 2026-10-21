@@ -403,6 +403,16 @@ repo no está registrado y no aplica nada. Se corre con `cd` a `aio-app` o `aio-
 ruta absoluta del `seed.sql`. Lo mismo vale para `copy-to-manual.mjs` y `prepare-branch.mjs`, que
 además piden `AIO_MANUAL_WEB` si el repo no la tiene en su `settings.local.json`.
 
+**`copy-to-manual.mjs` descarta las capturas JPG** por «recorte fallido»: su validación de tamaño
+lee la cabecera como PNG y en un JPG obtiene medidas absurdas (65536 × 4.292.542.531). Las páginas
+del Dashboard de Despachos publican `.jpg`, así que esas se copian con `cp` a la ruta del mapeo,
+después de revisarlas con Read. Pasó el 2026-10-21.
+
+**Dashboard de Despachos: los datos del usuario de pruebas no sirven para capturar.** Las tarjetas
+solo cuentan los centros operativos asignados al usuario, y en local los días con despachos son de
+centros que él no tiene. `modules/operations/dispatches-overview/seed.sql` arma el 28/09/2026 de
+Empresa Demo con seis despachos sobre las rutas del plan del lunes; la captura usa ese día.
+
 ## Al terminar, en este repo
 
 **Levantar el dev server reescribe `components.d.ts`**, que regenera `unplugin-vue-components` al

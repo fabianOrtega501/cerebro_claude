@@ -26,6 +26,7 @@ import { MAPPINGS as maintenanceSystems } from "./modules/maintenance/systems/ma
 import { MAPPINGS as maintenanceWorkOrders } from "./modules/maintenance/work-orders/mappings.mjs";
 import { MAPPINGS as mobileVisits } from "./modules/mobile/visits/mappings.mjs";
 import { MAPPINGS as operationsDispatches } from "./modules/operations/dispatches/mappings.mjs";
+import { MAPPINGS as operationsDispatchesOverview } from "./modules/operations/dispatches-overview/mappings.mjs";
 import { MAPPINGS as operationsIssues } from "./modules/operations/issues/mappings.mjs";
 import { MAPPINGS as operationsPqrs } from "./modules/operations/pqrs/mappings.mjs";
 import { MAPPINGS as operationsRoutes } from "./modules/operations/routes/mappings.mjs";
@@ -38,7 +39,7 @@ import { MAPPINGS as respelServiceProvisions } from "./modules/respel/service-pr
 import { MAPPINGS as respelDashboards } from "./modules/respel/dashboards/mappings.mjs";
 import { MAPPINGS as publicCitizenPortal } from "./modules/public/citizen-portal/mappings.mjs";
 
-const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceIssues, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsIssues, ...operationsPqrs, ...operationsRoutes, ...operationsTraining, ...respelBranches, ...respelClients, ...respelClientLoyalties, ...respelClientOperationCosts, ...respelServiceProvisions, ...respelDashboards, ...publicCitizenPortal };
+const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceIssues, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsDispatchesOverview, ...operationsIssues, ...operationsPqrs, ...operationsRoutes, ...operationsTraining, ...respelBranches, ...respelClients, ...respelClientLoyalties, ...respelClientOperationCosts, ...respelServiceProvisions, ...respelDashboards, ...publicCitizenPortal };
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {
