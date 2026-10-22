@@ -20,8 +20,14 @@ queden aqui y a la sesion principal solo le llegue el resumen.**
    ```
 
 2. Mira `code` en el JSON de salida. **Si no es 0, para ahi**: devuelve el codigo, el `message`
-   y, si vienen, la lista de `candidates` o `attachments` tal cual. No elijas tu una HU ni
-   reintentes con otro `--pick`: eso lo decide quien te llamo.
+   y, si vienen, la lista de `candidates` o `attachments`: cada adjunto con su `label`
+   (`documento 59493 del GLPI 57871 (nombre.pdf)`) y, aparte, su llave de `--pick`
+   (`glpi:59493`). No elijas tu una HU ni reintentes con otro `--pick`: eso lo decide quien te
+   llamo.
+
+   **El `id` de un adjunto es el numero del documento, no un caso.** El GLPI del ticket es solo
+   el campo `Codigo GLPI` de Mantis. Nunca escribas `GLPI 59493` ni `glpi:59493` como si fuera
+   el caso: la forma `fuente:id` solo va dentro del comando `--pick`.
 
 3. Si es 0, lee con Read `ticket_md` (si no es null) y `hu_md`. **Nunca leas el PDF ni el DOCX
    originales**: el hook `hu-pdf-guard` lo niega y el `.md` ya tiene todo el texto.
@@ -36,7 +42,7 @@ parafrasees: quien te llamo va a planear contra esas palabras.
 
 ```
 ticket: 10842 — <resumen de Mantis> | GLPI 56226 | estado: asignada
-hu: <ruta de hu.md> (~2.500 tokens, desde hu-glpi-123.pdf)
+hu: <ruta de hu.md> (~2.500 tokens, desde el documento 123 del GLPI 56226)
 sistema/modulo: AIO - AMI / Green - Visitas Clientes
 impacto/prioridad: Bajo / Alto
 objetivo: <una o dos frases>

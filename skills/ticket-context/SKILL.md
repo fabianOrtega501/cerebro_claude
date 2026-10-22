@@ -52,6 +52,11 @@ Segun el `code` que devuelva:
 | 6 | Falta una credencial | Decir la linea exacta que falta en `secrets.env`. **No inventarla ni reusar otra** |
 | 7 | Sin conexion o login rechazado | Si es timeout y el usuario esta fuera de la red corporativa, preguntar por la VPN |
 
+**Al mostrar adjuntos o candidatas, se usa su `label`**: `documento 59493 del GLPI 57871
+(nombre.pdf)`. El `id` de un adjunto es el numero del documento dentro del caso, no un GLPI;
+el GLPI del ticket es solo el campo `Codigo GLPI` de Mantis. La forma `glpi:59493` es la llave
+de `--pick` y no sale del comando: escrita en una pregunta, se lee como si fuera otro caso.
+
 Si la misma HU viene en PDF y DOCX, se bajan las dos y `hu.md` sale del DOCX: sus tablas salen limpias.
 
 ## Paso 3 — Leer lo que haga falta, nada mas

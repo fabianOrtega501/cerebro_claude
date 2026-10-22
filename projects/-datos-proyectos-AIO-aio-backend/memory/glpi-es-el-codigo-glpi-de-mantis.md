@@ -5,11 +5,11 @@ metadata:
   node_type: memory
   type: feedback
   originSessionId: df811c99-3ccb-4226-996f-01a8e2ee0efd
-  modified: 2026-10-21T19:16:24.928Z
+  modified: 2026-10-22T19:08:28.984Z
 ---
 
-Al hablar del GLPI de un ticket solo se cita el campo "Codigo GLPI" del ticket de Mantis (en el 11467, el 57766). El id que `tickets.py` muestra para un adjunto (`glpi:59376`) es el `docid` del documento dentro de ese caso, no otro caso: se presenta como "doc 59376 del GLPI 57766".
+Al hablar del GLPI de un ticket solo se cita el campo "Codigo GLPI" del ticket de Mantis (en el 11467, el 57766; en el 11488, el 57871). El id de un adjunto es el `docid` del documento dentro de ese caso, no otro caso. Desde el 2026-10-22, `tickets.py` trae cada adjunto con su `case` y un `label` listo para mostrar ("documento 59493 del GLPI 57871 (nombre.pdf)"): se muestra ese `label`, y `glpi:<id>` solo va dentro del comando `--pick`.
 
-**Why:** en el ticket 11467 presenté `glpi:59376` como si fuera el GLPI y Fabian creyó que el ticket apuntaba a otro caso. Lo pidió el 2026-10-21.
+**Why:** en el 11467 presenté `glpi:59376` como si fuera el GLPI. La memoria sola no bastó: en el 11488 volví a escribir `glpi:59493`, y Fabian pidió el 2026-10-22 corregirlo en la fuente (script, agente `ticket-reader` y skill `ticket-context`).
 
-**How to apply:** en cualquier resumen, pregunta o reporte de `ticket-context`, el GLPI sale del campo "Codigo GLPI"; los adjuntos se nombran con su docid y el caso al que pertenecen.
+**How to apply:** en cualquier resumen, pregunta o reporte de `ticket-context`, el GLPI sale del campo "Codigo GLPI" y los adjuntos se nombran con su `label`. Si una salida vieja no trae `label`, se arma igual: "documento <id> del GLPI <Codigo GLPI>".

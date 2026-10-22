@@ -80,6 +80,13 @@ def _ticket_md(issue):
     return "\n".join(lines) + "\n"
 
 
+def _doc(source, docid, name, case):
+    """Adjunto con su caso de origen y la etiqueta para mostrarlo: el docid nunca se presenta como un GLPI."""
+    where = f"del GLPI {case}" if source == "glpi" else f"del Mantis {case}"
+    return {"source": source, "id": docid, "name": name, "case": case,
+            "label": f"documento {docid} {where} ({name})"}
+
+
 def _candidates(mantis_id, issue, glpi_code, pick=None):
     """HU candidates from both sources and the GLPI case title; with `pick`, every attachment is a candidate."""
     found, op, case_title, all_docs = [], None, None, []
@@ -89,9 +96,9 @@ def _candidates(mantis_id, issue, glpi_code, pick=None):
         if case_title is None:
             raise Stop(2, f"El caso GLPI {glpi_code} no se pudo abrir: no existe o el usuario no tiene permiso. "
                           "Revisa el campo 'Codigo GLPI' del ticket de Mantis.")
-        all_docs += [{"source": "glpi", "id": d, "name": n} for d, n in glpi.attachments(op, glpi_code)]
+        all_docs += [_doc("glpi", d, n, glpi_code) for d, n in glpi.attachments(op, glpi_code)]
     if issue:
-        all_docs += [{"source": "mantis", "id": d, "name": n} for d, n in mantis.attachments(issue)]
+        all_docs += [_doc("mantis", d, n, mantis_id) for d, n in mantis.attachments(issue)]
     if not all_docs:
         raise Stop(3, "El ticket no tiene adjuntos. La HU puede estar en un caso relacionado o el requerimiento "
                       "vive solo en la descripcion: pide la HU al usuario si la descripcion no alcanza.")
@@ -189,14 +196,16 @@ def check(key):
     op = glpi.session() if meta["glpi"] else None
     now = []
     if op:
-        now += [{"source": "glpi", "id": d, "name": n} for d, n in glpi.attachments(op, meta["glpi"])]
+        now += [_doc("glpi", d, n, meta["glpi"]) for d, n in glpi.attachments(op, meta["glpi"])]
     if issue:
-        now += [{"source": "mantis", "id": d, "name": n} for d, n in mantis.attachments(issue)]
+        now += [_doc("mantis", d, n, meta["mantis"]) for d, n in mantis.attachments(issue)]
     now = {(d["source"], d["id"]) for d in now if meta.get("picked") or HU_PATTERN.search(d["name"])}
     before = {(d["source"], d["id"]) for d in meta.get("candidates_seen", meta["hu"])}
     changes = []
     if now != before:
-        changes.append(f"Cambiaron las HU adjuntas: nuevas {sorted(now - before)}, retiradas {sorted(before - now)}")
+        cases = {"glpi": meta["glpi"], "mantis": meta["mantis"]}
+        label = lambda docs: [f"documento {i} del {s.upper() if s == 'glpi' else s.capitalize()} {cases[s]}" for s, i in sorted(docs)]
+        changes.append(f"Cambiaron las HU adjuntas: nuevas {label(now - before)}, retiradas {label(before - now)}")
     if issue and issue.get("updated_at") != meta.get("mantis_updated_at"):
         changes.append(f"El ticket de Mantis se actualizo el {issue.get('updated_at', '')[:10]} "
                        "(nota o campo nuevo): revisa ticket.md despues de volver a bajarlo")
