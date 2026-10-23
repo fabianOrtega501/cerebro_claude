@@ -1,0 +1,15 @@
+anthropic.claude-code
+bierner.markdown-mermaid
+bmewburn.vscode-intelephense-client
+christian-kohler.npm-intellisense
+dbaeumer.vscode-eslint
+eamodio.gitlens
+esbenp.prettier-vscode
+ms-azuretools.vscode-containers
+ms-azuretools.vscode-docker
+ms-vscode-remote.remote-containers
+openai.chatgpt
+openai.codex-audio
+pkief.material-icon-theme
+sonarsource.sonarlint-vscode@5.10.0
+vue.volar

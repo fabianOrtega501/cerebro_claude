@@ -1,0 +1,15 @@
+{
+    "workbench.startupEditor": "none",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.browser.openLocalhostLinks": false,
+    "files.autoSave": "afterDelay",
+    "git.autofetch": true,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "claudeCode.preferredLocation": "panel",
+    "security.workspace.trust.untrustedFiles": "open",
+    "claudeCode.hideOnboarding": true,
+    "claudeCode.disableLoginPrompt": true,
+    "terminal.integrated.initialHint": false,
+    "sonarlint.pathToNodeExecutable": "/home/<usuario>/.nvm/versions/node/v24.x.x/bin/node",
+    "sonarlint.focusOnNewCode": true
+}

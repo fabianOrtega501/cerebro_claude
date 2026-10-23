@@ -30,4 +30,5 @@ condicion ("si hay mas de un monitor..."), no como dato.
 | Tema | Manual |
 |---|---|
 | Flameshot: capturas con la tecla `Print`, al portapapeles y a una carpeta | [aplicaciones/flameshot](aplicaciones/flameshot/README.md) |
+| VS Code: configuracion de usuario, atajos, extensiones y SonarQube conectado al servidor del equipo | [aplicaciones/vscode](aplicaciones/vscode/README.md) |
 | VPN de la empresa con strongSwan: tunel completo, DNS de la VPN y Docker por fuera | [red/vpn-ipsec](red/vpn-ipsec/README.md) |

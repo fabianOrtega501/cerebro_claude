@@ -1,0 +1,42 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "ctrl+[Semicolon]",
+        "command": "workbench.action.terminal.new"
+    },
+    {
+        "key": "ctrl+shift+space",
+        "command": "claude-vscode.editor.openLast"
+    },
+    // Teclado sin la tecla 102: menor, mayor y flecha de objeto
+    {
+        "key": "alt+[Comma]",
+        "command": "type",
+        "args": { "text": "<" },
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "alt+[Period]",
+        "command": "type",
+        "args": { "text": ">" },
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "alt+shift+[Period]",
+        "command": "type",
+        "args": { "text": "->" },
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "alt+[Comma]",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": { "text": "<" },
+        "when": "terminalFocus"
+    },
+    {
+        "key": "alt+[Period]",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": { "text": ">" },
+        "when": "terminalFocus"
+    }
+]
