@@ -39,6 +39,16 @@ export const MAPPINGS = {
 		"reciclaje-globo-escaneado.png": "Operaciones/ConsultaElementosPublico/ReciclajeVoluminosos/globo-escaneado.png",
 	},
 
+	// Canales de la empresa en el inicio y busqueda de varias rutas (capture-channels-routes.mjs).
+	"citizen-portal-channels-routes": {
+		"canales.png": "Operaciones/ConsultaElementosPublico/conectate-con-nosotros.png",
+		"buscar-ruta-modal.png": "Operaciones/ConsultaElementosPublico/HorariosRutas/buscar-ruta-modal.png",
+		"buscar-ruta-resultados.png": "Operaciones/ConsultaElementosPublico/HorariosRutas/buscar-ruta-resultados.png",
+		"selector-ruta.png": "Operaciones/ConsultaElementosPublico/HorariosRutas/selector-ruta.png",
+		"mapa-todas.png": "Operaciones/ConsultaElementosPublico/HorariosRutas/mapa-todas.png",
+		"mapa-todas-ficha.png": "Operaciones/ConsultaElementosPublico/HorariosRutas/mapa-todas-ficha.png",
+	},
+
 	// El bloque de verificacion de seguridad vive en dos pantallas distintas del portal, cada una
 	// con su documento: la consulta de radicado y el paso 4 del reporte de queja.
 	"citizen-portal-verification": {

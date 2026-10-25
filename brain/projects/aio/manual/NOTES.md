@@ -155,6 +155,11 @@ Cada uno de estos puntos costó una corrida fallida:
   fijo sobre el borde derecho y se come el campo que tenga debajo. En las capturas del bloque de
   verificacion se oculta por CSS (`.a11y-widget__fab`), que es lo que hace la vista `citizen-portal-verification`;
   el manual ya lo documenta aparte con `boton-accesibilidad.png`.
+- **El buscador de rutas del portal (`capture-channels-routes.mjs`) necesita clics de mouse reales.**
+  Un `element.click()` sobre los campos de Vuetify no abre su menú; se hace `clickAt` en el centro.
+  Las listas largas (municipios) son virtuales: la opción buscada no existe en el DOM hasta
+  desplazar la lista. Y tras **Buscar** sale el aviso verde «Rutas obtenidas» unos 2,5 s: hay que
+  esperar a que no haya `.v-snackbar--active` antes de capturar los resultados, o se cuela abajo.
 - **Dibujar en el `SignaturePad` tiene dos trampas.** La primera: los `mouseMoved` necesitan
   `buttons: 1`, porque sin el mapa de botones pulsados signature_pad los toma por un
   desplazamiento sin trazo y el lienzo queda vacio. La segunda: el lienzo del registro de
