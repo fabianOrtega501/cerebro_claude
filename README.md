@@ -27,6 +27,7 @@ cerebro solo enlaza, no copia.
 | Entender un modulo antes de tocarlo | `/explore-module` |
 | Guardar algo que no quiero repetir | `/manage-memory` |
 | Revisar el desarrollo de un companero (o el mio) con las reglas del equipo | `/peer-review <ticket>` |
+| Probar un desarrollo a fondo, archivo por archivo y flujo por flujo | `/prueba-integral` |
 | Saber si el cerebro esta sano | `/brain-doctor` |
 | Saber por que el computador esta lento, o como van actualizaciones y componentes | `/diagnose-machine` |
 | Trabajar contra desa, qa, pre o prod | `/ambiente qa lectura` (volver: `/ambiente local`) |
@@ -74,6 +75,7 @@ escribe codigo ni documentacion; avisa y se aparta.
 | `gen-test-set` | Set de pruebas manual, sacado del diff de la rama | — |
 | `review-overengineering` | Revisa el diff buscando lo que sobra: reimplementaciones, dependencias y abstracciones sin uso. Solo senala | — |
 | `peer-review` | Revision de pares: manual con el numero de ticket (Mantis o GLPI), sobre las ramas del companero, con informe para el; y modo propio, que `finish-development` corre siempre antes del commit de cierre. En GitLab solo lee | `brain/peer-reviews/` (fuera de git) |
+| `prueba-integral` | Deriva del diff todo lo que el cambio puede haber afectado y lo prueba flujo por flujo. Entrega una tabla de cobertura con una fila por archivo, y dice lo que no se probo. La corre `finish-development` en su Fase 2b | — |
 | `gen-sprint-summary` | La diapositiva del sprint: texto y PNG, desde las ramas de los ultimos dias | — |
 | `exploration-memory` | El mapa tecnico de un modulo, para no releer el mismo codigo cada ticket | `<proy>/exploration/` |
 | `explore-module` | Decide si vale la pena mapear un modulo y coordina al explorador | `<proy>/exploration/` |
