@@ -1,12 +1,24 @@
 ---
 name: sipa-roto-por-la-migracion
-description: "Inventario de ajustes de SIPA para status-api. El 7433 ya esta en desa; los servidores dependen de VUE_APP_API y no se despliega hasta salir a produccion con status-api."
+description: "Inventario de ajustes de SIPA para status-api. SIPA desa y qa ya apuntan a status-api; prod sigue en el monolito hasta que salga el nuevo STATUS."
 metadata: 
   node_type: memory
   type: project
   originSessionId: 9a89ba80-4bff-4132-ac32-32c94eb282b2
   modified: 2026-09-22T01:38:40.404Z
 ---
+
+## Estado al 2026-10-22
+
+- **SIPA desa y qa apuntan a status-api.** Un cambio de SIPA que dependa de status-api se despliega
+  ahi normalmente.
+- **SIPA prod apunta al monolito** hasta que el nuevo STATUS salga a produccion. Un desarrollo que
+  cambie SIPA y status-api a la vez llega a prod con esa salida, no antes.
+- **Riesgo concreto:** en un ambiente donde SIPA apunta al monolito, lo que SIPA guarda en una
+  columna que el monolito no conoce se pierde sin error, porque el monolito asigna columna por
+  columna. Se vio con `roles.aprobar_liquidacion`.
+
+Lo confirmo Fabian el 2026-10-22.
 
 ## Estado al 2026-10-08
 
