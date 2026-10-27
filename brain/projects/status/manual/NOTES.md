@@ -92,7 +92,13 @@ regenerar el ingreso.
 | Que se ve | De donde sale | Que hacer |
 |---|---|---|
 | El titulo dice `STATUS-LOCAL`, y en la barra superior `STATUS-LOCAL-PRUEBAS` | `VUE_APP_NAME_APP` del `.env` de `status-frontend`; `TheNavbarHorizontal` le suma el sufijo | Llamar a `usarNombrePublicado(cdp)` de `lib/session.mjs` justo antes de cada `screenshot`. Reemplaza el texto en el DOM, asi no hay que tocar el `.env` ni reiniciar el dev server |
-| El logo de la empresa sale como imagen rota en la barra | Las empresas de la base local tienen la columna `logo` vacia. La API responde bien: `status: warning`, *"El logo no se ha cargado aun"* | No es un defecto. Para capturar la barra hay que cargarle un logo a la empresa primero |
+| El logo sale como imagen rota en la barra superior | **Era un defecto del front**, no del ambiente: `layouts/components/Logo.vue` pedia `/images/logo/logo.png`, que no existe en `public/`; el archivo vive en `src/assets`. Corregido el 2026-10-26 | Ya no pasa. Si vuelve a verse roto, mirar primero esa ruta |
+
+> **Ojo con el diagnostico anterior.** Aqui decia que el logo roto venia de que las empresas de la
+> base local no tienen cargada su columna `logo`. Eso es cierto pero es **otro** logo: el de la
+> empresa, que la API sirve por `obtener-logo` y responde `status: warning` cuando no esta. El de la
+> barra superior es el del producto, estatico, y estaba roto por la ruta. Se confundieron los dos
+> hasta que QA lo reporto.
 | Un aviso rojo *"Error cargando datos de eficiencia: (permiso denegado)"* encima del tablero | El widget lee `bi.vw_balance_2`, que por `dblink` va al datawarehouse externo. Ese permiso no existe en local | **El tablero no se puede capturar desde local** mientras siga asi |
 
 `usarNombrePublicado` vive en `session.mjs` y no en el modulo porque le sirve a cualquier captura
