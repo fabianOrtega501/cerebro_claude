@@ -129,6 +129,31 @@ no que la ruta que escribiste exista.
 
 **Si algo falla, se arregla antes de seguir.** No se commitea un árbol que no compila.
 
+**En el front, el lint además del build.** El build compila un import que falta o una variable que
+no existe sin decir nada; el lint no. Dos de las devoluciones del 7433 —un import ausente y un
+`data is not defined`— eran exactamente eso y pasaron el build:
+
+```bash
+pnpm exec eslint src --ext .js,.vue --max-warnings 0   # o npm, según el preflight
+```
+
+Si el repo no tiene ESLint configurado, se dice y se sigue; no se instala nada en el cierre.
+
+## Fase 2b — Prueba integral
+
+Compilar y arrancar no es funcionar. Antes de commitear se corre la skill **`prueba-integral`**
+sobre cada repo del ticket: deriva del diff todo lo que el cambio puede haber afectado, lo prueba
+flujo por flujo y entrega la **tabla de cobertura**, con una fila por archivo.
+
+**Lo que no se probó se dice en la tabla.** Un "todo bien" sin tabla no cierra esta fase.
+
+El tamaño depende del cambio: una fila por archivo siempre; con «exhaustiva» —porque el usuario la
+pide o porque el diff pasa de ~20 archivos— se agregan los flujos ejecutados con evidencia, los
+casos límite y los consumidores en los otros repos.
+
+Lo pidió Fabian el 2026-10-27, tras cuatro devoluciones de QA en el 7433 que obligaron a tocar
+cincuenta archivos en una segunda revisión.
+
 ## Fase 3 — Decidir qué se sube
 
 Volver a correr `classify-changes.mjs` tras la limpieza y **enseñarle al usuario el reparto**:

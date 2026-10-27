@@ -336,6 +336,36 @@ Un dato puede pasar uno de estos casos y fallar otro: no se salta ninguno por ha
 anterior. El set de pruebas (`gen-test-set`) los incluye como casos, y antes de dar un desarrollo por
 terminado se corren yo mismo en pantalla.
 
+## Probar es cubrir el cambio entero, no lo que se me ocurra mirar
+
+Antes de commitear se corre la skill **`prueba-integral`**, que deriva del diff todo lo que el
+cambio puede haber afectado y entrega una **tabla de cobertura con una fila por archivo**. Rige en
+todos los proyectos. Lo pidio Fabian el 2026-10-27, despues de que el ticket 7433 volviera con
+cuatro devoluciones de QA y una segunda revision de cincuenta archivos.
+
+**La prueba se deriva del cambio, no de la intuicion.** En el 7433 se recorrieron 65 rutas y las
+cuatro devoluciones salieron igual: ninguna se rompia al abrir la pantalla, se rompian al usarla.
+
+Cuatro reglas que valen aunque la skill no este cargada:
+
+- **Se prueba el flujo, no la pantalla.** Hacer la accion con datos reales. "La vista carga" no es
+  un resultado.
+- **Se mide el entregable, no el insumo.** Si sale un PDF se inspecciona el PDF; si sale un Excel
+  se abre. Comprobar que el archivo de origen existe no prueba nada: las fuentes del acta estaban
+  en disco y el PDF salia con otra tipografia.
+- **Los casos que QA prueba primero**: el primer registro de un periodo, el estado abierto y no el
+  cerrado, la entidad sin datos, el campo vacio. Ahi aparecieron los dos bloqueantes del 7433.
+- **Toda correccion lleva una prueba que falle sin ella**, comprobado reintroduciendo el error. Una
+  prueba que no se vio fallar no esta verificada: esta escrita.
+
+**Como se dice el resultado.** No se escribe "verificado" sin la evidencia al lado —el numero, la
+salida, la captura—. Si no se ejecuto, se dice **"no lo probe"**, nunca "deberia funcionar". Y un
+conteo se cuenta antes de decirlo: afirmar "hay cuatro casos" y que sean dos quita credibilidad a
+todo el resto del informe.
+
+**Lo que no se probo se dice en la tabla.** Esconderlo es lo que convierte una prueba en una
+devolucion.
+
 ## La VPN solo hace falta desde fuera, y no afecta las bases locales
 
 **Primero: en que red esta el usuario.** En la **red corporativa** el GitLab interno
