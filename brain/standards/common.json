@@ -5,7 +5,7 @@
     {
       "id": "inline-comment",
       "kind": "inline-comment",
-      "files": "\\.(php|ts|js|mjs|vue)$",
+      "files": "^(?!.*\\.blade\\.php$).*\\.(php|ts|js|mjs|vue)$",
       "message": "Comentario suelto dentro del codigo. Solo se documenta la funcion con su docblock; el porque de una regla va a la documentacion tecnica (docs/).",
       "source": "~/.claude/CLAUDE.md, seccion Documentar funciones",
       "exceptions": []
