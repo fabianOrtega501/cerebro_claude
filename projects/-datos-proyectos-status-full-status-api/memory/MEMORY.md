@@ -11,3 +11,5 @@
 - [Reglas al escribir un Form Request](reglas-al-escribir-un-form-request.md) — las saca la tabla, no el controlador viejo; y boolean rompe lo que llega por FormData.
 - [Reemplazo masivo de un patrón](reemplazo-masivo-de-un-patron.md) — rompe lo que no debía tocar; revisar sitio por sitio después.
 - [Pruebas con datos que el front no envía](pruebas-con-datos-que-el-front-no-envia.md) — el payload se copia de la vista, no se inventa.
+- [El storage:link falla en silencio](storage-link-falla-en-silencio.md) — si la ruta ya está ocupada no crea el enlace, y toda descarga pública da 404 sin un error en el log.
+- [SIPA arma la URL de descarga](sipa-arma-la-url-de-descarga.md) — el enlace de la API es relativo al servidor, no al prefijo /api; recortar con replace es frágil.
