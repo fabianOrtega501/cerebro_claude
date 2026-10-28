@@ -61,18 +61,8 @@ function escapeHtml(text) {
 		.replace(/"/g, "&quot;");
 }
 
-/**
- * Columnas por fila y escala inicial de la letra para un slide de desarrollos.
- * @param {number} maxPerSection - Cajas de la seccion mas poblada
- * @param {number} total - Desarrollos del slide
- * @returns {{cols: number, scale: number}}
- */
-function layoutFor(maxPerSection, total) {
-	const cols = Math.min(Math.max(maxPerSection, 1), 4);
-	const scale = total <= 3 ? 1 : 0.9;
-
-	return { cols, scale };
-}
+/** Fixed columns per row: six boxes land as three on top and three below. */
+const COLUMNS = 3;
 
 /** HTML de una caja de desarrollo. */
 function cardHtml(dev, showTickets) {
@@ -100,16 +90,15 @@ function itemCardHtml(item) {
 /**
  * Secciones de color, una por grupo, con sus cajas ya armadas por `toCard`.
  * @param {{name: string, items: object[]}[]} groups - Grupos en el orden del slide
- * @param {number} cols - Columnas maximas por seccion
  * @param {(item: object) => string} toCard - Arma el HTML de una caja
  * @returns {string}
  */
-function sectionsHtml(groups, cols, toCard) {
+function sectionsHtml(groups, toCard) {
 	return groups.map((group, index) => {
 		const accent = group.accent ?? ACCENTS[index % ACCENTS.length];
 		const cards = group.items.map(toCard).join("\n");
 
-		return `\t\t<div class="section" style="--accent: ${accent}; --cols: ${Math.min(cols, group.items.length)}">\n`
+		return `\t\t<div class="section" style="--accent: ${accent}; --cols: ${COLUMNS}">\n`
 			+ `\t\t\t<div class="section-name">${escapeHtml(group.name)}</div>\n`
 			+ `\t\t\t<div class="cards">\n${cards}\n\t\t\t</div>\n\t\t</div>`;
 	}).join("\n");
@@ -143,8 +132,8 @@ function buildHtml({ author = "Fabian", showTickets = false, developments, subti
 		accent: ACCENTS[projects.indexOf(name) % ACCENTS.length],
 		items: developments.filter(d => (d.project ?? "Otros") === name),
 	}));
-	const { cols, scale } = layoutFor(Math.max(...grouped.map(g => g.items.length), 1), developments.length);
-	const sections = sectionsHtml(grouped, cols, dev => cardHtml(dev, showTickets));
+	const scale = developments.length <= 3 ? 1 : 0.9;
+	const sections = sectionsHtml(grouped, dev => cardHtml(dev, showTickets));
 
 	return { html: fillTemplate({ author, subtitle, scale, sections }), scale };
 }
@@ -172,7 +161,7 @@ function buildDevelopmentPages(data) {
 /** HTML de un slide de lista (`extraSlides`): grupos en tres columnas; la letra la ajusta la medicion. */
 function buildListHtml(slide, author = "Fabian") {
 	const groups = slide.groups ?? [];
-	const sections = sectionsHtml(groups, 3, itemCardHtml);
+	const sections = sectionsHtml(groups, itemCardHtml);
 
 	return { html: fillTemplate({ author, subtitle: slide.title, scale: 1, sections }), scale: 1 };
 }

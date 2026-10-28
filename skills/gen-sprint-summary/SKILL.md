@@ -170,7 +170,7 @@ Formato del JSON:
 `projects.json`. El orden de los desarrollos en el arreglo es el orden en la diapositiva.
 
 **De a seis por slide.** El renderizador toma los desarrollos en el orden del arreglo y arma un
-slide por cada seis. Cuando hay más de uno, cada slide lleva el subtítulo *Parte 1 de 2*. El
+slide por cada seis, en filas de tres cajas del mismo ancho: seis quedan tres arriba y tres abajo. Cuando hay más de uno, cada slide lleva el subtítulo *Parte 1 de 2*. El
 primero se llama `Retrospectiva_Sprint_<n>.png`, y los siguientes `_2`, `_3`…, antes de los de
 `extraSlides`. Para que un proyecto no quede partido entre dos imágenes, sus desarrollos van
 seguidos en el arreglo y el corte se cuadra en múltiplos de seis.
