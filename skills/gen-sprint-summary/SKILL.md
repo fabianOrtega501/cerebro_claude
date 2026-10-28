@@ -1,23 +1,23 @@
 ---
 name: gen-sprint-summary
 description: >-
-  Arma el RESUMEN DEL SPRINT en una sola diapositiva: lista los desarrollos que se iniciaron en los
+  Arma el RESUMEN DEL SPRINT en diapositivas de máximo seis desarrollos cada una: lista los desarrollos que se iniciaron en los
   últimos días hábiles barriendo los repos de producto del cerebro (los manuales quedan fuera:
   documentan un desarrollo, no son uno), y por cada uno responde las cinco
   preguntas del formato del equipo (Problema abordado, Valor generado, Decisión técnica relevante,
   Aprendizaje clave, Mejora futura). El borrador sale del diff real de las ramas; el usuario corrige.
-  Entrega el texto para copiar y un PNG de 1920x1080 listo para insertar como imagen en Google
+  Entrega el texto para copiar y uno o más PNG de 1920x1080 listos para insertar como imagen en Google
   Slides. No toca ramas, no commitea, no sube nada a ningún servicio y en base de datos no entra.
   USO MANUAL: se ejecuta SOLO cuando el usuario lo pide (/gen-sprint-summary o "arma el resumen del
   sprint"), nunca por iniciativa propia. Palabras gatillo: resumen del sprint, diapositiva del
   sprint, slide del sprint, cierre de sprint, qué hice este sprint, gen-sprint-summary.
 ---
 
-# Resumen del sprint en una diapositiva
+# Resumen del sprint en diapositivas
 
-Al cierre de cada sprint hay que entregar **una diapositiva por desarrollador**. La presentación
-completa junta la de todos; aquí se arma la de Fabian, con **todos los desarrollos en un solo
-slide**.
+Al cierre de cada sprint cada desarrollador entrega sus diapositivas. La presentación completa
+junta las de todos; aquí se arman las de Fabian, con **máximo seis desarrollos por slide**. Si hay
+más, el renderizador los reparte en varios slides; así ninguno queda cargado.
 
 Por cada desarrollo se responden siempre las mismas cinco preguntas:
 
@@ -82,10 +82,9 @@ recolector ya las agrupa y muestra los repos involucrados.
 Las ramas marcadas `[posible ruido]` (copias `-desa`, ramas de prueba, ramas de configuración) se
 muestran igual, pero se sugiere dejarlas fuera.
 
-**Con más de seis desarrollos el slide deja de leerse en proyección.** Si salen más, proponer un
-recorte razonado —los de más impacto para el usuario final, no los más largos de programar— y
-esperar el visto bueno. Dos desarrollos muy parecidos (tres tickets de permisos, por ejemplo) se
-pueden fundir en una caja, y conviene proponerlo.
+**Máximo seis desarrollos por slide.** Con más, no se recortan: van en varios slides de seis
+(ver la Fase 5). Dos desarrollos muy parecidos (tres tickets de permisos, por ejemplo) se pueden
+fundir en una caja, y conviene proponerlo.
 
 ## Fase 2 — Leer el diff de cada desarrollo
 
@@ -170,9 +169,15 @@ Formato del JSON:
 `project` es la etiqueta corta que se ve en el slide (`AIO`, `Epsilon`, `Status`), no la clave de
 `projects.json`. El orden de los desarrollos en el arreglo es el orden en la diapositiva.
 
+**De a seis por slide.** El renderizador toma los desarrollos en el orden del arreglo y arma un
+slide por cada seis. Cuando hay más de uno, cada slide lleva el subtítulo *Parte 1 de 2*. El
+primero se llama `Retrospectiva_Sprint_<n>.png`, y los siguientes `_2`, `_3`…, antes de los de
+`extraSlides`. Para que un proyecto no quede partido entre dos imágenes, sus desarrollos van
+seguidos en el arreglo y el corte se cuadra en múltiplos de seis.
+
 **Slides de lista.** Cuando un campo remite a algo que no cabe en una caja —los pendientes de una
 migración, por ejemplo—, va en un slide aparte con `extraSlides`. Cada uno sale como
-`Retrospectiva_Sprint_<n>_2.png`, `_3`…, con el mismo diseño y la medición de letra del principal:
+un PNG numerado después de los slides de desarrollos, con el mismo diseño y la medición de letra del principal:
 
 ```json
 "extraSlides": [
@@ -189,7 +194,7 @@ y `action` como *Qué hacer*. Si la caja habla de archivos, variables, vistas o 
 nombran**: en la reunión van a preguntar cuáles son.
 
 El renderizador **encoge la letra solo, midiendo en la página**, hasta que todo quepa; si avisa de
-que ni al mínimo cabe, hay texto cortado y toca quitar desarrollos o acortar frases. No ignorar ese
+que ni al mínimo cabe, hay texto cortado y toca acortar frases. No ignorar ese
 aviso: el recorte de CSS no se ve hasta que alguien lee el slide proyectado.
 
 Para insertarlo: en Google Slides, **Insertar > Imagen > Subir de tu computadora**. Google Slides no
@@ -205,7 +210,7 @@ importa HTML, por eso se entrega el PNG. Corregir una frase es editar el JSON y 
 | `Retrospectiva_Sprint_<n>.json` | La entrada del renderizador | No |
 | `Retrospectiva_Sprint_<n>.html` | La maqueta intermedia | No |
 | `Retrospectiva_Sprint_<n>.png` | Lo que se sube a Slides | No |
-| `Retrospectiva_Sprint_<n>_2.png`, … | Los slides de `extraSlides`, con su `.html` | No |
+| `Retrospectiva_Sprint_<n>_2.png`, … | Los slides siguientes de desarrollos y luego los de `extraSlides`, con su `.html` | No |
 
 El PNG llega a la presentación con el nombre puesto, sin depender de la carpeta que lo ubicaba.
 

@@ -16,6 +16,9 @@
  */
 
 import { execSync } from "node:child_process";
+import { readdirSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 /**
  * Puertos de depuración con un navegador vivo detrás.
@@ -69,6 +72,7 @@ const ports = process.argv.slice(2).length ? process.argv.slice(2) : debugPorts(
 
 if (!ports.length) {
 	console.log("No hay navegadores de automatización abiertos.");
+	console.log(`Perfiles temporales borrados: ${removeStaleProfiles()}.`);
 	process.exit(0);
 }
 
@@ -110,3 +114,21 @@ for (const port of [...new Set([...ports, ...debugPorts()])]) {
 }
 
 console.log(alive.length ? `\nAviso: siguen vivos los puertos ${alive.join(", ")}.` : "\nTodo limpio.");
+
+/**
+ * Deletes the `cdp-profile-*` folders in the temp dir that no running process uses.
+ * @returns {number} How many folders were removed
+ */
+function removeStaleProfiles() {
+	let inUse = "";
+
+	try { inUse = execSync("ps ax -o args=", { encoding: "utf8" }); } catch { return 0; }
+
+	const stale = readdirSync(tmpdir()).filter(name => name.startsWith("cdp-profile-") && !inUse.includes(name));
+
+	for (const name of stale) rmSync(join(tmpdir(), name), { recursive: true, force: true });
+
+	return stale.length;
+}
+
+console.log(`Perfiles temporales borrados: ${removeStaleProfiles()}.`);

@@ -7,8 +7,9 @@
  *   node render-slide.mjs --entrada d.json --sprint 18 --salida <otro-dir>
  *   node render-slide.mjs --entrada d.json --sprint 18 --solo-html    sin abrir Chrome
  *
- * Sin `--salida` escribe en `~/.claude/brain/sprints/Sprint_<n>`. Cada elemento de `extraSlides`
- * sale como un slide de lista aparte: `Retrospectiva_Sprint_<n>_2.png`, `_3`, …
+ * Sin `--salida` escribe en `~/.claude/brain/sprints/Sprint_<n>`. Los desarrollos van de a seis por
+ * slide, en el orden del JSON; cada slide de mas y cada elemento de `extraSlides` sale aparte:
+ * `Retrospectiva_Sprint_<n>_2.png`, `_3`, …
  *
  * El JSON de entrada:
  *   {
@@ -31,6 +32,9 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+
+/** Maximo de desarrollos por slide: con mas, el texto deja de leerse en proyeccion. */
+const PER_SLIDE = 6;
 
 /** Colores de cada seccion, en el orden en que aparecen los proyectos. */
 const ACCENTS = ["#2f5fd0", "#2f8f4e", "#b4600f", "#7a3fb0", "#0f7f8f"];
@@ -58,21 +62,16 @@ function escapeHtml(text) {
 }
 
 /**
- * Cuantas columnas por fila y cuanto encoger la letra, segun cuantas cajas tenga la seccion mas
- * poblada. Con mas de seis cajas el texto deja de leerse en proyeccion, y eso se avisa.
- *
+ * Columnas por fila y escala inicial de la letra para un slide de desarrollos.
  * @param {number} maxPerSection - Cajas de la seccion mas poblada
- * @param {number} sections - Cuantas secciones hay
- * @returns {{cols: number, scale: number, warn: string|null}}
+ * @param {number} total - Desarrollos del slide
+ * @returns {{cols: number, scale: number}}
  */
 function layoutFor(maxPerSection, total) {
 	const cols = Math.min(Math.max(maxPerSection, 1), 4);
-	const scale = total <= 3 ? 1 : total <= 6 ? 0.9 : total <= 9 ? 0.8 : 0.7;
-	const warn = total > 6
-		? `Son ${total} desarrollos: el texto va a quedar chico en proyección. Conviene dejar los 5 o 6 más relevantes.`
-		: null;
+	const scale = total <= 3 ? 1 : 0.9;
 
-	return { cols, scale, warn };
+	return { cols, scale };
 }
 
 /** HTML de una caja de desarrollo. */
@@ -107,7 +106,7 @@ function itemCardHtml(item) {
  */
 function sectionsHtml(groups, cols, toCard) {
 	return groups.map((group, index) => {
-		const accent = ACCENTS[index % ACCENTS.length];
+		const accent = group.accent ?? ACCENTS[index % ACCENTS.length];
 		const cards = group.items.map(toCard).join("\n");
 
 		return `\t\t<div class="section" style="--accent: ${accent}; --cols: ${Math.min(cols, group.items.length)}">\n`
@@ -132,14 +131,42 @@ function fillTemplate({ author, subtitle, scale, sections }) {
 		.replace("{{SECTIONS}}", `\n${sections}\n\t\t`);
 }
 
-/** HTML completo del slide de desarrollos, ya con la plantilla rellenada. */
-function buildHtml({ author = "Fabian", showTickets = false, developments = [] }) {
+/**
+ * HTML de un slide de desarrollos, ya con la plantilla rellenada.
+ * @param {{author?: string, showTickets?: boolean, developments: object[], subtitle?: string, projects: string[]}} slide - Contenido del slide; `projects` fija el color de cada proyecto
+ * @returns {{html: string, scale: number}}
+ */
+function buildHtml({ author = "Fabian", showTickets = false, developments, subtitle, projects }) {
 	const names = [...new Set(developments.map(d => d.project ?? "Otros"))];
-	const grouped = names.map(name => ({ name, items: developments.filter(d => (d.project ?? "Otros") === name) }));
-	const { cols, scale, warn } = layoutFor(Math.max(...grouped.map(g => g.items.length), 1), developments.length);
+	const grouped = names.map(name => ({
+		name,
+		accent: ACCENTS[projects.indexOf(name) % ACCENTS.length],
+		items: developments.filter(d => (d.project ?? "Otros") === name),
+	}));
+	const { cols, scale } = layoutFor(Math.max(...grouped.map(g => g.items.length), 1), developments.length);
 	const sections = sectionsHtml(grouped, cols, dev => cardHtml(dev, showTickets));
 
-	return { html: fillTemplate({ author, scale, sections }), warn, scale };
+	return { html: fillTemplate({ author, subtitle, scale, sections }), scale };
+}
+
+/**
+ * Parte los desarrollos en slides de `PER_SLIDE`, con subtitulo "Parte i de n" si son varios.
+ * @param {object} data - JSON de entrada
+ * @returns {{html: string, scale: number}[]}
+ */
+function buildDevelopmentPages(data) {
+	const developments = data.developments ?? [];
+	const projects = [...new Set(developments.map(d => d.project ?? "Otros"))];
+	const chunks = [];
+
+	for (let i = 0; i < Math.max(developments.length, 1); i += PER_SLIDE) chunks.push(developments.slice(i, i + PER_SLIDE));
+
+	return chunks.map((chunk, index) => buildHtml({
+		...data,
+		developments: chunk,
+		projects,
+		subtitle: chunks.length > 1 ? `Parte ${index + 1} de ${chunks.length}` : undefined,
+	}));
 }
 
 /** HTML de un slide de lista (`extraSlides`): grupos en tres columnas; la letra la ajusta la medicion. */
@@ -147,7 +174,7 @@ function buildListHtml(slide, author = "Fabian") {
 	const groups = slide.groups ?? [];
 	const sections = sectionsHtml(groups, 3, itemCardHtml);
 
-	return { html: fillTemplate({ author, subtitle: slide.title, scale: 1, sections }), warn: null, scale: 1 };
+	return { html: fillTemplate({ author, subtitle: slide.title, scale: 1, sections }), scale: 1 };
 }
 
 /**
@@ -268,7 +295,7 @@ async function main() {
 
 	const outDir = resolve((options.salida ?? join(process.env.HOME, ".claude", "brain", "sprints", `Sprint_${sprint}`)).replace(/^~/, process.env.HOME));
 	const pages = [
-		buildHtml(data),
+		...buildDevelopmentPages(data),
 		...(data.extraSlides ?? []).map(slide => buildListHtml(slide, data.author)),
 	].map((page, index) => {
 		const base = `Retrospectiva_Sprint_${sprint}${index === 0 ? "" : `_${index + 1}`}`;
@@ -281,8 +308,6 @@ async function main() {
 	for (const page of pages) {
 		writeFileSync(page.htmlPath, page.html);
 		console.log(`HTML: ${page.htmlPath}`);
-
-		if (page.warn) console.warn(`Aviso: ${page.warn}`);
 	}
 
 	if (options.soloHtml) return;

@@ -19,7 +19,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { spawn } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { once } from "node:events";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -126,6 +127,7 @@ function installSafetyNet() {
 		for (const browser of [...openBrowsers]) {
 			openBrowsers.delete(browser);
 			await closeWhateverIsOn(browser.port).catch(() => {});
+			await removeProfile(browser);
 			try { browser.process?.unref(); } catch { /* ya no está */ }
 		}
 
@@ -207,7 +209,7 @@ export async function launchChrome({ port = 9222, scale = 1 } = {}) {
 			if (response.ok) {
 				await response.json();
 
-				const handle = { process: process_, port };
+				const handle = { process: process_, port, profile };
 
 				openBrowsers.add(handle);
 
@@ -414,6 +416,8 @@ export async function closeBrowser(cdp, chrome) {
 	if (!cdp) {
 		if (chrome?.port) await closeWhateverIsOn(chrome.port).catch(() => {});
 
+		await removeProfile(chrome);
+
 		try { chrome?.process?.unref(); } catch { /* ya no está */ }
 
 		return;
@@ -446,7 +450,25 @@ export async function closeBrowser(cdp, chrome) {
 	 * **después** de haber terminado todas las capturas: el trabajo está hecho y el comando nunca
 	 * vuelve.
 	 */
+	await removeProfile(chrome);
 	chrome?.process?.unref();
+}
+
+/**
+ * Deletes the temporary Chrome profile once the browser exits (waits up to 5 s). Never throws.
+ * @param {{process?: object, profile?: string}|null} chrome - Handle returned by `launchChrome`
+ * @returns {Promise<void>}
+ */
+async function removeProfile(chrome) {
+	if (!chrome?.profile) return;
+
+	const child = chrome.process;
+
+	if (child && child.exitCode === null && child.signalCode === null) {
+		await Promise.race([once(child, "exit"), wait(5000)]).catch(() => {});
+	}
+
+	try { rmSync(chrome.profile, { recursive: true, force: true, maxRetries: 3 }); } catch { /* sigue en uso */ }
 }
 
 /**
