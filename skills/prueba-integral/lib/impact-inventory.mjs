@@ -228,14 +228,28 @@ const comoJson = args.includes("--json");
 const referencia = git(["rev-parse", "--verify", `origin/${base}`], repo).length
 	? `origin/${base}`
 	: base;
-const archivos = git(["diff", "--name-only", `${referencia}...HEAD`], repo)
+
+/** Fork point with the base, so the diff covers the branch and the working tree alike. */
+const bifurcacion = git(["merge-base", referencia, "HEAD"], repo).trim() || referencia;
+
+/** Files added but not yet staged; `git diff` alone never lists them. */
+const sinSeguimiento = git(["ls-files", "--others", "--exclude-standard"], repo)
 	.split("\n")
-	.filter((f) => f && !IGNORADAS.test(f));
+	.filter(Boolean);
+
+const archivos = [
+	...git(["diff", "--name-only", bifurcacion], repo).split("\n"),
+	...sinSeguimiento,
+]
+	.filter((f) => f && !IGNORADAS.test(f))
+	.filter((f, i, todos) => todos.indexOf(f) === i);
 
 const extra = args.flatMap((a, i) => (a === "--tambien" ? [args[i + 1]] : [])).filter(Boolean);
 const hermanos = [...new Set([...reposHermanos(repo), ...extra.map((r) => path.resolve(r))])].filter(existsSync);
 const inventario = archivos.map((archivo) => {
-	const diff = git(["diff", `${referencia}...HEAD`, "--", archivo], repo);
+	const diff = sinSeguimiento.includes(archivo)
+		? git(["diff", "--no-index", "/dev/null", archivo], repo)
+		: git(["diff", bifurcacion, "--", archivo], repo);
 	const simbolos = simbolosTocados(diff);
 
 	return {

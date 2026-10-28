@@ -31,6 +31,11 @@ node ~/.claude/skills/prueba-integral/lib/impact-inventory.mjs --base <rama base
 Por cada archivo devuelve que tipo de cambio es, que simbolos se tocaron y **quien los consume en
 los demas repos**. Con cincuenta archivos esto a mano no se hace, y por eso se saltaba.
 
+**Cuenta lo que esta sin commitear, y los archivos nuevos.** La skill se corre antes del commit, asi
+que el trabajo todavia esta en el working tree: compara contra el punto donde la rama se separo de su
+base, no contra `HEAD`. Con `base...HEAD` devolvia cero archivos justo cuando mas se la necesita; paso
+en el 7433 con 65 archivos sin commitear.
+
 **`--tambien <ruta>` para el repo que consume este pero vive en otro proyecto.** `projects.json`
 agrupa por proyecto, y hay repos que cruzan: `status-api` sirve a Status **y a SIPA**, asi que
 SIPA no sale solo. Olvidarlo fue lo que dejo nueve servicios de SIPA sin adaptar.
