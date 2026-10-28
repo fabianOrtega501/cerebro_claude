@@ -16,7 +16,7 @@
       "mcp": []
     },
     "qa": {
-      "hosts": [],
+      "hosts": ["status-api-qa.datint.co"],
       "ssh": [],
       "databases": [
         { "host": "172.17.10.14", "port": "5432", "db": "status-qa" },
