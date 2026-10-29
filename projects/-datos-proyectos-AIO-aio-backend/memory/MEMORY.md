@@ -33,3 +33,4 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [cierre-con-todas-las-documentaciones](cierre-con-todas-las-documentaciones.md) — Al cerrar un desarrollo se hacen siempre manual, control de cambios y set de pruebas, sin preguntar cuáles
 - [adaptar-lo-nuevo-al-manejo-existente](adaptar-lo-nuevo-al-manejo-existente.md) — Si el ticket choca con un manejo global existente, no se cambia ese manejo; se adapta lo nuevo solo para los campos del ticket
 - [auditoria-local-sin-particion](auditoria-local-sin-particion.md) — En la base local las tablas particionadas (auditoría y GPS) se quedan sin partición del mes y la secuencia de gps.events va atrasada
+- [conteos-del-set-con-sql](conteos-del-set-con-sql.md) — Si un caso del set de pruebas obliga a contar datos de varias pantallas, se entrega el SQL para tomar la evidencia de la base

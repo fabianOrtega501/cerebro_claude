@@ -262,6 +262,14 @@ ejecutar. Va aparte para que el bloque de arriba se pegue sin editarlo.
   lo dice y se pregunta al usuario cómo conseguir el dato. No se inserta a mano.
 - **Si algo solo se puede comprobar por API o por base de datos, se dice explícitamente** en ese caso.
   Disfrazarlo de prueba de vista hace que se documente como probado algo que nadie vio.
+- **Un total que hay que contar en varias pantallas lleva su consulta SQL en el anexo.** Si el valor
+  esperado de un caso sale de sumar o contar datos repartidos (pesos de varios despachos, kilómetros
+  por desplazamiento, personas sin repetir), el anexo trae el `SELECT` que lo calcula con los mismos
+  filtros del código: empresa, fecha, estados, `active` y alcance del usuario. El usuario la corre y
+  toma de ahí la evidencia; la pantalla sigue siendo la prueba de lo que ve el usuario. La consulta se
+  corre antes en el ambiente de pruebas, para dejar el valor esperado escrito en el caso, y se revisa
+  que unir tablas hijas no multiplique filas. **Un valor esperado nunca se calcula de memoria.** Lo
+  pidió Fabian el 2026-10-29, en el ticket 11467.
 
 ## Cuando un caso falla
 

@@ -6,7 +6,7 @@
   },
   "environments": {
     "desa": {
-      "hosts": ["172.17.10.15"],
+      "hosts": ["172.17.10.15", "aioapidesa.datint.co"],
       "ssh": [],
       "databases": [
         { "host": "172.17.10.14", "port": "5432", "db": "sgh-desa" },
