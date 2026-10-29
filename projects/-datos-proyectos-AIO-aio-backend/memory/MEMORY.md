@@ -34,3 +34,4 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [adaptar-lo-nuevo-al-manejo-existente](adaptar-lo-nuevo-al-manejo-existente.md) — Si el ticket choca con un manejo global existente, no se cambia ese manejo; se adapta lo nuevo solo para los campos del ticket
 - [auditoria-local-sin-particion](auditoria-local-sin-particion.md) — En la base local las tablas particionadas (auditoría y GPS) se quedan sin partición del mes y la secuencia de gps.events va atrasada
 - [conteos-del-set-con-sql](conteos-del-set-con-sql.md) — Si un caso del set de pruebas obliga a contar datos de varias pantallas, se entrega el SQL para tomar la evidencia de la base
+- [sin-actions-van-como-servicios](sin-actions-van-como-servicios.md) — En el AIO no se crean clases nuevas en app/Actions; una operación de negocio con nombre propio va como servicio en la carpeta de su entidad

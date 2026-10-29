@@ -52,14 +52,39 @@ algo que ya costo una devolucion. Cuando aparezca una nueva, se agrega su fila, 
 | Se abre una transaccion | Toda escritura dentro del bloque, **por que conexion va**. Otra conexion no ve lo que aun no se confirmo | F7: todo primer cargue fallaba por llave foranea |
 | Cambia una firma o un tipo | Todos los llamadores y que tipo declaran | F8: `deLaEmpresa` paso a arreglo y el llamador pedia objeto |
 | Cambia una clave de la respuesta | Los consumidores **en todos los repos**, incluido el que cruza proyectos | `archivoLog` contra `log` |
-| Se borra un manejo de error | Que lo reemplaza y **bajo que respuesta del backend se activa** | F10: Reversiones dejo de avisar |
+| Se borra un manejo de error | **Enumerar las clases de error que ese bloque recibia**, no solo la que se tiene en mente, y por cada una decir quien avisa ahora. Un `catch` recibe el fallo de la API *y* el de la aplicacion: una variable que no existe, un dato con otra forma, lo que revienta dentro del `then` | F10: Reversiones dejo de avisar. Y la revision del 7433: se vaciaron 102 `catch` dando por hecho que el aviso global cubria todo; los errores de JavaScript quedaron mudos |
 | Cambia como se arma una URL | Que el destino se alcance **desde donde corre el codigo**, no solo desde el navegador | Las fuentes del PDF: el contenedor no alcanzaba su propio dominio |
 | Se migra codigo de otro repo | Que sus vistas, imagenes, fuentes y rutas **existan aqui** | F3: faltaban las plantillas del acta |
+
+## Fase 2b — Lo que el repo ya resolvio
+
+**Antes de inventar un criterio propio, mirar como resuelven lo mismo los archivos que el cambio
+NO toca.** Un `grep` del concepto sobre la rama base basta:
+
+```bash
+git grep -ln "<el concepto>" origin/<base> -- src/
+```
+
+En el 7433 se invento un criterio para decidir cuando avisar de un error, y el repo ya tenia el
+suyo —`if (!error.isAxiosError)`— en siete archivos de `desa`, mas la carpeta de utilidades donde
+va. La revision de pares lo marco. **No es una regla de estilo: el criterio propio tapo justo el
+caso que el del repo si cubria.**
+
+Es el escalon 2 de la escalera del `CLAUDE.md` aplicado a las pruebas: lo que ya existe esta
+probado en produccion, lo recien inventado no.
 
 ## Fase 3 — Ejecutar, no mirar
 
 **Se prueba el flujo, no la pantalla.** Por cada funcionalidad tocada: hacer la accion con datos
 reales y observar el resultado. "La vista carga" no es un resultado.
+
+**Se provoca el fallo, no se espera a que aparezca.** Si el cambio toca como se avisa de un error,
+hay que **causar cada clase de error por separado** y mirar que ve el usuario en cada una: la API
+que responde mal, la API que no responde, y **un error de la propia aplicacion** —forzando un
+`undefined` o una funcion que no existe dentro del `then`—. En el 7433 se probo a fondo el error de
+API, que era el que se tenia en la cabeza, y nunca se construyo el de la aplicacion: ahi estaba el
+defecto. **El caso que uno no prueba es el que uno no imagina; por eso se enumera antes, en la
+Fase 2, en vez de confiar en lo que se le ocurra a uno al probar.**
 
 **Se mide el entregable, no el insumo.** Si sale un PDF, se inspecciona el PDF —`pdffonts`, paginas,
 contenido—; si sale un Excel, se abre. Comprobar que el archivo de origen existe no prueba nada: las
@@ -89,6 +114,16 @@ Es el entregable. Una fila por archivo del diff:
 
 Las filas de "no se probo" son las importantes: son las que el usuario puede cuestionar. Esconderlas
 es lo que convierte una prueba en una devolucion.
+
+**Una fila que repite la misma frase en cincuenta archivos no es cobertura, es un sello.** Cuando el
+cambio aplica un mismo patron en muchos archivos, la tabla puede agruparlos, pero entonces **la fila
+del grupo dice que caso se ejecuto y en cual de esos archivos**, no "lint y build". En el 7433 la
+tabla agrupo 50 archivos bajo "lint por archivo, build, y el patron verificado en pantalla en 2
+rutas": las dos rutas ejercitaban la misma clase de error, asi que el grupo quedo con media prueba y
+se leyo como si estuviera entero.
+
+**Antes de cerrar la tabla, la pregunta de control:** *de todo lo que este cambio puede romper, que
+no intente romper a proposito?* Lo que salga de ahi es una fila mas, ejecutada o declarada.
 
 **El set de pruebas de `gen-test-set` sale de esta tabla**, no se escribe de nuevo: aqui estan los
 casos y su resultado.
