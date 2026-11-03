@@ -27,11 +27,14 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [no-usar-stash-para-comparar-con-la-base](no-usar-stash-para-comparar-con-la-base.md) — No usar git stash para comparar la rama contra su base; aplica stashes ajenos y deja conflictos en archivos de otros tickets
 - [solo-lo-pedido](solo-lo-pedido.md) — No agregar trabajo, validaciones ni protecciones que no se pidieron; lo que parezca necesario se propone, no se agrega
 - [push-antes-de-documentar](push-antes-de-documentar.md) — Al cerrar, el push de las ramas de código va antes del control de cambios, el set de pruebas y el manual
+- [repetir-revision-tras-corregir](repetir-revision-tras-corregir.md) — Si la revisión de pares propia lleva a corregir algo, se vuelve a correr completa antes de seguir
 - [revision-de-pares-propia](revision-de-pares-propia.md) — Antes del commit, revisar el diff con la lista de 12 fallas que devolvió la revisión de pares del 11411
 - [vscode-autoguardado-pisa-cambios](vscode-autoguardado-pisa-cambios.md) — El autoguardado de VS Code deshace los cambios hechos con git checkout o git apply; confirmar con git diff antes del add
 - [glpi-es-el-codigo-glpi-de-mantis](glpi-es-el-codigo-glpi-de-mantis.md) — El GLPI de un ticket es solo el campo "Codigo GLPI" de Mantis; el id de un adjunto es un docid, no un caso
 - [cierre-con-todas-las-documentaciones](cierre-con-todas-las-documentaciones.md) — Al cerrar un desarrollo se hacen siempre manual, control de cambios y set de pruebas, sin preguntar cuáles
 - [adaptar-lo-nuevo-al-manejo-existente](adaptar-lo-nuevo-al-manejo-existente.md) — Si el ticket choca con un manejo global existente, no se cambia ese manejo; se adapta lo nuevo solo para los campos del ticket
 - [auditoria-local-sin-particion](auditoria-local-sin-particion.md) — En la base local las tablas particionadas (auditoría y GPS) se quedan sin partición del mes y la secuencia de gps.events va atrasada
+- [rutas-de-menu-completas](rutas-de-menu-completas.md) — Al indicar dónde está algo en el AIO, dar la ruta completa del menú verificada contra la tabla menus
 - [conteos-del-set-con-sql](conteos-del-set-con-sql.md) — Si un caso del set de pruebas obliga a contar datos de varias pantallas, se entrega el SQL para tomar la evidencia de la base
 - [sin-actions-van-como-servicios](sin-actions-van-como-servicios.md) — En el AIO no se crean clases nuevas en app/Actions; una operación de negocio con nombre propio va como servicio en la carpeta de su entidad
+- [worker-sail-sigue-vivo](worker-sail-sigue-vivo.md) — Detener sail artisan queue:work no mata el worker del contenedor; matar los viejos por PID y dejar uno solo
