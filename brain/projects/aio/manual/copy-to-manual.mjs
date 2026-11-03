@@ -39,8 +39,10 @@ import { MAPPINGS as respelServiceProvisions } from "./modules/respel/service-pr
 import { MAPPINGS as respelDashboards } from "./modules/respel/dashboards/mappings.mjs";
 import { MAPPINGS as publicCitizenPortal } from "./modules/public/citizen-portal/mappings.mjs";
 import { MAPPINGS as settingsCompanies } from "./modules/settings/companies/mappings.mjs";
+import { MAPPINGS as settingsReports } from "./modules/settings/reports/mappings.mjs";
+import { MAPPINGS as reportsGenerate } from "./modules/reports/generate/mappings.mjs";
 
-const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceIssues, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsDispatchesOverview, ...operationsIssues, ...operationsPqrs, ...operationsRoutes, ...operationsTraining, ...respelBranches, ...respelClients, ...respelClientLoyalties, ...respelClientOperationCosts, ...respelServiceProvisions, ...respelDashboards, ...publicCitizenPortal, ...settingsCompanies };
+const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceIssues, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsDispatchesOverview, ...operationsIssues, ...operationsPqrs, ...operationsRoutes, ...operationsTraining, ...respelBranches, ...respelClients, ...respelClientLoyalties, ...respelClientOperationCosts, ...respelServiceProvisions, ...respelDashboards, ...publicCitizenPortal, ...settingsCompanies, ...settingsReports, ...reportsGenerate };
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {
