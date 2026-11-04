@@ -366,6 +366,15 @@ todo el resto del informe.
 **Lo que no se probo se dice en la tabla.** Esconderlo es lo que convierte una prueba en una
 devolucion.
 
+## Antes de finish-development: pantalla, set propio y confirmacion
+
+Terminado el desarrollo, y antes de correr `finish-development`, siempre: (1) se prueba en pantalla
+web todo lo que el cambio toca, con datos propios o con el estado de lo existente respaldado y
+restaurado al final; (2) se entrega un set de pruebas para Fabian, distinto del de Mantis, con cada
+caso marcado como «lo vi en pantalla», «lo cubre la prueba automatica» o «no lo probe»; (3) se espera
+su confirmacion. Solo con ese si se pasa a `finish-development`. Lo pidio Fabian el 2026-11-04 (ticket
+11549), despues de que la prueba en pantalla destapo un auto-import roto que el typecheck no vio.
+
 ## La VPN solo hace falta desde fuera, y no afecta las bases locales
 
 **Primero: en que red esta el usuario.** En la **red corporativa** el GitLab interno

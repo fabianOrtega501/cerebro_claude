@@ -20,6 +20,9 @@ skill viene a resolver.
 
 ## Fase 0 — Preflight
 
+**Antes de arrancar**: el desarrollo ya se probó en pantalla web, Fabian recibió su set de pruebas
+propio y lo confirmó (`CLAUDE.md`, «Antes de finish-development»). Si no, se hace eso primero.
+
 ```bash
 node ~/.claude/skills/finish-development/lib/preflight.mjs
 ```
