@@ -197,6 +197,37 @@ En la misma interacción en que se presente el resumen de la HU, preguntar:
 se hace en ese repo. Es lo que permite que el plan nazca reutilizando, en vez de corregirlo después
 en la revisión.
 
+## Paso 4b — Explicar la HU antes del plan
+
+Antes de leer código para el plan, **leer el `hu.md` completo** —no solo el resumen del subagente—
+y, si la pantalla importa, las páginas del PDF con capturas. Con eso se escribe la explicación de
+la HU y **se espera a que el usuario confirme que la entendió**. Si algo no cuadra se corrige la
+explicación; el plan no se arma sobre una HU mal entendida. Lo pidió Fabian el 2026-11-04: un plan
+presentado antes de entender el requerimiento obliga a revisar las dos cosas a la vez.
+
+Va en dos formatos, en `~/.claude/cache/tickets/<clave>/`, junto al `hu.md` (fuera del respaldo
+de GitHub, porque sale de un documento del cliente):
+
+| Archivo | Para qué |
+|---|---|
+| `explicacion.html` | Primera lectura. Presentación autocontenida con el formato de `brain/learning/slides/laravel-colas-jobs.html`: flechas para avanzar, una idea por diapositiva, modo oscuro. Se abre con `xdg-open` |
+| `explicacion.md` | Consulta durante el desarrollo, con la vista previa de VS Code. Mismo contenido, diagramas en Mermaid |
+
+Estructura fija, en este orden:
+
+1. **Por qué se pide**: el problema de hoy, a quién le pasa y qué cuesta no hacerlo.
+2. **Qué se pide**: el cambio en lenguaje de negocio, contado por cada usuario que lo vive (quien
+   configura, quien opera la pantalla, el operario en el celular…).
+3. **Glosario**: cada término de negocio del ticket en una frase.
+4. **Cómo se pide**: los datos nuevos y qué significan, las reglas (RN) explicadas una por una con
+   un ejemplo, los criterios de aceptación agrupados por flujo con un diagrama por flujo, y lo que
+   la HU pide técnicamente en cada repo.
+5. **Lo que la HU no dice**: ambigüedades y huecos, como preguntas para el usuario. No se
+   resuelven solas.
+
+Se explica para entender, no se copia la HU: el valor está en el porqué y en los ejemplos. En
+`fullstack-ticket` este paso va antes de su Fase 2; el contrato y el plan vienen después del sí.
+
 ## Paso 5 — El plan lleva diagrama de flujo. Siempre
 
 Antes de tocar un archivo hay que exponer el plan y esperar el sí —eso ya lo exige el `CLAUDE.md`—,
