@@ -165,6 +165,25 @@ Antes de crear, verifica que el árbol esté limpio, que la base exista y esté 
 remoto, y que no haya ya una rama igual (ni una que solo difiera en mayúsculas). Si algo falla,
 no crea nada y dice qué resolver.
 
+## Paso 3b — Nombrar la sesión
+
+Con la rama creada, nombrar la conversación con el mismo ticket y descripción, para encontrarla
+en la lista de sesiones:
+
+```bash
+node ~/.claude/skills/start-development/lib/session-title.mjs --project <clave> \
+  [--ticket <numero>] --desc "<descripcion>"
+```
+
+Queda `10842 AIO FiltroPorTipoDeVehiculo`: ticket, **clave del proyecto** (no el repo, porque un
+ticket fullstack es una sola sesión) y descripción en PascalCase. Escribe la misma entrada
+`custom-title` que `/rename`.
+
+**Se corre en la sesión principal, no en `branch-starter`**: busca la conversación con
+`CLAUDE_CODE_SESSION_ID`. Si falla, no detiene el arranque: se le dice al usuario el `/rename`
+exacto que debe escribir. El formato no está documentado por Anthropic; si una versión lo cambia,
+el título automático vuelve y no se daña nada.
+
 ## Paso 4 — Recoger el contexto del ticket
 
 Con la rama ya creada, **traer el ticket y su HU con la skill `ticket-context`**, usando el

@@ -6,6 +6,8 @@
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
+      "Bash(node ~/.claude/skills/start-development/lib/session-title.mjs *)",
+      "Bash(node /home/fabian-ortega/.claude/skills/start-development/lib/session-title.mjs *)",
       "Bash(docker compose *)",
       "Bash(docker-compose ps *)",
       "Bash(grep -rln 'protected $table = '\\\\''menu'\\\\''\\\\|protected $table = \"menu\"' app/)",
