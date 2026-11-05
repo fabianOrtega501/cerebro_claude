@@ -19,8 +19,9 @@ import { copyScreenshots, imagesRoot, resolveManualRoot } from "./lib/manual.mjs
 // que hay que tocar fuera de la carpeta del módulo.
 import { MAPPINGS as censo } from "./modules/censo/mappings.mjs";
 import { MAPPINGS as settings } from "./modules/settings/mappings.mjs";
+import { MAPPINGS as respelServiceProvision } from "./modules/respel/service-provision/mappings.mjs";
 
-const MAPPINGS_BY_MODULE = { ...censo, ...settings };
+const MAPPINGS_BY_MODULE = { ...censo, ...settings, ...respelServiceProvision };
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {
