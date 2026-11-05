@@ -100,6 +100,22 @@ function git(args, repo) {
 }
 
 /**
+ * Diff of an untracked file against /dev/null; git exits 1 when there are differences.
+ *
+ * @param {string} archivo
+ * @param {string} repo
+ * @returns {string}
+ */
+function newFileDiff(archivo, repo) {
+	try {
+		return git(["diff", "--no-index", "/dev/null", archivo], repo);
+	} catch (error) {
+		if (error.status === 1) return String(error.stdout).trim();
+		throw error;
+	}
+}
+
+/**
  * Repos del proyecto al que pertenece el repo dado, segun projects.json del cerebro.
  *
  * @param {string} repo
@@ -248,7 +264,7 @@ const extra = args.flatMap((a, i) => (a === "--tambien" ? [args[i + 1]] : [])).f
 const hermanos = [...new Set([...reposHermanos(repo), ...extra.map((r) => path.resolve(r))])].filter(existsSync);
 const inventario = archivos.map((archivo) => {
 	const diff = sinSeguimiento.includes(archivo)
-		? git(["diff", "--no-index", "/dev/null", archivo], repo)
+		? newFileDiff(archivo, repo)
 		: git(["diff", bifurcacion, "--", archivo], repo);
 	const simbolos = simbolosTocados(diff);
 
