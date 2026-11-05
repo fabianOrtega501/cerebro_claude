@@ -80,9 +80,9 @@ function readRegistryFile() {
 }
 
 /**
- * Databases per environment, built from the servers and names in secrets.env.
+ * Databases per environment from secrets.env, on the project's own server (`PRODSGH`) or the general one.
  *
- * @returns {{databases: Array<{env: string, project: string, server: string, host: string, port?: string, db: string, source: string}>, unclassified: string[]}}
+ * @returns {{databases: Array<{env: string, project: string, server: string, general?: string, host: string, port?: string, db: string, source: string}>, unclassified: string[]}}
  *   `unclassified`: `DB_*` keys that fit no pattern or whose environment has no server
  */
 export function databasesFromSecrets() {
@@ -114,10 +114,12 @@ export function databasesFromSecrets() {
 	const databases = [];
 
 	for (const entry of names) {
-		const server = Object.keys(servers).find(s => servers[s].includes(entry.env));
+		const candidates = Object.keys(servers).filter(s => servers[s].includes(entry.env));
+		const general = candidates.find(s => ENV_CODES.has(s));
+		const server = candidates.find(s => s === `${entry.env}${entry.project}`.toUpperCase() && conn[s]?.host) ?? general;
 
 		if (server && conn[server]?.host)
-			databases.push({ ...entry, server, host: conn[server].host, port: conn[server].port });
+			databases.push({ ...entry, server, general, host: conn[server].host, port: conn[server].port ?? conn[general]?.port });
 		else
 			unclassified.push(entry.source);
 	}
@@ -142,9 +144,9 @@ export function dbConnection(project, env, { writes = null } = {}) {
 	assertEnvironment({ host: entry.host, port: entry.port, db: entry.db, writes, why: `dbConnection(${project}, ${env})` });
 
 	const secrets = Object.fromEntries(secretEntries());
-	const prefix = `DB_${entry.server}_`;
+	const field = name => secrets[`DB_${entry.server}_${name}`] ?? secrets[`DB_${entry.general}_${name}`];
 
-	return { host: entry.host, port: entry.port, user: secrets[`${prefix}USERNAME`], password: secrets[`${prefix}PASSWORD`], db: entry.db };
+	return { host: entry.host, port: entry.port, user: field("USERNAME"), password: field("PASSWORD"), db: entry.db };
 }
 
 /** Host de una URL, o `null`. */

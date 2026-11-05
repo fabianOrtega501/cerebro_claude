@@ -2,7 +2,8 @@
   "_comment": "Environment registry. Databases in secrets.env (DB_<SERVER>_* + DB_<PROJECT>_<ENV>) are added automatically; only what is not there goes here. Read by brain/lib/environments.mjs; changing it asks for approval.",
   "servers": {
     "DESA": ["desa", "qa", "pre"],
-    "PROD": ["prod"]
+    "PROD": ["prod"],
+    "PRODSGH": ["prod"]
   },
   "environments": {
     "desa": {
