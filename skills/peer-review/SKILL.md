@@ -127,12 +127,57 @@ simple, con respeto, directo y sin jerga innecesaria; cada comentario se entiend
   falla (un dato o entrada de ejemplo) y qué ve el usuario o el sistema. *Por qué*: una frase con la regla y
   su fuente. *Cómo podría quedar*: el cambio puntual. Nada de historia del módulo, precedentes ni
   alternativas: lo que solo decide el usuario va en el chat.
-- Nada de hashes ni códigos de reglas en el texto. **Cada comentario lleva archivo y línea**:
-  `ruta/archivo.ext:42`, o `:42-51` si es un bloque. La línea es la del archivo en la rama revisada
-  (`git show origin/<rama>:<archivo> | grep -n`); si el MR ya se mezcló, la del commit del merge.
+- Nada de hashes ni códigos de reglas en el texto. **Cada comentario lleva su Ubicación**, de uno de
+  tres tipos (ver «Ubicación de cada comentario» abajo).
 - Ejemplos de código solo cuando el cambio no se entiende sin verlos, cortos y sin comentarios dentro.
 - **Sin datos privados**: IPs, hosts y URLs internas, tokens, contraseñas, contenido de `.env`, nombres
   de contenedores o bases, ni datos personales.
+
+#### Ubicación de cada comentario
+
+Los comentarios se publican en GitLab, así que cada uno dice dónde se pega:
+
+| Tipo | Cuándo | Cómo se escribe |
+|---|---|---|
+| **General** | Afecta a toda la aplicación y no a un solo archivo, o es del MR en conjunto: alcance, tickets mezclados, MR que falta, orden de despliegue | `General` |
+| **Archivo** | Aplica al archivo completo y no a una línea: un archivo eliminado, uno que falta, algo que recorre todo el archivo | `Archivo: ruta/archivo.ext` |
+| **Línea** | La novedad está en una línea o un bloque concreto | `Línea: ruta/archivo.ext:42` (o `:42-51`) |
+
+- La línea es la del archivo en la rama revisada (`git show origin/<rama>:<archivo> | grep -n`); si el MR
+  ya se mezcló, la del commit del merge.
+- **GitLab solo deja comentar las líneas que están en el diff del MR.** Si la línea no cambió en el MR,
+  el comentario pasa a tipo **Archivo** y la línea se menciona en el texto. Si el archivo ni siquiera está
+  en el MR (una documentación que faltó actualizar, un archivo que no se tocó), pasa a **General** y el
+  texto nombra el archivo.
+- **Un problema en varios lugares sigue siendo un solo hallazgo** (para no inflar el conteo), pero lleva
+  **una Ubicación por lugar**, y en «Comentarios para GitLab» sale un comentario por cada una: el texto
+  completo en la primera y, en las demás, uno corto que remite a ella.
+
+#### Comentarios para GitLab
+
+Al final del informe y en el chat va la sección **«Comentarios para GitLab»**, lista para pegar
+recorriendo el MR de arriba abajo: primero **General** y luego un subtítulo por archivo, en el orden de
+la pestaña de cambios del MR. Cada comentario empieza con el nivel entre corchetes y el número del
+hallazgo, y va en **texto normal, no en bloque de código**:
+
+~~~markdown
+## Comentarios para GitLab
+
+### General
+- [Impide aprobar · 2] <texto completo del comentario>
+
+### src/App.vue
+- Línea 37-42 · [Impide aprobar · 1] <texto completo>
+
+### src/views/.../WasteInfoModal.vue
+- Archivo · [Debe corregirse · 8] <texto completo>
+
+### src/composables/useAlert.ts
+- Línea 29 · [Debe corregirse · 7] Mismo caso del comentario de `useSyncResultMessage.ts:46`: <una frase>
+~~~
+
+El texto de cada comentario es el del hallazgo condensado: qué pasa, por qué y cómo podría quedar,
+sin los títulos de sección.
 
 ~~~markdown
 # Revisión de la rama <rama> (<repo>)
@@ -149,7 +194,7 @@ simple, con respeto, directo y sin jerga innecesaria; cada comentario se entiend
 ## Impide aprobar
 
 ### 1. <título corto en lenguaje claro>
-**Dónde:** `ruta/archivo.ext:línea` (una por renglón si se repite)
+**Ubicación:** `General` · `Archivo: ruta/archivo.ext` · `Línea: ruta/archivo.ext:42` (una por renglón si se repite)
 **Qué noté:** <2–3 frases: qué hace hoy, el caso concreto en que falla y su efecto>
 **Por qué hay que corregirlo:** <una frase: la regla y de dónde sale>
 **Cómo podría quedar:**
@@ -171,6 +216,9 @@ simple, con respeto, directo y sin jerga innecesaria; cada comentario se entiend
 
 ## Cómo se revisó
 <qué se leyó, lint, calidad, pruebas corridas o no y por qué>
+
+## Comentarios para GitLab
+<General primero, luego por archivo en el orden del MR; ver arriba>
 ~~~
 
 Al cerrar: vuelta a la rama original de cada repo, y `git status` para confirmar que quedó como estaba.
@@ -198,7 +246,7 @@ Lo corre `finish-development` en su Fase 1b, **siempre**, después de `review-ov
    `~/.claude/CLAUDE.md` (docblocks, comentarios, claves i18n al final, nombres de 5 palabras, solo
    lecturas al probar) y la lista de la memoria del proyecto (en AIO, `revision-de-pares-propia`), punto
    por punto, diciendo qué se verificó y cómo.
-5. **Entrega en el chat**, sin informe: la tabla de conteos por nivel y cada hallazgo con archivo y línea, qué
+5. **Entrega en el chat**, sin informe: la tabla de conteos por nivel y cada hallazgo con su Ubicación, qué
    pasa, la regla y la corrección propuesta. **Lo que «Impide aprobar» o «Debe corregirse» se corrige, o
    el usuario lo acepta de forma explícita, antes de proponer el commit.** `finish-development` no sigue
    hasta que eso quede resuelto.
@@ -259,7 +307,7 @@ En este orden. Cada comentario cita **de dónde sale la regla**; sin respaldo, e
 | **Mejora sugerida** | Mejora claridad, reutilización o rendimiento, pero lo actual es aceptable |
 | **Pregunta** | No queda clara la intención; se pregunta en vez de suponer |
 
-Un mismo problema en varios archivos es **un** comentario con todas sus ubicaciones, cada una con su línea. Un arreglo sin
+Un mismo problema en varios archivos es **un** hallazgo con todas sus ubicaciones, y en GitLab un comentario por ubicación. Un arreglo sin
 prueba que lo proteja es «Debe corregirse»; un cambio de alcance global fuera del caso, «Impide
 aprobar». **Cada cita se verifica antes de escribirla.**
 
