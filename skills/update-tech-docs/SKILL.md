@@ -34,7 +34,7 @@ node ~/.claude/skills/update-tech-docs/lib/undocumented-functions.mjs --project 
 El primero compara la rama actual contra el punto donde se separó de su base y dice **qué módulos
 tienen lógica cambiada y no tienen documentación tocada**. Sale 1 si hay pendientes.
 
-El segundo lista **las funciones sin docblock, o con el docblock incompleto (sin `@return` o con
+El segundo lista **las funciones sin docblock, o con el docblock incompleto (sin `@return` en una que devuelve algo, o con
 menos `@param` que argumentos), de los archivos PHP que toca la rama**, separando las `nuevas`
 (declaradas en líneas añadidas) de las que ya existían. Revisa `app/`, `database/migrations/`,
 `database/seeders/` y `tests/`, o lo que diga `docGlobs` en el perfil; los métodos con `@OA` no
@@ -74,7 +74,7 @@ quien abre el archivo dentro de seis meses.
 archivos que el ticket no toca. Reescribir documentación ajena infla el MR y entierra el cambio
 real entre ruido.
 
-**Qué va dentro: máximo 1,5 renglones de prosa, más `@param` y `@return`.** Qué hace la pieza,
+**Qué va dentro: máximo 1,5 renglones de prosa, más `@param` y, si devuelve algo, `@return`.** Qué hace la pieza,
 concreto —qué devuelve o qué cambia—, y sus entradas y salidas cuando la firma no las explique
 sola. Nada interno: ni el porqué de una condición, ni cómo funciona un operador, ni el orden de
 dos instrucciones.

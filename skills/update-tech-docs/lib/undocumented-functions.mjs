@@ -91,13 +91,22 @@ function parameterCount(lines, index) {
 	return (inside.match(/\$\w+/g) ?? []).length;
 }
 
-/** What a docblock lacks: `@return`, or one `@param` per argument. Swagger endpoints (`@OA\`) need neither. */
-function missingTags(doc, name, params) {
+/** Whether the signature starting at `index` declares a `void` return type. */
+function returnsVoid(lines, index) {
+	let signature = "";
+
+	for (let i = index; i < lines.length && !/[{;]/.test(signature); i++) signature += lines[i];
+
+	return /\)\s*:\s*void\b/.test(signature);
+}
+
+/** What a docblock lacks: `@return` (unless it returns void), or one `@param` per argument. Swagger endpoints need neither. */
+function missingTags(doc, name, params, isVoid) {
 	if (doc.includes("@OA\\")) return [];
 
 	const missing = [];
 
-	if (name !== "__construct" && !/@return\b/.test(doc)) missing.push("@return");
+	if (name !== "__construct" && !isVoid && !/@return\b/.test(doc)) missing.push("@return");
 	if ((doc.match(/@param\b/g) ?? []).length < params) missing.push("@param");
 
 	return missing;
@@ -127,7 +136,7 @@ function functionsIn(source) {
 			name: match[1],
 			line: index + 1,
 			hasDoc: doc !== null,
-			missing: doc === null ? [] : missingTags(doc, match[1], parameterCount(lines, index)),
+			missing: doc === null ? [] : missingTags(doc, match[1], parameterCount(lines, index), returnsVoid(lines, index)),
 		});
 	});
 

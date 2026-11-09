@@ -536,8 +536,9 @@ Lo decidio Fabian el 2026-09-16.
   deje en el ticket 11308; lo pidio como regla el 2026-09-29.
 - **Documentacion tecnica.** Ningun numero de ticket, ni de Mantis, ni de GLPI, ni referencia a
   una historia de usuario. El codigo se lee sin ese contexto.
-- **`@param` y `@return` siempre**, uno por argumento, salvo en los metodos de endpoint con
-  Swagger. No cuentan dentro del limite.
+- **`@param` siempre**, uno por argumento, y **`@return` cuando la funcion devuelve algo**: en una
+  que no devuelve nada (`void`, `Promise<void>`) no es obligatorio. Los metodos de endpoint con
+  Swagger no llevan ninguno. No cuentan dentro del limite. Lo decidio Fabian el 2026-11-05.
 
 **Renglon y medio de prosa por funcion. Ni uno mas.** Un renglon completo y, solo si hace falta,
 medio mas; en la practica, casi siempre uno. El limite es duro y no admite "es que esta funcion es

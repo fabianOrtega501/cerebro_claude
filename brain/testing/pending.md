@@ -13,3 +13,4 @@ Al generar el set, borrar la línea.
 | Fecha | Proyecto | Ticket | Rama | Base | Sha de la base |
 |---|---|---|---|---|---|
 | 2026-09-15 | aio | 11118 | feature/11118-fabian-originDesa-TramasGps | desa | 5b8e525a39c5a09c7edc5f954acb1c254419481b |
+| 2026-11-09 | aio | 11730 | feature/11730-fabian-originDesa-SemaforoPuntosControlDespachos | desa | aio-backend c722f78ecfb831710d54f3f8d0a920d982ec6b3a · aio-app 740cb843adee3da1cc47a57512b3b5c9e0296858 |

@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: feedback
   originSessionId: 8c34b7cf-528c-4a38-9db5-224293c71ab9
-  modified: 2026-10-19T15:50:53.674Z
+  modified: 2026-11-05T20:01:20.203Z
 ---
 
 Antes de proponer el commit de un desarrollo en AIO, se revisa el diff completo como lo haría la
@@ -20,7 +20,7 @@ revisión de pares, con esta lista. Cada punto salió de una devolución real de
 3. **Las reglas de privacidad viven en el servidor.** Lo que la pantalla limpia (el anónimo) también
    lo limpia el servicio, y se prueba llamando la API directo, no solo desde la vista.
 4. **Docblocks completos en todo archivo nuevo**, también en Form Requests y pruebas: `rules()`,
-   `messages()`, `@return void`. Se compara con el archivo vecino, que suele tenerlos.
+   `messages()`. El `@return` solo es obligatorio si la función devuelve algo (regla del 2026-11-05). Se compara con el archivo vecino, que suele tenerlos.
 5. **Formato de las líneas nuevas**: `pint --test` sobre los archivos tocados y corregir a mano solo
    lo de nuestras líneas (ver [[no-usar-pint-en-aio]]).
 6. **Datos vacíos**: sin ubicación, sin dirección, sin roles. No llamar un servicio externo con un
