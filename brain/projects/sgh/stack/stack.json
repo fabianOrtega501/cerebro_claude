@@ -1,0 +1,16 @@
+{
+  "label": "SGH — Sistema de Gestion Humana",
+  "ticketPrefix": "<numero>: SGH:",
+  "contract": "",
+  "verifier": "",
+  "protectedBranches": ["desa", "qa", "prod"],
+  "repos": [
+    {
+      "role": "monolith",
+      "path": "/datos/proyectos/sgh",
+      "stack": "Laravel 5.2.45 + PHP 7.1, vistas Blade con jQuery/DataTables, PostgreSQL. Un solo repo: front y back juntos",
+      "checks": []
+    }
+  ],
+  "containers": {}
+}
