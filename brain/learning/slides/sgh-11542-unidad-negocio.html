@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SGH 11542 · Unidad de negocio</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#1d2329; --muted:#5d6b76; --line:#dfe3e6;
+  --accent:#1f6f8b; --accent-soft:#e3f0f5; --ok:#2e7d4f; --ok-soft:#e5f3ea;
+  --warn:#a45d00; --warn-soft:#fbf0de; --bad:#a52020; --bad-soft:#fbe6e6;
+  --code:#f1f3f5; --code-ink:#24292f;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161a; --card:#1b2127; --ink:#e7ecef; --muted:#9aa8b2; --line:#2c353d;
+    --accent:#5cb3d1; --accent-soft:#183440; --ok:#6cc58f; --ok-soft:#173326;
+    --warn:#e0a650; --warn-soft:#3a2b14; --bad:#ef7d7d; --bad-soft:#3d1c1c;
+    --code:#0f1418; --code-ink:#d6dde3;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161a; --card:#1b2127; --ink:#e7ecef; --muted:#9aa8b2; --line:#2c353d;
+  --accent:#5cb3d1; --accent-soft:#183440; --ok:#6cc58f; --ok-soft:#173326;
+  --warn:#e0a650; --warn-soft:#3a2b14; --bad:#ef7d7d; --bad-soft:#3d1c1c;
+  --code:#0f1418; --code-ink:#d6dde3;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+.deck{height:100%;display:flex;align-items:center;justify-content:center;padding:16px}
+.slide{display:none;width:min(1100px,100%);max-height:calc(100vh - 90px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:36px 44px}
+.slide.on{display:block;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:2.2em;margin:.1em 0 .3em}
+h2{font-size:1.5em;margin:0 0 .6em;color:var(--accent)}
+.kicker{color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.78em;margin-bottom:.4em}
+p{margin:.4em 0 .8em}
+.muted{color:var(--muted)}
+code{background:var(--code);color:var(--code-ink);padding:.08em .35em;border-radius:5px;font-size:.92em}
+pre{background:var(--code);color:var(--code-ink);padding:14px 16px;border-radius:10px;overflow:auto;font-size:.86em;line-height:1.5;margin:.5em 0}
+pre .hl{background:var(--accent-soft);display:inline-block;width:100%}
+.ref{font-size:.8em;color:var(--muted);font-family:ui-monospace,monospace}
+.f{opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
+.f.show{opacity:1;transform:none}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.box{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--bg)}
+.box h3{margin:0 0 .3em;font-size:1.02em}
+.term{font-weight:700;color:var(--accent)}
+.tag{display:inline-block;font-size:.75em;padding:.1em .55em;border-radius:20px;font-weight:600}
+.t-ok{background:var(--ok-soft);color:var(--ok)}
+.t-warn{background:var(--warn-soft);color:var(--warn)}
+.t-bad{background:var(--bad-soft);color:var(--bad)}
+.t-acc{background:var(--accent-soft);color:var(--accent)}
+.analogy{border-left:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:.6em 0}
+/* Recorrido animado */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.node{border:2px solid var(--line);border-radius:10px;padding:10px;text-align:center;font-size:.86em;background:var(--bg);transition:all .35s}
+.node b{display:block;font-size:1.05em;margin-bottom:2px}
+.node.active{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.04);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.node.done{border-color:var(--ok);opacity:.75}
+.lane{font-size:.75em;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.caption{min-height:3.4em;border:1px dashed var(--line);border-radius:10px;padding:10px 14px;background:var(--bg)}
+.ticket{display:inline-block;background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:0 .4em;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:.92em}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.bar{position:fixed;left:0;top:0;height:4px;background:var(--accent);transition:width .3s}
+.nav{position:fixed;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:10px;align-items:center;font-size:.85em;color:var(--muted)}
+.nav button{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 14px;cursor:pointer;font:inherit}
+.nav button:hover{border-color:var(--accent)}
+.q{border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:10px 0}
+.q summary{cursor:pointer;font-weight:600}
+.q div{margin-top:8px;color:var(--muted)}
+@media (max-width:640px){
+  .slide{padding:22px 16px;max-height:calc(100vh - 80px)}
+  body{font-size:15px}
+  h1{font-size:1.7em}
+}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<main class="deck">
+
+<section class="slide">
+  <div class="kicker">Modo práctica · SGH 11542</div>
+  <h1>La unidad de negocio en la planta</h1>
+  <p class="muted">Cómo se construye este desarrollo, pieza por pieza. Después lo haces tú con el plan.</p>
+  <p class="f">Usa <code>→</code> o <code>espacio</code> para avanzar, <code>←</code> para volver.</p>
+</section>
+
+<section class="slide">
+  <div class="kicker">1 · El mapa</div>
+  <h2>Seis piezas, en este orden</h2>
+  <div class="grid g3">
+    <div class="box f"><h3>1. Base de datos</h3><p>Una columna nueva, una columna más grande y el parámetro sembrado.</p></div>
+    <div class="box f"><h3>2. Servicio</h3><p>Quien lee el JSON del parámetro y lo entrega listo.</p></div>
+    <div class="box f"><h3>3. Parámetros generales</h3><p>Textarea y validación del JSON antes de guardar.</p></div>
+    <div class="box f"><h3>4. Planta</h3><p>Validar, limpiar, el select y el cargue.</p></div>
+    <div class="box f"><h3>5. Reportes</h3><p>Una línea por reporte y el <code>groupBy</code> del 804.</p></div>
+    <div class="box f"><h3>6. Documentación</h3><p>La regla de negocio, en <code>docs/</code>.</p></div>
+  </div>
+  <div class="analogy f"><b>Por qué en ese orden:</b> cada pieza usa la anterior. El servicio lee lo que siembra la base; la planta usa el servicio.</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">2 · Glosario</div>
+  <h2>Las palabras del ticket</h2>
+  <div class="grid g3">
+    <div class="box f"><span class="term">Migración</span><p>Un archivo que cambia la estructura de la base y sabe deshacerse (<code>up</code> / <code>down</code>).</p><p class="muted">Una receta con su «cómo devolverse».</p></div>
+    <div class="box f"><span class="term">change()</span><p>Cambia el tipo de una columna que ya existe. En Laravel 5.2 lo hace una librería aparte: doctrine/dbal.</p></div>
+    <div class="box f"><span class="term">Seeder</span><p>Un archivo que inserta datos iniciales.</p></div>
+    <div class="box f"><span class="term">Idempotente</span><p>Correrlo una o diez veces deja lo mismo.</p><p class="muted">Antes de echar azúcar, mirar si ya tiene.</p></div>
+    <div class="box f"><span class="term">Servicio</span><p>Una clase que guarda una lógica para que varios la usen sin repetirla.</p></div>
+    <div class="box f"><span class="term">Contrato (interface)</span><p>La lista de métodos que el servicio promete tener, sin el cómo.</p><p class="muted">El enchufe: dice la forma, no qué hay detrás.</p></div>
+    <div class="box f"><span class="term">Binding</span><p>La línea que le dice a Laravel «cuando pidan este contrato, entrega esta clase».</p></div>
+    <div class="box f"><span class="term">Validator · after()</span><p>Una revisión extra que corre después de las reglas normales, con todos los datos a la mano.</p></div>
+    <div class="box f"><span class="term">beforeSave()</span><p>Un gancho que corre justo antes de guardar: el último retoque al registro.</p></div>
+    <div class="box f"><span class="term">Select dependiente</span><p>Un select cuyas opciones cambian según otro (la empresa).</p></div>
+    <div class="box f"><span class="term">groupBy</span><p>Junta filas iguales en una sola para sumar. Toda columna que se muestra sin sumar tiene que estar en él.</p></div>
+    <div class="box f"><span class="term">Estático</span><p>Un método que se llama sin crear el objeto (<code>Clase::metodo()</code>). No tiene <code>$this</code>.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="kicker">3 · Base de datos</div>
+  <h2>Dos migraciones, un seeder y la migración que lo corre</h2>
+  <table>
+    <tr class="f"><td><b>Columna nueva</b></td><td><code>PLPR_UNIDADNEGOCIO</code>, texto de 3, nula. Patrón: <code>2022_06_06_150516_columns_nueva_fecha_autorzacion…</code></td></tr>
+    <tr class="f"><td><b>Columna más grande</b></td><td><code>PAGE_VALOR</code> a <code>text</code> con <code>change()</code>. Patrón: <code>2023_07_07_100703_increment_reme_observaciones_length.php</code></td></tr>
+    <tr class="f"><td><b>Seeder</b></td><td>Si ya existe <code>PPTO_UNIDADES_NEGOCIO</code>, no hace nada; si no, inserta la plantilla de la empresa 0.</td></tr>
+    <tr class="f"><td><b>Migración del seeder</b></td><td>Llama al seeder con <code>Artisan::call</code>, como la de Vacunas.</td></tr>
+  </table>
+  <div class="analogy f"><b>Por qué un seeder que primero pregunta:</b> TI va a agregar empresas en producción. Si el seeder volviera a insertar, o sobrescribiera, borraría ese trabajo.</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">4 · Servicio</div>
+  <h2>Contrato + implementación + binding</h2>
+  <div class="grid g3">
+    <div class="box f"><h3>Contrato</h3><p><code>IParametroGeneralService</code>: los 4 métodos y qué devuelven.</p></div>
+    <div class="box f"><h3>Implementación</h3><p><code>ParametroGeneralService extends BaseService</code>: el cómo.</p></div>
+    <div class="box f"><h3>Binding</h3><p>En <code>ServiceBindingServiceProvider</code>: contrato ⇒ implementación.</p></div>
+  </div>
+  <p class="f">El controlador pide el <b>contrato</b> en su constructor y Laravel le entrega la implementación. Así se hizo Vacunas: <code>VacunaController.php:20</code>.</p>
+  <div class="analogy f"><b>Ojo con las mayúsculas:</b> SGH pasa a MAYÚSCULAS todo lo que llega del formulario (<code>getRequest()</code>). Si TI guarda el JSON desde la pantalla, <code>"empresa"</code> queda como <code>"EMPRESA"</code>. El servicio pasa las claves a minúsculas al leer, y así no importa cómo se guardó.</div>
+</section>
+
+<section class="slide" data-flow="5">
+  <div class="kicker">5 · Validar en dos tiempos</div>
+  <h2>rules() + after()</h2>
+  <div class="flow">
+    <div class="node" data-n="1"><span class="lane">llega</span><b>Guardar</b>formulario o Excel</div>
+    <div class="node" data-n="2"><span class="lane">tiempo 1</span><b>rules()</b>3 dígitos, no 000</div>
+    <div class="node" data-n="3"><span class="lane">tiempo 2</span><b>after()</b>¿de su empresa?</div>
+    <div class="node" data-n="4"><span class="lane">retoque</span><b>beforeSave()</b>sin U.N. ⇒ vacío</div>
+    <div class="node" data-n="5"><span class="lane">sale</span><b>Se guarda</b>o vuelve con el error</div>
+  </div>
+  <div class="caption" id="cap"></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">6 · Los caminos de escritura</div>
+  <h2>Por dónde entra cada guardado</h2>
+  <table>
+    <tr><th>Camino</th><th>Pasa por</th></tr>
+    <tr class="f"><td>Formulario crear</td><td><code>storeModel()</code> ⇒ <code>validateRules()</code> ⇒ <code>beforeSave()</code></td></tr>
+    <tr class="f"><td>Formulario editar</td><td><code>update()</code> ⇒ <code>validateRules()</code> ⇒ <code>beforeSave()</code></td></tr>
+    <tr class="f"><td>Excel ACTUALIZAR</td><td><code>validarReglasNegocio()</code> ⇒ <code>update()</code></td></tr>
+    <tr class="f"><td>Excel CREAR</td><td><code>validarReglasNegocio()</code> (desde <code>ModelController</code>). No pasa por <code>beforeSave()</code>: ahí se limpia el código.</td></tr>
+  </table>
+  <div class="analogy f"><b>La idea:</b> no se corrige cada pantalla. Se pone la regla en los pocos puntos por donde pasan <b>todas</b> las escrituras.</div>
+</section>
+
+<section class="slide">
+  <div class="kicker">7 · Formulario y reportes</div>
+  <h2>Lo visible</h2>
+  <div class="grid g2">
+    <div class="box f"><h3>Select dependiente</h3><p>Se copia el par de <code>CEOP_ID</code> (<code>form-inputs.blade.php:32-33</code>). El JS (<code>select2-dependiente.js</code>) pide <code>buscaUnidadNegocio?id=&lt;empresa&gt;</code> y arma las opciones con las claves <code>PLPR_UNIDADNEGOCIO</code> y <code>UNIDAD_NEGOCIO</code>.</p><p>El widget deshabilita el select si llega vacío: por eso un script pequeño lo habilita cuando trae opciones.</p></div>
+    <div class="box f"><h3>Reportes</h3><p>La pantalla de reportes arma las columnas con lo que traiga el <code>select</code>: una línea por reporte basta.</p><p>En el 804 hay <code>groupBy</code>: la columna nueva también va ahí, o PostgreSQL rechaza la consulta.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="kicker">8 · Errores típicos</div>
+  <h2>Dónde suele romperse</h2>
+  <table>
+    <tr class="f"><td><span class="tag t-bad">change()</span></td><td>Tabla sin comillas dobles dentro del string ⇒ doctrine no la encuentra.</td></tr>
+    <tr class="f"><td><span class="tag t-bad">Orden</span></td><td>El seeder corre antes de ampliar <code>PAGE_VALOR</code> ⇒ el JSON no cabe.</td></tr>
+    <tr class="f"><td><span class="tag t-bad">Número</span></td><td>Tratar <code>001</code> como número ⇒ queda <code>1</code>. Pasa en Excel si la celda no es texto.</td></tr>
+    <tr class="f"><td><span class="tag t-bad">El if</span></td><td>Meter la validación dentro del <code>if</code> de <code>PLPR_NUEVA</code> ⇒ no corre si la fila no trae NUEVA.</td></tr>
+    <tr class="f"><td><span class="tag t-warn">Columnas</span></td><td><code>&lt;th&gt;</code>, <code>columns</code> y <code>getData()</code> en distinto orden ⇒ la tabla se descuadra.</td></tr>
+    <tr class="f"><td><span class="tag t-warn">Tuyo</span></td><td>En un ticket anterior creíste que recibir datos por constructor quería decir que la regla no validaba. Aquí el servicio llega por constructor y <b>sí</b> valida: el constructor solo entrega la herramienta.</td></tr>
+  </table>
+</section>
+
+<section class="slide">
+  <div class="kicker">9 · Para cerrar</div>
+  <h2>Tres preguntas</h2>
+  <details class="q f"><summary>1. ¿Por qué la validación por empresa no va en <code>rules()</code> del modelo?</summary><div><code>rules()</code> es estático y no conoce la empresa de la planta. La lista válida depende de un dato del mismo registro: eso lo resuelve <code>after()</code>, que ve todos los datos.</div></details>
+  <details class="q f"><summary>2. Si una empresa no tiene U.N. y llega «001» por Excel, ¿qué pasa y dónde se decide?</summary><div>Se ignora: queda vacía. En CREAR lo hace <code>validarReglasNegocio()</code>, cambiando <code>$datos</code>; en formulario y en ACTUALIZAR, <code>beforeSave()</code>.</div></details>
+  <details class="q f"><summary>3. ¿Por qué el servicio pasa las claves a minúsculas?</summary><div>Porque <code>getRequest()</code> pone en mayúsculas lo que se guarda desde la pantalla. Sin eso, el JSON editado por TI dejaría a todas las empresas sin U.N., sin dar ningún error.</div></details>
+</section>
+
+<section class="slide">
+  <div class="kicker">Ahora tú</div>
+  <h2>El plan, paso a paso</h2>
+  <p>Ábrelo con la vista previa de VS Code:</p>
+  <pre>~/.claude/brain/learning/plans/2026-11-09-sgh-11542-plan.md</pre>
+  <ol>
+    <li class="f">Empieza por la <b>Etapa 1</b>. Cuando termines un paso, dime y lo reviso.</li>
+    <li class="f">Si te trabas, pide una pista: primero te digo dónde mirar; el código, solo si me lo pides.</li>
+    <li class="f">Si aparece una palabra que no entiendes, pregúntala: se agrega al glosario.</li>
+  </ol>
+</section>
+
+</main>
+<div class="nav"><button id="prev" aria-label="Anterior">←</button><span id="count"></span><button id="next" aria-label="Siguiente">→</button></div>
+<template id="caps">
+<p>Llega un guardado: el formulario de crear o editar, o una fila del Excel.</p>
+<p><b>rules()</b> del modelo revisa lo que vale para todos: si viene, 3 dígitos y distinto de 000. No sabe de empresas.</p>
+<p><b>after()</b> mira la empresa: si tiene U.N., exige un código de su lista; si no tiene, no exige nada.</p>
+<p><b>beforeSave()</b>: si la empresa no tiene U.N., deja el código vacío. Es tu decisión de «ignorar el código».</p>
+<p>Si algo falló, vuelve al formulario con el mensaje en el campo; si no, se guarda.</p>
+</template>
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var caps=document.getElementById('caps');
+  var capList=caps?[].slice.call(caps.content.querySelectorAll('p')).map(function(p){return p.innerHTML}):[];
+  var i=0, step=0;
+  function frags(s){return [].slice.call(s.querySelectorAll('.f'))}
+  function maxStep(s){return s.dataset.flow?+s.dataset.flow:frags(s).length}
+  function render(){
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    var s=slides[i];
+    if(s.dataset.flow){
+      [].slice.call(s.querySelectorAll('.node')).forEach(function(n){
+        var k=+n.dataset.n; n.classList.toggle('active',k===step); n.classList.toggle('done',k<step);
+      });
+      document.getElementById('cap').innerHTML=step?capList[step-1]:'Avanza para recorrerlo.';
+    } else {
+      frags(s).forEach(function(f,k){f.classList.toggle('show',k<step)});
+    }
+    document.getElementById('count').textContent=(i+1)+' / '+slides.length;
+    document.getElementById('bar').style.width=((i+1)/slides.length*100)+'%';
+    try{location.hash=i+1}catch(e){}
+  }
+  function next(){var s=slides[i]; if(step<maxStep(s)){step++}else if(i<slides.length-1){i++;step=0} render()}
+  function prev(){if(step>0){step--}else if(i>0){i--;step=maxStep(slides[i])} render()}
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','PageDown',' ','Enter'].indexOf(e.key)>=0){e.preventDefault();next()}
+    if(['ArrowLeft','PageUp','Backspace'].indexOf(e.key)>=0){e.preventDefault();prev()}
+  });
+  document.getElementById('next').onclick=next;
+  document.getElementById('prev').onclick=prev;
+  var h=parseInt((location.hash||'').slice(1),10); if(h>0&&h<=slides.length){i=h-1}
+  render();
+})();
+</script>
+</body>
+</html>
