@@ -27,6 +27,7 @@ import { MAPPINGS as maintenanceWorkOrders } from "./modules/maintenance/work-or
 import { MAPPINGS as mobileVisits } from "./modules/mobile/visits/mappings.mjs";
 import { MAPPINGS as operationsDispatches } from "./modules/operations/dispatches/mappings.mjs";
 import { MAPPINGS as operationsDispatchesOverview } from "./modules/operations/dispatches-overview/mappings.mjs";
+import { MAPPINGS as operationsCheckpointCompliance } from "./modules/operations/dispatch-checkpoint-compliance/mappings.mjs";
 import { MAPPINGS as operationsIssues } from "./modules/operations/issues/mappings.mjs";
 import { MAPPINGS as operationsPqrs } from "./modules/operations/pqrs/mappings.mjs";
 import { MAPPINGS as operationsRoutes } from "./modules/operations/routes/mappings.mjs";
@@ -43,7 +44,7 @@ import { MAPPINGS as settingsCompanies } from "./modules/settings/companies/mapp
 import { MAPPINGS as settingsReports } from "./modules/settings/reports/mappings.mjs";
 import { MAPPINGS as reportsGenerate } from "./modules/reports/generate/mappings.mjs";
 
-const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceIssues, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsDispatchesOverview, ...operationsIssues, ...operationsPqrs, ...operationsRoutes, ...operationsTraining, ...respelBranches, ...respelClients, ...respelClientLoyalties, ...respelClientOperationCosts, ...respelServiceProvisions, ...respelDashboards, ...respelProgrammings, ...publicCitizenPortal, ...settingsCompanies, ...settingsReports, ...reportsGenerate };
+const MAPPINGS_BY_VIEW = { ...authLogin, ...avl, ...avlRouteSearch, ...maintenanceIssues, ...maintenanceLogbook, ...maintenanceSystems, ...maintenanceWorkOrders, ...mobileVisits, ...operationsDispatches, ...operationsDispatchesOverview, ...operationsCheckpointCompliance,...operationsIssues, ...operationsPqrs, ...operationsRoutes, ...operationsTraining, ...respelBranches, ...respelClients, ...respelClientLoyalties, ...respelClientOperationCosts, ...respelServiceProvisions, ...respelDashboards, ...respelProgrammings, ...publicCitizenPortal, ...settingsCompanies, ...settingsReports, ...reportsGenerate };
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {
