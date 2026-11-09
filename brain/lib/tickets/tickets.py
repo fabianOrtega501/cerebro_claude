@@ -122,11 +122,15 @@ def _choose(found, pick):
     return found
 
 
+FETCHED_FILES = ("ticket.md", "hu.md", "meta.json")
+
+
 def _reset_folder(folder):
-    """Empties the ticket cache folder: only this run's files count."""
-    if folder.exists():
-        shutil.rmtree(folder)
-    folder.mkdir(parents=True, mode=0o700)
+    """Deletes only the files a fetch writes; keeps the rest (e.g. explicacion.*)."""
+    folder.mkdir(parents=True, mode=0o700, exist_ok=True)
+    for path in folder.iterdir():
+        if path.name in FETCHED_FILES or path.name.startswith("hu-"):
+            shutil.rmtree(path) if path.is_dir() else path.unlink()
 
 
 def fetch(mantis_id, glpi_code, pick):
