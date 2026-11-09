@@ -1,0 +1,1 @@
+- [Ticket 11542: estado al pausar](ticket-11542-estado.md) — rama creada, HU entendida, respuestas a ambigüedades y próximos pasos (mapa SGH primero)
