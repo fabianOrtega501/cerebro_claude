@@ -39,3 +39,4 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [sin-actions-van-como-servicios](sin-actions-van-como-servicios.md) — En el AIO no se crean clases nuevas en app/Actions; una operación de negocio con nombre propio va como servicio en la carpeta de su entidad
 - [demo-google-11433](demo-google-11433.md) — Demo de Google del 11433 en la copia aio-app-google, rama local de experimento; se borra al decidir
 - [worker-sail-sigue-vivo](worker-sail-sigue-vivo.md) — Detener sail artisan queue:work no mata el worker del contenedor; matar los viejos por PID y dejar uno solo
+- [dblink-local-apunta-a-desa](dblink-local-apunta-a-desa.md) — En local, database_connections puede tener filas hacia desa (el ETL lee desa sin avisar); la contraseña se cifra con el database_name de la fila

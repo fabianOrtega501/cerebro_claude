@@ -288,6 +288,11 @@ destino de otro ambiente, niega escrituras en modo lectura y pregunta en cada op
   `DB_*` que no encaje queda sin registrar y Doctor lo reporta.
 - Para conectarse desde un script, `dbConnection("status", "qa")` arma la conexion con las dos
   piezas y pasa por la guarda antes de devolverla. No se rearma a mano en cada script.
+- **En prod, `dbConnection` desde un script siempre se niega**: la guarda pide aprobación en cada
+  operación de producción, y un script no puede pedirla. Para leer de prod, el `psql` va directo en el
+  comando de Bash, con el host visible y la contraseña leída de `secrets.env` sin imprimirla
+  (`PGPASSWORD="$(grep ^DB_PROD_PASSWORD= …)"`), para que la guarda se lo muestre a Fabian. Pasó el
+  2026-11-10 al copiar SGH de producción a local.
 - `secrets.example.env` (versionado) lista las mismas claves sin valores. Clave nueva en
   `secrets.env`, clave nueva en el ejemplo: Doctor avisa si se separan.
 - Un host que la guarda no conoce se niega: preguntar a que ambiente pertenece y proponer la
