@@ -1,0 +1,16 @@
+{
+  "label": "Soporte — scripts SQL y utilidades de soporte de los aplicativos",
+  "ticketPrefix": "",
+  "contract": "",
+  "verifier": "",
+  "protectedBranches": ["main"],
+  "repos": [
+    {
+      "role": "scripts",
+      "path": "/datos/proyectos/soporte",
+      "stack": "Scripts SQL (PostgreSQL, PL/pgSQL), shell de crontab, Python y PHP sueltos. Sin build ni pruebas: cada archivo se aplica a mano en el ambiente que corresponda",
+      "checks": []
+    }
+  ],
+  "containers": {}
+}

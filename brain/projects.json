@@ -67,6 +67,13 @@
         "paths": ["plugins", ".claude-plugin"]
       }
     },
+    "soporte": {
+      "label": "Soporte — scripts SQL y utilidades de soporte de los aplicativos",
+      "//": "No es un aplicativo: versiona los objetos de base que se aplican a mano en cada ambiente (procedimientos del ETL de SGH de AIO, crontab de base, cargues y consultas de soporte). Rama base: main.",
+      "repos": [
+        "/datos/proyectos/soporte"
+      ]
+    },
     "infra": {
       "label": "Infraestructura — imagenes Docker y base de datos local",
       "//": "No es un aplicativo: publica las imagenes base de PHP del CI y el stack de postgres local que usan todos los demas proyectos.",
