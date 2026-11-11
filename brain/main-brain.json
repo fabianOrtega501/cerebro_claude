@@ -17,9 +17,14 @@
     "development:peer-review": [
       "skills/peer-review"
     ],
+    "development:review-overengineering": [
+      "skills/review-overengineering"
+    ],
     "aio:check-contract": [
       "brain/projects/aio/stack/check-contract.mjs"
     ]
   },
-  "contributions": []
+  "contributions": [
+    { "branch": "feature/fabian-review-overengineering", "commit": "ae13793", "plugin": "development", "version": "0.2.0", "piece": "skills/review-overengineering", "status": "pending" }
+  ]
 }
