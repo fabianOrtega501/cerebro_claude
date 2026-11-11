@@ -497,7 +497,7 @@ Se tomo de Ponytail el 2026-10-05 sin instalar el plugin, que choca con el modo 
 de comentarios y con las suites de pruebas. Para revisar un diff con este criterio esta la skill
 `review-overengineering`.
 
-## Documentar funciones: maximo 1,5 renglones, en todas partes
+## Documentar funciones: 1,5 renglones recomendado, 2 maximo, en todas partes
 
 **Rige en todo lo que se escriba**: el codigo propio de `~/.claude` y tambien los repos de
 trabajo. No hay excepcion por repo ni por lenguaje, salvo la de Swagger que se explica abajo.
@@ -545,11 +545,12 @@ Lo decidio Fabian el 2026-09-16.
   que no devuelve nada (`void`, `Promise<void>`) no es obligatorio. Los metodos de endpoint con
   Swagger no llevan ninguno. No cuentan dentro del limite. Lo decidio Fabian el 2026-11-05.
 
-**Renglon y medio de prosa por funcion. Ni uno mas.** Un renglon completo y, solo si hace falta,
-medio mas; en la practica, casi siempre uno. El limite es duro y no admite "es que esta funcion es
-especial": si no cabe, el problema es la funcion, no el limite. Lo bajo Fabian de 3 a 2 el
-2026-10-09, tras la revision de pares del ticket 11041, y de 2 a 1,5 el 2026-10-20, para igualarlo
-a la regla del equipo (`team-rules.md` de `peer-review`, punto 2).
+**Renglon y medio de prosa por funcion, recomendado; dos, el maximo.** Un renglon completo y, solo si
+hace falta, medio mas; en la practica, casi siempre uno. Hasta dos renglones se acepta; mas de dos no:
+el limite es duro y no admite "es que esta funcion es especial": si no cabe, el problema es la
+funcion, no el limite. Lo bajo Fabian de 3 a 2 el 2026-10-09, tras la revision de pares del ticket
+11041, de 2 a 1,5 el 2026-10-20, y el 2026-11-11 dejo 1,5 como recomendado y 2 como maximo, igual que
+la regla del equipo (`team-rules.md` de `peer-review`, punto 2).
 
 En ese renglon y medio va, en este orden de prioridad:
 

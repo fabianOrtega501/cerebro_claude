@@ -15,8 +15,9 @@ Al citarlas en un informe, el respaldo es «reglas del equipo para la revisión 
    encima de cada interfaz de TypeScript. Si algo necesita explicación, va en el docblock. Que un archivo
    vecino tenga comentarios no es permiso: es deuda heredada. Excepción: los comentarios de Blade
    (`{{-- --}}`) en plantillas, donde son convención.
-2. **La descripción de un docblock tiene máximo 1,5 líneas** (sin contar `@param` ni `@return`): una
-   línea con el qué; el porqué largo no va ahí.
+2. **La descripción de un docblock tiene máximo 2 líneas; lo recomendado es 1,5** (sin contar `@param`
+   ni `@return`): el qué; el porqué largo no va ahí. Hasta 2 líneas se acepta; más de 2 debe
+   corregirse.
 3. **Una función recibe como máximo 3 parámetros.** Lo demás va en un objeto de opciones con valores por
    defecto. Los parámetros que no se usan se eliminan.
 4. **Un componente genérico solo hace lo suyo.** Nada de props, banderas ni eventos de un caso de negocio
