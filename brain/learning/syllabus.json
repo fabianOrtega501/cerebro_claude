@@ -13,7 +13,7 @@
         "indice",
         "llave foranea"
       ],
-      "lastPracticed": "2026-10-19",
+      "lastPracticed": "2026-11-11",
       "cleanStreak": 0,
       "tickets": [
         {
@@ -22,9 +22,18 @@
           "date": "2026-10-19",
           "hint": 1,
           "blocking": 2
+        },
+        {
+          "ticket": "11542",
+          "project": "sgh",
+          "date": "2026-11-11",
+          "hint": 2,
+          "blocking": 4
         }
       ],
-      "recurringErrors": []
+      "recurringErrors": [
+        "->change() sin comillas dobles en la tabla en MAYÚSCULAS; down() faltante"
+      ]
     },
     "laravel-eloquent": {
       "label": "Modelos, relaciones y consultas con Eloquent",

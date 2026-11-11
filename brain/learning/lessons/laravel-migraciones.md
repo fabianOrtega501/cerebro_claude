@@ -65,12 +65,17 @@ explicita. Para probar: `migrate` real y `migrate:rollback`. (Memoria
 - Extraer un dato de una cadena sin comprobar el formato (anio = 4 primeros caracteres de
   `periodo`): si algun registro viejo no cumple el formato, la copia mete basura sin avisar.
 - Nueva FK sin indice: el join del listado escanea la tabla completa.
+- `->change()` sobre una tabla en MAYUSCULAS sin comillas dobles dentro del string
+  (`'"PARAMETROSGENERALES"'`): doctrine pasa el nombre a minusculas y no encuentra la tabla.
+- Migracion que agranda un tipo sin `down()`: el rollback no la deshace. El `down()` vuelve al
+  tipo anterior, aunque falle si ya hay datos que no caben.
 
 ## 5. Apariciones
 
 | Ticket | Proyecto | Como aparecio | Pista mas alta |
 |---|---|---|---|
 | 10841 | status | Tabla hija `dt_tramites_formularios`, 3 columnas a nulable, FK nueva sin cascade, copia de 146 tramites con verificacion separada del vaciado | (pendiente) |
+| 11542 | sgh | Columna `PLPR_UNIDADNEGOCIO` nueva y `PAGE_VALOR` de varchar(300) a text con `->change()` | 2 |
 
 ## Preguntas de cierre
 
