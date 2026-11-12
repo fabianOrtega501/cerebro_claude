@@ -6,7 +6,7 @@ description: >-
   documentan un desarrollo, no son uno), y por cada uno responde las cinco
   preguntas del formato del equipo (Problema abordado, Valor generado, Decisión técnica relevante,
   Aprendizaje clave, Mejora futura). El borrador sale del diff real de las ramas; el usuario corrige.
-  Entrega el texto para copiar y uno o más PNG de 1920x1080 listos para insertar como imagen en Google
+  Entrega el texto para copiar y uno o más PNG de 3840x2160 listos para insertar como imagen en Google
   Slides. No toca ramas, no commitea, no sube nada a ningún servicio y en base de datos no entra.
   USO MANUAL: se ejecuta SOLO cuando el usuario lo pide (/gen-sprint-summary o "arma el resumen del
   sprint"), nunca por iniciativa propia. Palabras gatillo: resumen del sprint, diapositiva del
@@ -158,9 +158,9 @@ Formato del JSON:
 {
   "author": "Fabian",
   "sprint": "18",
-  "showTickets": false,
+  "showTickets": true,
   "developments": [
-    { "project": "AIO", "ticket": "9357",
+    { "project": "AIO", "ticket": "9357", "status": { "passed": true, "label": "desa y QA" },
       "problem": "…", "value": "…", "decision": "…", "learning": "…", "improvement": "…" }
   ]
 }
@@ -168,6 +168,16 @@ Formato del JSON:
 
 `project` es la etiqueta corta que se ve en el slide (`AIO`, `Epsilon`, `Status`), no la clave de
 `projects.json`. El orden de los desarrollos en el arreglo es el orden en la diapositiva.
+
+**Ticket y estado.** Con `showTickets` en `true` cada caja abre con `#<ticket>` y, si trae `status`,
+una etiqueta al lado: verde *✓ Pasó · <label>* con `passed: true`, naranja *⏳ No pasó · <label>* con
+`false`. El estado no se adivina: después de un `fetch`, en cada repo y por cada rama se busca si
+tiene algún commit del ticket: `git log origin/<rama> --no-merges --grep=<ticket> -1` (o el código
+GLPI, si los commits lo usan). **Nunca el último commit de `--all`**: si alguien copió los commits a
+su rama, la copia tiene otro hash y el ticket parece no haber pasado. Pasó es que está en desa y QA (se dice si
+también llegó a prod); no pasó es que sigue en la rama local o solo en desa. Si los repos de un ticket
+quedaron en sitios distintos, la etiqueta lo dice (*web en desa y QA, AMI en rama local*). Las
+etiquetas se muestran al usuario en la Fase 4, junto con el texto.
 
 **De a seis por slide.** El renderizador toma los desarrollos en el orden del arreglo y arma un
 slide por cada seis, en filas de tres cajas del mismo ancho: seis quedan tres arriba y tres abajo. Cuando hay más de uno, cada slide lleva el subtítulo *Parte 1 de 2*. El

@@ -1,6 +1,6 @@
 /**
  * Maqueta el slide del sprint: de un JSON de desarrollos a `Retrospectiva_Sprint_<n>.html` y su
- * PNG de 1920x1080.
+ * PNG de 3840x2160 (maqueta de 1920x1080 a densidad 2).
  *
  * Uso:
  *   node render-slide.mjs --entrada desarrollos.json --sprint 18
@@ -15,9 +15,10 @@
  *   {
  *     "author": "Fabian",
  *     "sprint": "18",
- *     "showTickets": false,
+ *     "showTickets": true,
  *     "developments": [
- *       { "project": "AIO", "ticket": "9357", "problem": "...", "value": "...",
+ *       { "project": "AIO", "ticket": "9357", "status": { "passed": true, "label": "desa y QA" },
+ *         "problem": "...", "value": "...",
  *         "decision": "...", "learning": "...", "improvement": "..." }
  *     ],
  *     "extraSlides": [
@@ -64,6 +65,20 @@ function escapeHtml(text) {
 /** Fixed columns per row: six boxes land as three on top and three below. */
 const COLUMNS = 3;
 
+/** Densidad de la captura: la maqueta sigue en 1920x1080 y el PNG sale a 3840x2160. */
+const PIXEL_RATIO = 2;
+
+/**
+ * Etiqueta verde «Pasó» o naranja «No pasó» que va junto al ticket; vacía sin `status`.
+ * @param {{passed: boolean, label: string} | undefined} status - Dónde quedó el desarrollo
+ * @returns {string}
+ */
+function badgeHtml(status) {
+	if (!status) return "";
+	const [css, text] = status.passed ? ["ok", "✓ Pasó"] : ["pending", "⏳ No pasó"];
+	return ` <span class="badge ${css}">${text} · ${escapeHtml(status.label)}</span>`;
+}
+
 /** HTML de una caja de desarrollo. */
 function cardHtml(dev, showTickets) {
 	const lines = FIELDS
@@ -72,7 +87,7 @@ function cardHtml(dev, showTickets) {
 			`<div class="line"><span class="icon">${icon}</span><b>${label}:</b> ${escapeHtml(dev[key])}</div>`)
 		.join("\n\t\t\t\t");
 
-	const ticket = showTickets && dev.ticket ? `<div class="ticket">#${escapeHtml(dev.ticket)}</div>\n\t\t\t\t` : "";
+	const ticket = showTickets && dev.ticket ? `<div class="ticket">#${escapeHtml(dev.ticket)}${badgeHtml(dev.status)}</div>\n\t\t\t\t` : "";
 
 	return `\t\t\t<div class="card">\n\t\t\t\t${ticket}${lines}\n\t\t\t</div>`;
 }
@@ -191,12 +206,12 @@ async function fitToSlide(cdp, from) {
 }
 
 /**
- * Captura cada HTML a PNG de 1920x1080 con un solo Chrome, el que ya maneja `update-manual`.
+ * Captura cada HTML a PNG de 1920x1080 por `PIXEL_RATIO` con un solo Chrome, el de `update-manual`.
  * @param {{htmlPath: string, pngPath: string, scale: number}[]} jobs - Slides a capturar
  * @returns {Promise<{path: string, scale: number, fits: boolean}[]>} Uno por slide, en orden
  */
 async function renderPngs(jobs) {
-	const { launchChrome, connectPage, setViewport, screenshot, closeBrowser, waitUntil } =
+	const { launchChrome, connectPage, screenshot, closeBrowser, waitUntil } =
 		await import("../../update-manual/lib/browser.mjs");
 
 	let chrome = null;
@@ -205,7 +220,7 @@ async function renderPngs(jobs) {
 	try {
 		chrome = await launchChrome({ port: 9333 });
 		cdp = await connectPage(chrome.port);
-		await setViewport(cdp, { width: 1920, height: 1080 });
+		await cdp.send("Emulation.setDeviceMetricsOverride", { width: 1920, height: 1080, deviceScaleFactor: PIXEL_RATIO, mobile: false });
 
 		const results = [];
 
