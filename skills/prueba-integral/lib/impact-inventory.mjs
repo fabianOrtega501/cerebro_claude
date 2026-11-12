@@ -150,6 +150,7 @@ function reposHermanos(repo) {
  */
 function simbolosTocados(diff) {
 	const nombres = new Set();
+	const agregados = new Set();
 
 	for (const linea of diff.split("\n")) {
 		if (!/^[+-]/.test(linea) || /^[+-]{3}/.test(linea)) {
@@ -158,42 +159,47 @@ function simbolosTocados(diff) {
 
 		const funcion = linea.match(/function\s+(\w+)/);
 		const metodoJs = linea.match(/^\s*[+-]\s*(?:async\s+)?(\w+)\s*\([^)]*\)\s*\{/);
+		const flecha = linea.match(/(?:const|let)\s+(\w+)\s*=\s*(?:async\s*)?(?:function|\(|\w+\s*=>)/);
 		const clave = linea.match(/['"](\w{4,})['"]\s*=>/);
 
-		for (const encontrado of [funcion?.[1], metodoJs?.[1], clave?.[1]]) {
+		for (const encontrado of [funcion?.[1], metodoJs?.[1], flecha?.[1], clave?.[1]]) {
 			if (encontrado && encontrado.length >= 5 && !DEMASIADO_COMUNES.has(encontrado.toLowerCase())) {
 				nombres.add(encontrado);
+
+				if (linea.startsWith("+")) agregados.add(encontrado);
 			}
 		}
 	}
 
-	return [...nombres].slice(0, 12);
+	return [...nombres].slice(0, 12).map((nombre) => ({ nombre, quitado: !agregados.has(nombre) }));
 }
 
 /**
- * Archivos de los demas repos que mencionan alguno de los simbolos.
+ * Files in the other project repos that mention a symbol, and in this repo the ones still using a removed name.
  *
- * @param {string[]} simbolos
- * @param {string[]} repos
- * @param {string} propio
+ * @param {{ nombre: string, quitado: boolean }[]} simbolos
+ * @param {string[]} repos - Project repos, including the one being inventoried.
+ * @param {string} propio - The inventoried repo.
+ * @param {string} archivoPropio - The changed file, skipped as its own consumer.
  * @returns {object[]}
  */
-function consumidores(simbolos, repos, propio) {
+function consumidores(simbolos, repos, propio, archivoPropio) {
 	const hallados = [];
 
 	for (const repo of repos) {
-		if (path.resolve(repo) === path.resolve(propio)) {
-			continue;
-		}
+		const mismoRepo = path.resolve(repo) === path.resolve(propio);
 
-		for (const simbolo of simbolos) {
+		for (const { nombre: simbolo, quitado } of simbolos.filter((s) => !mismoRepo || s.quitado)) {
 			try {
 				const salida = execFileSync(
 					"grep",
 					[
-						"-rl",
+						"-rlw",
 						"--include=*.php",
 						"--include=*.js",
+						"--include=*.mjs",
+						"--include=*.ts",
+						"--include=*.tsx",
 						"--include=*.vue",
 						...FUERA.map((d) => `--exclude-dir=${d}`),
 						"-e",
@@ -203,8 +209,14 @@ function consumidores(simbolos, repos, propio) {
 					{ encoding: "utf8", timeout: 20000 },
 				).trim();
 
-				for (const archivo of salida.split("\n").filter(Boolean).slice(0, 4)) {
-					hallados.push({ repo: path.basename(repo), simbolo, archivo: path.relative(repo, archivo) });
+				const archivos = salida
+					.split("\n")
+					.filter(Boolean)
+					.map((archivo) => path.relative(repo, archivo))
+					.filter((archivo) => !(mismoRepo && archivo === archivoPropio));
+
+				for (const archivo of archivos.slice(0, 4)) {
+					hallados.push({ repo: path.basename(repo), simbolo, quitado, archivo });
 				}
 			} catch {
 				// grep sale 1 cuando no encuentra nada: no es un error
@@ -261,7 +273,7 @@ const archivos = [
 	.filter((f, i, todos) => todos.indexOf(f) === i);
 
 const extra = args.flatMap((a, i) => (a === "--tambien" ? [args[i + 1]] : [])).filter(Boolean);
-const hermanos = [...new Set([...reposHermanos(repo), ...extra.map((r) => path.resolve(r))])].filter(existsSync);
+const hermanos = [...new Set([repo, ...reposHermanos(repo), ...extra.map((r) => path.resolve(r))])].filter(existsSync);
 const inventario = archivos.map((archivo) => {
 	const diff = sinSeguimiento.includes(archivo)
 		? newFileDiff(archivo, repo)
@@ -271,8 +283,8 @@ const inventario = archivos.map((archivo) => {
 	return {
 		archivo,
 		tipos: tiposDelDiff(diff),
-		simbolos,
-		consumidores: consumidores(simbolos, hermanos, repo),
+		simbolos: simbolos.map(({ nombre }) => nombre),
+		consumidores: consumidores(simbolos, hermanos, repo, archivo),
 		lineas: diff.split("\n").filter((l) => /^[+-]/.test(l) && !/^[+-]{3}/.test(l)).length,
 	};
 });
@@ -299,7 +311,8 @@ if (comoJson) {
 		}
 
 		for (const c of fila.consumidores) {
-			console.log(`     usa "${c.simbolo}": ${c.repo}/${c.archivo}`);
+			const aviso = c.quitado ? " ← el diff quitó este nombre: revisar que ya no lo use" : "";
+			console.log(`     usa "${c.simbolo}": ${c.repo}/${c.archivo}${aviso}`);
 		}
 
 		if (fila.tipos.length === 0 && fila.consumidores.length === 0) {

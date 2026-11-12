@@ -488,6 +488,12 @@ servia; si nadie mas lo usa, se elimina ahi mismo. El codigo muerto no rompe nad
 lo nota hasta que lo marca la revision del MR. Lo pidio Fabian el 2026-10-08, tras dos comentarios
 del MR del ticket 11254 (un `getAllNoPagination` y una clave de traduccion huerfanos).
 
+**Al cambiar el nombre de algo o quitarlo, la busqueda del nombre viejo es en todo el repo, `tests/`
+incluida, nunca solo en `src/`.** Un uso que queda con el nombre viejo no rompe el build ni el lint
+del archivo tocado: rompe la prueba o la pantalla que nadie abrio. Paso en el 11549, el 2026-11-12:
+la busqueda se limito a `src/` y la prueba unitaria de la funcion quedo llamando un nombre que ya
+no existia.
+
 **Lo minimo nunca recorta** la validacion en el request, el manejo de errores que evita perder
 datos, los permisos ni lo que la HU pide. **Tampoco pasa por encima del estandar del repo**: si el
 equipo ya tiene la pieza (`BaseService`, `CommonFormRequest`), usarla es el escalon 2.

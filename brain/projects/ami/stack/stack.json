@@ -12,7 +12,7 @@
       "role": "front",
       "path": "/datos/proyectos/app-movil",
       "stack": "Ionic Vue 3 + Capacitor 8 + TypeScript, offline-first sobre SQLite",
-      "checks": ["npm run lint", "npm run build"],
+      "checks": ["npm run lint", "npm run build", "node ~/.claude/skills/finish-development/lib/related-tests.mjs"],
       "//dev": "El 5173 suele estar ocupado por aio-app: npm run dev -- --port 5180 --strictPort"
     },
     {

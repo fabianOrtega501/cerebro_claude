@@ -31,6 +31,11 @@ node ~/.claude/skills/prueba-integral/lib/impact-inventory.mjs --base <rama base
 Por cada archivo devuelve que tipo de cambio es, que simbolos se tocaron y **quien los consume en
 los demas repos**. Con cincuenta archivos esto a mano no se hace, y por eso se saltaba.
 
+**En el repo propio, quien sigue usando un nombre que el diff quito**, pruebas incluidas, marcado con
+«el diff quitó este nombre». Cubre `.ts` y las funciones flecha (`export const x = () =>`). En el
+11549 se cambio el nombre de una funcion y su prueba quedo con el viejo: el inventario no miraba el
+repo propio ni los `.ts`, y la tabla salio sin esa fila.
+
 **Cuenta lo que esta sin commitear, y los archivos nuevos.** La skill se corre antes del commit, asi
 que el trabajo todavia esta en el working tree: compara contra el punto donde la rama se separo de su
 base, no contra `HEAD`. Con `base...HEAD` devolvia cero archivos justo cuando mas se la necesita; paso

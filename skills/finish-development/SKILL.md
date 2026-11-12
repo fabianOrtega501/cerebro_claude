@@ -110,6 +110,11 @@ node ~/.claude/skills/finish-development/lib/run-checks.mjs --repo <repo> \
 Traduce `pnpm` a `npm` si hace falta. `--with-build` agrega el build, que es lo único que
 demuestra que el proyecto compila de verdad.
 
+**El build no compila las pruebas.** En un repo con Vitest, el check `related-tests.mjs` corre las
+pruebas que importan los archivos cambiados (`vitest related`) y solo falla por las fallas nuevas:
+las que también fallan en la base se reportan como heredadas, sin bloquear. En el 11549 se cambió
+el nombre de una función, la prueba siguió con el nombre viejo, y lint y build pasaron.
+
 Y que arranque, que es distinto de que compile:
 
 ```bash
