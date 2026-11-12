@@ -41,3 +41,4 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [worker-sail-sigue-vivo](worker-sail-sigue-vivo.md) — Detener sail artisan queue:work no mata el worker del contenedor; matar los viejos por PID y dejar uno solo
 - [congelamiento-de-desa](congelamiento-de-desa.md) — Desde el día 8 del sprint no se sube nada a desa ni se abren MR hacia desa; la reapertura varía y se pregunta
 - [dblink-local-apunta-a-desa](dblink-local-apunta-a-desa.md) — En local, database_connections puede tener filas hacia desa (el ETL lee desa sin avisar); la contraseña se cifra con el database_name de la fila
+- [cada-rn-con-su-caso](cada-rn-con-su-caso.md) — Cada RN de la HU con su fila en el plan y su caso en el set; una condición heredada que la contradiga se decide antes de editar
