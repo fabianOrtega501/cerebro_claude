@@ -18,5 +18,10 @@ solo sirve de intérprete y monta el repo.
 - **Prod de SGH**: servidor de `DB_PRODSGH_HOST`, base `postgres`, esquema `sgh` (PostgreSQL 10.9). El usuario
   de soporte no puede leer las secuencias: `pg_dump --data-only` falla y se copia con `\copy (select …)` por
   tabla. `corporativo.sgh` (otro servidor de prod) es una integración que la aplicación no usa.
+- **`composer dump-autoload`** falla por permisos porque `vendor/` es de root. Se corre así:
+  `docker exec -u root -e HOME=/tmp sgh-app composer dump-autoload`.
+- **Probar en pantalla desde Chrome por CDP**: el login pide un captcha de imagen. Se toma una captura del
+  formulario, se lee el captcha en la imagen y se envía el formulario con usuario, clave y captcha
+  (`credentialsFor("sgh")`). Antes de capturar, ocultar `.phpdebugbar`, que tapa el pie de la página.
 - **Colas**: `QUEUE_DRIVER=database`; solo correos de tickets y reingresos.
   `docker exec -d sgh-app php artisan queue:work --daemon --tries=3`.

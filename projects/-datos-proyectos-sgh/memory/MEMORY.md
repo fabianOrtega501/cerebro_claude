@@ -1,1 +1,1 @@
-- [Ticket 11542: estado al pausar](ticket-11542-estado.md) — rama creada, HU entendida, respuestas a ambigüedades y próximos pasos (mapa SGH primero)
+- [Ticket 11542: cerrado](ticket-11542-estado.md) — commits de sgh y manual subidos; faltan los MR (sgh → desa, manual → qa) y sus notas
