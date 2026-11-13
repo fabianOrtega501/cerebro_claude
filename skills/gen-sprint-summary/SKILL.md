@@ -180,7 +180,12 @@ quedaron en sitios distintos, la etiqueta lo dice (*web en desa y QA, AMI en ram
 etiquetas se muestran al usuario en la Fase 4, junto con el texto.
 
 **De a seis por slide.** El renderizador toma los desarrollos en el orden del arreglo y arma un
-slide por cada seis, en filas de tres cajas del mismo ancho: seis quedan tres arriba y tres abajo. Cuando hay más de uno, cada slide lleva el subtítulo *Parte 1 de 2*. El
+slide por cada seis. Todos los desarrollos van en una sola rejilla, sin sección por proyecto: el
+proyecto se ve en cada caja como una etiqueta de su color, y el borde de la caja lleva ese color.
+Nunca hay más de tres cajas en la fila de arriba: hasta tres van en una fila; cuatro quedan dos y
+dos; cinco, tres y dos; seis, tres y tres. Una fila con menos cajas las ensancha, y las filas se
+estiran hasta llenar el alto, así que no quedan huecos. La letra arranca grande (escala 1.5) y la
+medición la baja hasta que todo cabe. Cuando hay más de un slide, cada uno lleva el subtítulo *Parte 1 de 2*. El
 primero se llama `Retrospectiva_Sprint_<n>.png`, y los siguientes `_2`, `_3`…, antes de los de
 `extraSlides`. Para que un proyecto no quede partido entre dos imágenes, sus desarrollos van
 seguidos en el arreglo y el corte se cuadra en múltiplos de seis.

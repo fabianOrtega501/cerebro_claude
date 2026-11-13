@@ -65,8 +65,14 @@ function escapeHtml(text) {
 /** Fixed columns per row: six boxes land as three on top and three below. */
 const COLUMNS = 3;
 
+/** Columnas de la rejilla de desarrollos: con 6, una fila de 3 cajas o de 2 cajas reparte exacto. */
+const GRID_TRACKS = 6;
+
 /** Densidad de la captura: la maqueta sigue en 1920x1080 y el PNG sale a 3840x2160. */
 const PIXEL_RATIO = 2;
+
+/** Escala de partida de un slide de desarrollos: la medicion la baja hasta que todo quepa. */
+const MAX_SCALE = 1.5;
 
 /**
  * Etiqueta verde «Pasó» o naranja «No pasó» que va junto al ticket; vacía sin `status`.
@@ -79,17 +85,26 @@ function badgeHtml(status) {
 	return ` <span class="badge ${css}">${text} · ${escapeHtml(status.label)}</span>`;
 }
 
-/** HTML de una caja de desarrollo. */
-function cardHtml(dev, showTickets) {
+/**
+ * HTML de una caja de desarrollo, con la etiqueta del proyecto, el ticket y su estado.
+ * @param {object} dev - Desarrollo del JSON
+ * @param {boolean} showTickets - Pintar `#ticket` y la etiqueta de estado
+ * @param {string} accent - Color del proyecto
+ * @param {number} span - Columnas de la rejilla que ocupa la caja
+ * @returns {string}
+ */
+function cardHtml(dev, showTickets, accent, span) {
 	const lines = FIELDS
 		.filter(([key]) => dev[key])
 		.map(([key, icon, label]) =>
 			`<div class="line"><span class="icon">${icon}</span><b>${label}:</b> ${escapeHtml(dev[key])}</div>`)
 		.join("\n\t\t\t\t");
 
-	const ticket = showTickets && dev.ticket ? `<div class="ticket">#${escapeHtml(dev.ticket)}${badgeHtml(dev.status)}</div>\n\t\t\t\t` : "";
+	const project = `<span class="project">${escapeHtml(dev.project ?? "Otros")}</span>`;
+	const number = showTickets && dev.ticket ? `#${escapeHtml(dev.ticket)}${badgeHtml(dev.status)}` : "";
+	const head = `<div class="ticket">${project}${number}</div>\n\t\t\t\t`;
 
-	return `\t\t\t<div class="card">\n\t\t\t\t${ticket}${lines}\n\t\t\t</div>`;
+	return `\t\t\t<div class="card" style="--accent: ${accent}; grid-column: span ${span}">\n\t\t\t\t${head}${lines}\n\t\t\t</div>`;
 }
 
 /** HTML de una caja de un slide de lista: titulo, que pasa y que hacer. */
@@ -141,16 +156,28 @@ function fillTemplate({ author, subtitle, scale, sections }) {
  * @returns {{html: string, scale: number}}
  */
 function buildHtml({ author = "Fabian", showTickets = false, developments, subtitle, projects }) {
-	const names = [...new Set(developments.map(d => d.project ?? "Otros"))];
-	const grouped = names.map(name => ({
-		name,
-		accent: ACCENTS[projects.indexOf(name) % ACCENTS.length],
-		items: developments.filter(d => (d.project ?? "Otros") === name),
-	}));
-	const scale = developments.length <= 3 ? 1 : 0.9;
-	const sections = sectionsHtml(grouped, dev => cardHtml(dev, showTickets));
+	const accentOf = dev => ACCENTS[projects.indexOf(dev.project ?? "Otros") % ACCENTS.length];
+	const rows = rowsFor(developments.length);
+	const cards = [];
+	let start = 0;
 
-	return { html: fillTemplate({ author, subtitle, scale, sections }), scale };
+	for (const count of rows) {
+		for (const dev of developments.slice(start, start + count)) {
+			cards.push(cardHtml(dev, showTickets, accentOf(dev), GRID_TRACKS / count));
+		}
+		start += count;
+	}
+
+	const sections = `\t\t<div class="grid" style="--rows: ${rows.length}; --tracks: ${GRID_TRACKS}">\n${cards.join("\n")}\n\t\t</div>`;
+
+	return { html: fillTemplate({ author, subtitle, scale: MAX_SCALE, sections }), scale: MAX_SCALE };
+}
+
+/** Cajas por fila: hasta 3 en una; 4 quedan 2+2, 5 quedan 3+2 y 6 quedan 3+3. */
+function rowsFor(count) {
+	if (count <= COLUMNS) return [count];
+	const top = Math.min(COLUMNS, Math.ceil(count / 2));
+	return [top, count - top];
 }
 
 /**

@@ -12,6 +12,7 @@
 	:root {
 		--ink: #1f2937;
 		--muted: #4b5563;
+		--text: #2d3748;
 		--title: #2f5fd0;
 		--scale: {{SCALE}};
 	}
@@ -65,11 +66,13 @@
 		overflow: hidden;
 	}
 
-	.line { font-size: calc(21px * var(--scale)); line-height: 1.34; color: var(--muted); }
+	.line { font-size: calc(21px * var(--scale)); line-height: 1.34; color: var(--text); }
 	.line b { color: var(--ink); font-weight: 700; }
 	.icon { margin-right: 6px; }
 	.item-title { font-size: calc(23px * var(--scale)); font-weight: 700; color: var(--accent); line-height: 1.25; }
 	.ticket { font-size: calc(22px * var(--scale)); font-weight: 700; color: #2b59c3; display: flex; align-items: center; gap: 10px; }
+	.grid { display: grid; grid-template-columns: repeat(var(--tracks), 1fr); grid-template-rows: repeat(var(--rows), 1fr); gap: 18px; flex: 1; min-height: 0; }
+	.project { font-size: 0.8em; color: #fff; background: var(--accent); padding: 2px 12px; border-radius: 8px; }
 	.badge { font-size: calc(17px * var(--scale)); font-weight: 600; padding: 3px 12px; border-radius: 999px; }
 	.badge.ok { color: #1e7a3c; background: #e3f4e8; }
 	.badge.pending { color: #b45309; background: #fdefdc; }
