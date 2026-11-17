@@ -297,6 +297,10 @@ En este orden. Cada comentario cita **de dónde sale la regla**; sin respaldo, e
 8. **Seguridad y rendimiento**: permisos, empresa de la sesión en toda acción por id, validación de
    entrada, SQL con parámetros, datos personales en respuestas o logs, consultas por fila, paginación y
    secretos en el código.
+9. **Lo que sobra, solo en el modo manual** (en el propio ya corrió antes `finish-development`): se aplica
+   el criterio de `review-overengineering` al diff de la rama. Cada hallazgo es **Mejora sugerida**; si
+   además incumple una regla escrita (el `CLAUDE.md`, las reglas del equipo), es **Debe corregirse** y se
+   cita la fuente. Un símbolo que el cambio dejó huérfano es **Debe corregirse**.
 
 ### Clasificar
 
