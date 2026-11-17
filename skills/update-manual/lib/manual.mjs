@@ -50,18 +50,28 @@ export function resolveManualRoot(profile, explicitPath) {
 export const imagesRoot = (profile, manualRoot) => join(manualRoot, ...profile.imagesPath);
 
 /**
- * Lee el ancho y alto de un PNG desde su cabecera IHDR.
+ * Ancho y alto de un PNG (cabecera IHDR) o de un JPEG (marcador SOF), leídos sin dependencias.
  *
- * Se hace a mano y no con una librería para no meterle dependencias a la skill.
- *
- * @param {string} path - Ruta del PNG
- * @returns {{width: number, height: number}} Dimensiones en píxeles. **No valida que el archivo
- *          sea un PNG**: con otro formato devuelve números sin sentido
+ * @param {string} path - Ruta de la imagen
+ * @returns {{width: number, height: number}} Dimensiones en píxeles; 0 x 0 si el formato no se reconoce
  */
-export function pngSize(path) {
+export function imageSize(path) {
 	const bytes = readFileSync(path);
 
-	return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+	if (bytes.readUInt32BE(0) === 0x89504e47) {
+		return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+	}
+
+	let offset = 2;
+	while (bytes[0] === 0xff && bytes[1] === 0xd8 && offset + 9 < bytes.length) {
+		const marker = bytes[offset + 1];
+		if ((marker >= 0xc0 && marker <= 0xcf) && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+			return { width: bytes.readUInt16BE(offset + 7), height: bytes.readUInt16BE(offset + 5) };
+		}
+		offset += 2 + bytes.readUInt16BE(offset + 2);
+	}
+
+	return { width: 0, height: 0 };
 }
 
 /**
@@ -96,7 +106,7 @@ export function copyScreenshots({ from, mappings, imagesDir, overwrite = false }
 		}
 
 		// Un recorte fallido no falla: produce una imagen de 20x20 o de miles de píxeles de alto.
-		const { width, height } = pngSize(source);
+		const { width, height } = imageSize(source);
 		if (width < 200 || height < 100 || height > 4000) {
 			suspicious.push(`${screenshot} (${width}x${height})`);
 			continue;

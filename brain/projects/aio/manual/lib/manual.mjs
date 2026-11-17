@@ -9,7 +9,7 @@
 import { PROFILE } from "../profile.mjs";
 import * as engine from "../../../../../skills/update-manual/lib/manual.mjs";
 
-export { copyScreenshots, pngSize } from "../../../../../skills/update-manual/lib/manual.mjs";
+export { copyScreenshots, imageSize } from "../../../../../skills/update-manual/lib/manual.mjs";
 
 /** Igual que la del motor, pero sin tener que pasar el perfil. */
 export const resolveManualRoot = explicitPath => engine.resolveManualRoot(PROFILE, explicitPath);

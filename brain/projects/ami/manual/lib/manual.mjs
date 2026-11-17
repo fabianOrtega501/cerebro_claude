@@ -3,7 +3,7 @@
 import { PROFILE } from "../profile.mjs";
 import * as engine from "../../../../../skills/update-manual/lib/manual.mjs";
 
-export { copyScreenshots, pngSize } from "../../../../../skills/update-manual/lib/manual.mjs";
+export { copyScreenshots, imageSize } from "../../../../../skills/update-manual/lib/manual.mjs";
 
 export const resolveManualRoot = explicitPath => engine.resolveManualRoot(PROFILE, explicitPath);
 export const imagesRoot = manualRoot => engine.imagesRoot(PROFILE, manualRoot);
