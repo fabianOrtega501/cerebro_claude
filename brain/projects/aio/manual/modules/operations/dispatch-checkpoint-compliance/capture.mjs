@@ -1,5 +1,5 @@
 /**
- * Captures, 1800 px wide so the list shows its Semáforo column, the "Cumplimiento Por Puntos De Control" tab of Dispatches: the day list and the point-by-point detail.
+ * Captures, 1800 px wide so the list shows its Cumplimiento column, the "Cumplimientos" tab of Dispatches: the day list and the point-by-point detail.
  *
  * Uso:
  *   node modules/operations/dispatch-checkpoint-compliance/capture.mjs --salida <carpeta>
@@ -61,7 +61,7 @@ const { email, password } = credentialsFor("aio");
 const { cdp, chrome } = await openSession({ base, email, password, company, module: "Operacion", width: 1800, height: 1700 });
 
 try {
-	await goTo(cdp, base, "/operations/dispatches?tab=checkpointCompliance");
+	await goTo(cdp, base, "/operations/dispatches?tab=compliances");
 	await waitUntil(cdp, `!!document.querySelector('input') && [...document.querySelectorAll('input')].some(i => i._flatpickr)`, { timeout: 60000, what: "filtros" });
 	await wait(2000);
 	const dateSet = await evaluate(cdp, `(() => { const fp = [...document.querySelectorAll('input')].map(i => i._flatpickr).find(Boolean); if (!fp) return false; fp.setDate('${date}', true); return true; })()`);
