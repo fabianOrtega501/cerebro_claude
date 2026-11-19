@@ -70,6 +70,17 @@ Hace `fetch --prune` en todos los repos de `projects.json` (salvo main-brain) y 
 Se le muestra al usuario qué ramas aparecieron, de quién y de cuándo, y **se confirma cuáles se
 revisan** antes de seguir. Si las ramas son suyas, modo propio.
 
+**El lado asignado.** Si el proyecto tiene back y front en repos distintos, el usuario indica junto con
+el ticket qué lado le asignaron: `back`, `front` o `ambos` («Revisar 11890 back»). Si no lo dice, se
+pregunta antes de seguir. En un monolito (back y front en el mismo repo) no se pregunta: la asignación
+es una sola y se revisa todo.
+
+- **El lado asignado** recibe la revisión completa. Es el único que cuenta en la tabla de niveles, el
+  que decide si se puede aprobar y el que va primero en el chat y en el informe.
+- **El otro lado** se puede mirar, pero queda como **adicional**: no cuenta en la tabla ni impide
+  aprobar, aunque lo que se encuentre sea grave, porque eso le corresponde a quien tenga asignada esa
+  revisión. Si es grave, se marca así dentro de la sección adicional.
+
 ### M3. El merge request
 
 Por cada rama:
@@ -116,6 +127,10 @@ comentarios hay por nivel, primero los que impiden aprobar; dónde quedó el inf
 puede decidir (una regla sin respaldo escrito, el orden de despliegue, algo visto en el otro repo). Si
 con sus reglas propias (`~/.claude/CLAUDE.md`, memorias como `revision-de-pares-propia`) se vería algo
 más, se le menciona aquí **como opcional**: al compañero no se le exigen.
+
+**Con un lado asignado** (M2), primero va todo lo de ese lado: la tabla, los hallazgos y sus comentarios
+para GitLab. Al final, en el chat y en el informe, va una sección **«Adicional: <el otro lado>»** con lo
+visto en el otro repo, en una lista corta y con sus propios comentarios para GitLab, separados por MR.
 
 **El informe, para el compañero**, en `brain/peer-reviews/…`. Si ya existe de una revisión anterior de
 la misma rama, se agrega una sección nueva con la fecha. Se escribe en español de Colombia, pretérito
