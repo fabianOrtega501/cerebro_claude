@@ -51,6 +51,17 @@ Con `ticket-context`: el subagente `ticket-reader` con `fetch <mantis>` o `fetch
 un código de GLPI, si el caso trae número de Mantis, se usan los dos para buscar ramas. La HU define si
 el cambio está **completo**; sin ella solo se revisa la forma, y se dice en el informe.
 
+**Las notas de Mantis.** Además de la HU, se leen todas las notas del ticket (`ticket.md`): las del
+desarrollador, las de QA y las del solicitante. Una nota que acuerda un cambio de alcance, justifica una
+decisión o responde una duda de la HU evita el comentario.
+
+- Lo que una nota ya decidió **no se marca como hallazgo**. En «Cómo se revisó» se cita la nota con su
+  fecha y su autor («el listado por despachos lo acordó el solicitante, nota del 2026-11-12»).
+- Si la nota contradice la HU, manda la nota, porque es más reciente. Si no queda claro quién decidió,
+  se le pregunta al usuario en el chat, no al compañero en GitLab.
+- En cada revisión nueva de la misma rama se vuelve a bajar el ticket: las notas que llegaron después
+  pueden cerrar comentarios que siguen abiertos.
+
 ### M2. Las ramas del ticket
 
 ```bash
