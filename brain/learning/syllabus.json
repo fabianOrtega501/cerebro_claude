@@ -48,7 +48,7 @@
         "join",
         "listado"
       ],
-      "lastPracticed": "2026-09-29",
+      "lastPracticed": "2026-11-18",
       "cleanStreak": 0,
       "tickets": [
         {
@@ -57,10 +57,18 @@
           "date": "2026-09-29",
           "hint": 4,
           "blocking": 0
+        },
+        {
+          "ticket": "11927",
+          "project": "aio",
+          "date": "2026-11-18",
+          "hint": 4,
+          "blocking": 3
         }
       ],
       "recurringErrors": [
-        "ubico el filtro por estado derivado en el servicio y no en applyFilters del repositorio"
+        "ubico el filtro por estado derivado en el servicio y no en applyFilters del repositorio",
+        "Variable del use de un when sin definir y Carbon sobre un texto"
       ]
     },
     "laravel-validacion": {
@@ -280,7 +288,7 @@
     },
     "depuracion": {
       "label": "Depurar: leer el error, aislar la causa y comprobar la hipotesis",
-      "level": "practicado",
+      "level": "dominado",
       "keywords": [
         "error",
         "falla",
@@ -290,13 +298,20 @@
         "log",
         "hotfix"
       ],
-      "lastPracticed": "2026-09-30",
-      "cleanStreak": 1,
+      "lastPracticed": "2026-11-18",
+      "cleanStreak": 2,
       "tickets": [
         {
           "ticket": "11349",
           "project": "ami",
           "date": "2026-09-30",
+          "hint": 2,
+          "blocking": 0
+        },
+        {
+          "ticket": "11927",
+          "project": "aio",
+          "date": "2026-11-18",
           "hint": 2,
           "blocking": 0
         }
@@ -383,7 +398,7 @@
       "label": "Pruebas automatizadas con PHPUnit en Laravel",
       "level": "visto",
       "keywords": [],
-      "lastPracticed": "2026-10-19",
+      "lastPracticed": "2026-11-18",
       "cleanStreak": 0,
       "tickets": [
         {
@@ -392,9 +407,18 @@
           "date": "2026-10-19",
           "hint": 3,
           "blocking": 3
+        },
+        {
+          "ticket": "11927",
+          "project": "aio",
+          "date": "2026-11-18",
+          "hint": 4,
+          "blocking": 6
         }
       ],
-      "recurringErrors": []
+      "recurringErrors": [
+        "Escenario que no aislaba la regla: factory aleatoria, ids confundidos, caso faltante tapado con ?? null"
+      ]
     }
   }
 }

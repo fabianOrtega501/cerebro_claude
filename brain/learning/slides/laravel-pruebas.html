@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pruebas de Feature en Laravel</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#1d2329; --muted:#5d6b76; --line:#dfe3e6;
+  --accent:#1f6f8b; --accent-soft:#e3f0f5; --ok:#2e7d4f; --ok-soft:#e5f3ea;
+  --warn:#a45d00; --warn-soft:#fbf0de; --bad:#a52020; --bad-soft:#fbe6e6;
+  --code:#f1f3f5; --code-ink:#24292f;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161a; --card:#1b2127; --ink:#e7ecef; --muted:#9aa8b2; --line:#2c353d;
+    --accent:#5cb3d1; --accent-soft:#183440; --ok:#6cc58f; --ok-soft:#173326;
+    --warn:#e0a650; --warn-soft:#3a2b14; --bad:#ef7d7d; --bad-soft:#3d1c1c;
+    --code:#0f1418; --code-ink:#d6dde3;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161a; --card:#1b2127; --ink:#e7ecef; --muted:#9aa8b2; --line:#2c353d;
+  --accent:#5cb3d1; --accent-soft:#183440; --ok:#6cc58f; --ok-soft:#173326;
+  --warn:#e0a650; --warn-soft:#3a2b14; --bad:#ef7d7d; --bad-soft:#3d1c1c;
+  --code:#0f1418; --code-ink:#d6dde3;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+.deck{height:100%;display:flex;align-items:center;justify-content:center;padding:16px}
+.slide{display:none;width:min(1100px,100%);max-height:calc(100vh - 90px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:36px 44px}
+.slide.on{display:block;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:2.2em;margin:.1em 0 .3em}
+h2{font-size:1.5em;margin:0 0 .6em;color:var(--accent)}
+.kicker{color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.78em;margin-bottom:.4em}
+p{margin:.4em 0 .8em}
+.muted{color:var(--muted)}
+code{background:var(--code);color:var(--code-ink);padding:.08em .35em;border-radius:5px;font-size:.92em}
+pre{background:var(--code);color:var(--code-ink);padding:14px 16px;border-radius:10px;overflow:auto;font-size:.86em;line-height:1.5;margin:.5em 0}
+pre .hl{background:var(--accent-soft);display:inline-block;width:100%}
+.ref{font-size:.8em;color:var(--muted);font-family:ui-monospace,monospace}
+.f{opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
+.f.show{opacity:1;transform:none}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.box{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--bg)}
+.box h3{margin:0 0 .3em;font-size:1.02em}
+.term{font-weight:700;color:var(--accent)}
+.tag{display:inline-block;font-size:.75em;padding:.1em .55em;border-radius:20px;font-weight:600}
+.t-ok{background:var(--ok-soft);color:var(--ok)}
+.t-warn{background:var(--warn-soft);color:var(--warn)}
+.t-bad{background:var(--bad-soft);color:var(--bad)}
+.t-acc{background:var(--accent-soft);color:var(--accent)}
+.analogy{border-left:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:.6em 0}
+/* Recorrido animado */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.node{border:2px solid var(--line);border-radius:10px;padding:10px;text-align:center;font-size:.86em;background:var(--bg);transition:all .35s}
+.node b{display:block;font-size:1.05em;margin-bottom:2px}
+.node.active{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.04);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.node.done{border-color:var(--ok);opacity:.75}
+.lane{font-size:.75em;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.caption{min-height:3.4em;border:1px dashed var(--line);border-radius:10px;padding:10px 14px;background:var(--bg)}
+.ticket{display:inline-block;background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:0 .4em;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:.92em}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.bar{position:fixed;left:0;top:0;height:4px;background:var(--accent);transition:width .3s}
+.nav{position:fixed;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:10px;align-items:center;font-size:.85em;color:var(--muted)}
+.nav button{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 14px;cursor:pointer;font:inherit}
+.nav button:hover{border-color:var(--accent)}
+.q{border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:10px 0}
+.q summary{cursor:pointer;font-weight:600}
+.q div{margin-top:8px;color:var(--muted)}
+@media (max-width:640px){
+  .slide{padding:22px 16px;max-height:calc(100vh - 80px)}
+  body{font-size:15px}
+  h1{font-size:1.7em}
+}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<div class="deck">
+
+<section class="slide"><div class="kicker">Tema · laravel-pruebas · ticket 11927</div><h1>Un guardia que repite tu prueba</h1>
+<p>Probar a mano demuestra que el rango funciona <b>hoy, en tu computador</b>. No dice nada de mañana.</p>
+<div class="analogy f">Una prueba automática es como el guardia de la portería: revisa lo mismo cada vez que alguien entra. El CI la corre en cada MR, y si alguien vuelve a dejar el filtro de un solo día, el pipeline se pone rojo antes de llegar a desa.</div>
+<p class="f"><span class="tag t-warn">Regla</span> Toda corrección lleva una prueba <b>que falle sin ella</b>. Si nunca la viste fallar, no está verificada: solo está escrita.</p></section>
+
+<section class="slide"><h2>Glosario primero</h2><table>
+<tr><th>Término</th><th>Qué es</th></tr>
+<tr class="f"><td class="term">Prueba de Feature</td><td>Hace una petición HTTP de verdad a la aplicación (sin navegador) y revisa la respuesta</td></tr>
+<tr class="f"><td class="term">Factory</td><td>Fábrica de registros válidos con datos inventados. Tú fijas solo lo que le importa al escenario</td></tr>
+<tr class="f"><td class="term">RefreshDatabase</td><td>Cada prueba arranca con la base de pruebas vacía; lo que creó se revierte al terminar</td></tr>
+<tr class="f"><td class="term">setUp()</td><td>Se ejecuta antes de <b>cada</b> prueba: aquí se crea el usuario y se inicia sesión con <code>actingAs</code></td></tr>
+<tr class="f"><td class="term">Afirmación (assert)</td><td>La comprobación: si no se cumple, la prueba falla y dice por qué</td></tr>
+</table></section>
+
+<section class="slide" data-flow="3"><h2>Las tres partes de toda prueba</h2>
+<div class="flow">
+<div class="node" data-n="1"><b>Preparar</b>factories crean el escenario</div>
+<div class="node" data-n="2"><b>Actuar</b><code>$this->get(...)</code></div>
+<div class="node" data-n="3"><b>Afirmar</b><code>assertContains</code> / <code>assertNotContains</code></div>
+</div>
+<div class="caption" id="cap">Avanza para recorrerlo.</div>
+<template id="caps">
+<p><b>Preparar</b>: el despacho base el 12 a las 05:00, y a su alrededor un despacho por cada caso que quieres demostrar. Cada uno cambia <b>una sola cosa</b> respecto al base.</p>
+<p><b>Actuar</b>: llamar a <code>/api/dispatches/v0/get-select-for-weights?filter=</code> con el mismo JSON que mandará la pantalla de Apoyos: <code>dispatch_date</code>, <code>company_id</code>, <code>user_id</code>.</p>
+<p><b>Afirmar</b>: lo que debe estar <b>está</b>, y lo que no debe estar <b>no está</b>. Las dos mitades: sin la segunda, una consulta que trae todo también pasaría.</p>
+</template></section>
+
+<section class="slide"><h2>Cómo se ve en este repo</h2>
+<p class="ref">tests/Feature/Modules/Operation/DispatchDownload/ClosedDispatchDistributionTest.php · ya prueba este mismo endpoint</p>
+<pre>class ClosedDispatchDistributionTest extends TestCase
+{
+    <span class="hl">use RefreshDatabase, WithoutMiddleware;</span>
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->user = UserFactory::new()->create();
+        <span class="hl">$this->actingAs($this->user);</span>
+    }</pre>
+<pre>$response = $this->get('/api/dispatches/v0/get-select-for-weights?filter='
+    .json_encode(['user_id' => $this->user->id]));
+
+<span class="hl">$ids = array_column($response->json('data') ?? [], 'id');</span>
+$this->assertContains($closed->id, $ids, 'El despacho cerrado debe ofrecerse como destino.');
+$this->assertNotContains($annulled->id, $ids, 'El despacho anulado sigue excluido.');</pre>
+<p class="f muted"><code>WithoutMiddleware</code> salta el permiso: aquí no se prueba el permiso, se prueba la consulta. El mensaje al final de cada assert es lo que leerás cuando falle.</p></section>
+
+<section class="slide"><h2>La trampa de este repo</h2>
+<p><code>DispatchFactory</code> crea <b>una empresa, un servicio y un centro operativo nuevos</b> por cada despacho.</p>
+<div class="grid g2">
+<div class="box f"><h3><span class="tag t-bad">Así falla</span></h3><pre>$base = DispatchFactory::new()->create([...]);
+$ayer = DispatchFactory::new()->create([
+    'start_datetime' => '2026-11-11 22:00:00',
+]);</pre><p class="muted">$ayer queda en otro centro: el filtro de centros del usuario lo saca y la prueba falla por una razón que no es la fecha.</p></div>
+<div class="box f"><h3><span class="tag t-ok">Así sí</span></h3><pre>$same = [
+  'company_id' => $base->company_id,
+  'operational_center_id' => $base->operational_center_id,
+];
+$ayer = DispatchFactory::new()->create(
+  $same + ['start_datetime' => '2026-11-11 22:00:00']
+);</pre></div>
+</div>
+<p class="f muted">Y el usuario necesita ese centro: <code>UserOperationalCenter::insert</code>, igual que el modelo.</p></section>
+
+<section class="slide"><h2>Errores típicos</h2>
+<div class="grid g2">
+<div class="box f"><h3>Solo el caso feliz</h3>Afirmar lo que sale, nunca lo que no sale. Una consulta sin filtro también pasa.</div>
+<div class="box f"><h3>Datos que no aíslan</h3>Si el de ayer es además de otro servicio, no sabes si salió por la fecha o por el servicio.</div>
+<div class="box f"><h3>No verla fallar</h3>Devuelve el <code>whereDate</code> de un día y corre la prueba. Si sigue en verde, no prueba nada.</div>
+<div class="box f"><h3>Nombres largos</h3>Máximo 5 palabras sin <code>test_</code>. El detalle va al docblock.</div>
+</div>
+<p class="f muted">No copies del modelo los comentarios sueltos dentro de los métodos: en código nuevo no van.</p></section>
+
+<section class="slide"><h2>Preguntas de cierre</h2>
+<details class="q"><summary>1. Si tu prueba pasa con el código viejo, ¿qué te está diciendo?</summary><div>Que no prueba la regla nueva: el escenario no tiene un registro que solo el rango deje entrar (el del día anterior o el del posterior).</div></details>
+<details class="q"><summary>2. ¿Por qué el despacho del día anterior debe ser del mismo centro y servicio que el base?</summary><div>Para que lo único distinto sea la fecha. Si cambia otra cosa, cuando falle no sabrás cuál de las dos lo sacó.</div></details>
+<details class="q"><summary>3. ¿Qué parte del escenario demuestra que la Distribución de pesos no cambió?</summary><div>Una segunda prueba que llame sin <code>dispatch_date</code>, con <code>start_datetime</code> y <code>service_id</code> como la Distribución, y afirme que solo sale el mismo día y servicio.</div></details></section>
+
+<section class="slide"><h2>Ahora tú</h2>
+<p class="f">1. Responde las tres preguntas antes de mirar las respuestas.</p>
+<p class="f">2. Escribe en una tabla el escenario: qué despachos creas, qué cambia cada uno respecto al base y si debe salir o no.</p>
+<p class="f">3. Con eso armamos el archivo <code>tests/Feature/Modules/Operation/Dispatch/SupportDispatchSelectTest.php</code>.</p></section>
+
+</div>
+<div class="nav"><button id="prev">←</button><span id="count"></span><button id="next">→</button></div>
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var caps=document.getElementById('caps');
+  var capList=caps?[].slice.call(caps.content.querySelectorAll('p')).map(function(p){return p.innerHTML}):[];
+  var i=0, step=0;
+  function frags(s){return [].slice.call(s.querySelectorAll('.f'))}
+  function maxStep(s){return s.dataset.flow?+s.dataset.flow:frags(s).length}
+  function render(){
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+    var s=slides[i];
+    if(s.dataset.flow){
+      [].slice.call(s.querySelectorAll('.node')).forEach(function(n){
+        var k=+n.dataset.n; n.classList.toggle('active',k===step); n.classList.toggle('done',k<step);
+      });
+      document.getElementById('cap').innerHTML=step?capList[step-1]:'Avanza para recorrerlo.';
+    } else {
+      frags(s).forEach(function(f,k){f.classList.toggle('show',k<step)});
+    }
+    document.getElementById('count').textContent=(i+1)+' / '+slides.length;
+    document.getElementById('bar').style.width=((i+1)/slides.length*100)+'%';
+    try{location.hash=i+1}catch(e){}
+  }
+  function next(){var s=slides[i]; if(step<maxStep(s)){step++}else if(i<slides.length-1){i++;step=0} render()}
+  function prev(){if(step>0){step--}else if(i>0){i--;step=maxStep(slides[i])} render()}
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','PageDown',' ','Enter'].indexOf(e.key)>=0){e.preventDefault();next()}
+    if(['ArrowLeft','PageUp','Backspace'].indexOf(e.key)>=0){e.preventDefault();prev()}
+  });
+  document.getElementById('next').onclick=next;
+  document.getElementById('prev').onclick=prev;
+  var h=parseInt((location.hash||'').slice(1),10); if(h>0&&h<=slides.length){i=h-1}
+  render();
+})();
+</script>
+</body>
+</html>

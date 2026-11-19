@@ -53,6 +53,22 @@ vista (.vue)  ->  servicio local (services/app, SQL a SQLite)  ->  importación 
 |---|---|---|
 | ami | Ticket 11349: botón "Siguiente" vs "Guardar" en Visitas Clientes | La decisión vive en un `computed` de un componente hijo; la causa estaba cuatro tramos atrás |
 
+En el AIO web la cadena de un selector es más corta, pero cruza los dos repos:
+
+```
+vista (.vue, arma el objeto filters)  ->  service del front ($api, manda ?filter=JSON)
+      ->  controlador Custom  ->  Custom*Service (consulta)  ->  QuerysFilters (filtro genérico)  ->  SQL
+```
+
+La herramienta clave del backend es **ver el SQL real** que sale, sin adivinarlo leyendo PHP.
+Desde tinker, con una consulta de solo lectura:
+
+```bash
+./vendor/bin/sail artisan tinker --execute "DB::enableQueryLog(); <llamar al servicio>; dump(DB::getQueryLog());"
+```
+
+El query log trae cada `where` con sus valores (`bindings`). Ahí se ve qué filtro recorta la lista.
+
 ## 4. Errores tipicos
 
 - **Arreglar donde se ve el síntoma.** Forzar el paso de firma en la vista cuando la causa es que
@@ -61,6 +77,11 @@ vista (.vue)  ->  servicio local (services/app, SQL a SQLite)  ->  importación 
   mirar qué hace con él, aunque el arreglo termine siendo del front.
 - **Tuyo, ticket 11349** — Proponer cambiar el backend sin leer cómo trataba el parámetro (ya era
   opcional), y agregar una protección que ya existía en otro tramo. Leer antes de proponer.
+- **Creer lo que dice el reporte sobre la causa.** "Salen rutas del turno siguiente" describe lo
+  que el usuario vio, no qué filtro lo produjo. El turno puede no estar en la consulta: la causa se
+  demuestra con el SQL y los datos, no con la frase del ticket.
+- **Deducir el SQL leyendo PHP.** Laravel transforma cosas al compilar (castea, agrega esquemas,
+  convierte arrays en `IN`). Lo que se ejecuta se ve en el query log.
 - **No preguntar por qué está la línea.** Borrar un filtro sin mirar el `git log` puede reabrir la
   falla que ese filtro corrigió.
 
@@ -69,6 +90,7 @@ vista (.vue)  ->  servicio local (services/app, SQL a SQLite)  ->  importación 
 | Ticket | Proyecto | Como aparecio | Pista mas alta |
 |---|---|---|---|
 | 11349 | ami | Visita sin preguntas que no pedía firma: la causa estaba en un filtro de la importación | 2 |
+| 11927 | aio | Selector de Apoyos que solo ofrecía despachos del turno siguiente: encontrar qué filtro de `get-select-for-weights` recorta la lista | 2 |
 
 ## Preguntas de cierre
 

@@ -25,7 +25,7 @@ node ~/.claude/skills/start-development/lib/parse-request.mjs <lo que escribió>
 ```
 
 Reconoce cada dato por lo que es, **en cualquier orden**, y devuelve `missing` con lo que falta.
-Preguntar solo eso. Si `missing` viene vacío, **no se pregunta nada**: se va directo al paso 2.
+Preguntar solo eso. Si `missing` viene vacío, **no se pregunta nada**: se va directo al paso 1b.
 
 Preguntar por algo que el usuario ya escribió es el peor defecto que puede tener un checklist:
 lo vuelve un peaje en lugar de una ayuda.
@@ -67,6 +67,24 @@ Si el proyecto que quiere no está en la lista, hay que agregarlo a `brain/proje
 seguir.
 
 A partir de aquí, **todo lleva `--project <clave>`**. No volver a deducir nada.
+
+## Paso 1b — Cerebro al día con main-brain
+
+Antes de crear la rama, el cerebro se pone al día con lo que el equipo publicó en main-brain:
+
+```bash
+node ~/.claude/skills/start-development/lib/update-branches.mjs --project main-brain
+node ~/.claude/skills/sync-brain/lib/report.mjs main-brain
+```
+
+| `status` | Qué hacer |
+|---|---|
+| `clean` o `dismissed` | Una línea ("main-brain sin cambios") y seguir |
+| `changed` o `unwatched` | Correr **`sync-brain` completo sobre main-brain ahora**, del paso 2 al 6, y solo entonces seguir con el ticket. No se deja para después: así no queda una revisión pendiente |
+| `fetched: false` | Sin red o sin VPN: decirlo en una línea y seguir; no bloquea el arranque |
+
+La sincronización completa sigue pidiendo aprobación para cada absorción y para el commit del
+cerebro, como siempre.
 
 ## Paso 2 — Poner las ramas al día
 
@@ -183,6 +201,19 @@ ticket fullstack es una sola sesión) y descripción en PascalCase. Escribe la m
 `CLAUDE_CODE_SESSION_ID`. Si falla, no detiene el arranque: se le dice al usuario el `/rename`
 exacto que debe escribir. El formato no está documentado por Anthropic; si una versión lo cambia,
 el título automático vuelve y no se daña nada.
+
+## Paso 3c — Lo que trajo el pull en el `.claude/` de los repos
+
+El paso 2 hizo pull de los repos del proyecto y puede haber traído cambios en su `.claude/`. El
+hook no lo ve, porque el pull corrió dentro de un script. Por cada repo del proyecto:
+
+```bash
+node ~/.claude/skills/sync-brain/lib/report.mjs <ruta-del-repo>
+```
+
+Si alguno sale `changed`, se resume en una línea por repo y se pregunta: **revisar ahora o al
+terminar el ticket**. Si es al terminar, no se corre `settle`, para que el aviso se repita. Si todos
+salen limpios, no se dice nada.
 
 ## Paso 4 — Recoger el contexto del ticket
 

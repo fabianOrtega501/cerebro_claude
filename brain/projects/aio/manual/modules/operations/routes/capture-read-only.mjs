@@ -1,8 +1,8 @@
 /**
  * Capturas del asistente de la ruta abierto en modo consulta (botón Ver) en Operaciones > Rutas.
  *
- * Documenta que la columna Acciones está disponible en todas las pestañas y que en consulta solo
- * queda el botón de ver el detalle del registro.
+ * En consulta, Personal y Suministros muestran sus acciones según su propio permiso; las demás
+ * pestañas solo el botón de ver el detalle.
  *
  * Uso:
  *   node modules/operations/routes/capture-read-only.mjs --salida <carpeta>
@@ -32,12 +32,12 @@ const outputDir = arg("salida", "./capturas");
 const company = arg("empresa", "Empresa Demo");
 const routeCode = arg("ruta", "MAR-01");
 
-/** Pestañas del asistente que tienen tabla, con el nombre del archivo de cada una. */
+/** Pestañas con tabla; `managed` marca las que en consulta muestran acciones según su propio permiso. */
 const TABS = [
-	{ pattern: /personal/i, file: "consulta_personal.png" },
+	{ pattern: /personal/i, file: "consulta_personal.png", managed: true },
 	{ pattern: /peaje/i, file: "consulta_peajes.png" },
 	{ pattern: /punto/i, file: "consulta_puntos_control.png" },
-	{ pattern: /suministro/i, file: "consulta_suministros.png" },
+	{ pattern: /suministro/i, file: "consulta_suministros.png", managed: true },
 ];
 
 const centerOf = (cdp, selector, index = 0) =>
@@ -137,7 +137,7 @@ try {
 
 		console.log(`${tab.file.padEnd(30)} ${JSON.stringify(actions)}`);
 
-		if (actions.editar || actions.eliminar || actions.agregar)
+		if (!tab.managed && (actions.editar || actions.eliminar || actions.agregar))
 			console.log("  AVISO: la pestaña muestra acciones de edición en modo consulta");
 
 		await screenshot(cdp, `${outputDir}/${tab.file}`);

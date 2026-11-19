@@ -23,4 +23,19 @@ export const MAPPINGS = {
 		"observacion-editable.png": "Mantenimiento/ordenDeTrabajo/OT_65.png",
 		"observacion-consulta.png": "Mantenimiento/ordenDeTrabajo/OT_66.png",
 	},
+
+	/* External work order (capture-external.mjs over seed-external.sql): OT_69-74 are new (OT_67-68 are the logbook ones). */
+	"work-order-external": {
+		"orden-externa-agregar.png": "Mantenimiento/ordenDeTrabajo/OT_69.png",
+		"orden-externa-encabezado.png": "Mantenimiento/ordenDeTrabajo/OT_70.png",
+		"alerta-cambio-interna.png": "Mantenimiento/ordenDeTrabajo/OT_71.png",
+		"suministro-valor-unitario.png": "Mantenimiento/ordenDeTrabajo/OT_72.png",
+		"finalizar-valor.png": "Mantenimiento/ordenDeTrabajo/OT_73.png",
+		"procesar-masivo-externa.png": "Mantenimiento/ordenDeTrabajo/OT_74.png",
+	},
+
+	/* Massive processing of an internal order (capture-external.mjs --solo-masivo): regenerates OT_36 with `--sobrescribir`. */
+	"work-order-massive-internal": {
+		"procesar-masivo.png": "Mantenimiento/ordenDeTrabajo/OT_36.png",
+	},
 };

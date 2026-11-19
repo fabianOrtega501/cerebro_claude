@@ -294,7 +294,9 @@ El hook `claude-upstream-notice` lo detecta y arranca `sync-brain`, que clasific
 va en una sola direccion: repo -> cerebro. La unica cosa que viaja al reves son las memorias del
 equipo, y para eso esta `manage-memory`.
 
-**main-brain** se revisa igual, con `node ~/.claude/skills/sync-brain/lib/report.mjs main-brain`: hace
+**main-brain** entra en toda sincronizacion y se revisa al arrancar cada desarrollo
+(`start-development`, Paso 1b): primero se adelanta su `qa` local con `update-branches.mjs`, sin
+cambiar de rama, y despues `node ~/.claude/skills/sync-brain/lib/report.mjs main-brain` hace
 `fetch` y compara `plugins/` y `.claude-plugin/` de la rama de `upstream.ref` en `brain/projects.json`
 (`origin/qa` mientras sea la base, despues `origin/prod`). Lo que va del cerebro a main-brain lo lleva
 `contribute-main-brain`, siempre por una rama `feature/*` desde `origin/qa` y un MR hacia `qa`.

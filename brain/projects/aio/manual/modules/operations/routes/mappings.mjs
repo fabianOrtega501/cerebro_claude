@@ -28,15 +28,14 @@ export const MAPPINGS = {
 	},
 
 	/*
-	 * Asistente de la ruta abierto con el botón Ver. Se documentan dos pestañas: con las cuatro
-	 * el documento quedaría repitiendo la misma idea con distintas tablas.
-	 *
-	 * `modal_detalle_ruta_personal.png` se genera pero no se copia: con los datos de prueba ese
-	 * paso del wizard sale vacío ("No data available") y documentaría un estado sin información.
-	 * Agregarlo cuando exista una ruta con personal asignado.
+	 * Asistente de la ruta abierto con el botón Ver. Personal y Suministros muestran sus acciones
+	 * según su propio permiso; Puntos de control representa las pestañas que quedan en consulta.
+	 * Personal se toma de una ruta con personal (PROMOAMBIENTAL, --ruta 4373) y Suministros de
+	 * una con suministros (Empresa Demo, --ruta 3215): son dos corridas con --empresa distinto.
 	 */
 	"route-read-only": {
 		"consulta_personal.png": "Operaciones/Rutas/ruta_consulta_personal.png",
 		"consulta_puntos_control.png": "Operaciones/Rutas/ruta_consulta_puntos_control.png",
+		"consulta_suministros.png": "Operaciones/Rutas/ruta_consulta_suministros.png",
 	},
 };

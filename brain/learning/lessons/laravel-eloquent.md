@@ -67,12 +67,17 @@ es columna **se ignora en silencio**: la busqueda devuelve todo y nadie ve un er
 - **Escribir la regla dos veces y que diverjan.** El accessor dice una cosa y el filtro otra. Las
   dos deben salir de la misma definicion (constantes para los cuatro nombres, y la misma fecha de
   hoy).
+- **Tuyo, ticket 11927** — Usar una variable en el `use` de un `when` que solo se define dentro de
+  un `if`: si el `if` no corre, PHP avisa y Laravel responde 500. Se inicializa en `null` antes.
+- **Tuyo, ticket 11927** — Llamar un método de Carbon sobre un texto: una columna sin *cast* llega
+  como `string`. Primero `Carbon::parse()`, después `subDay()`.
 
 ## 5. Apariciones
 
 | Ticket | Proyecto | Como aparecio | Pista mas alta |
 |---|---|---|---|
 | 11308 | aio | Estado de la vigencia derivado de `active` + dos fechas, mostrado en el listado y usado como filtro de busqueda | — |
+| 11927 | aio | Rango de fechas con Carbon y `whereHas('services.typesVehicles')` dentro del `when` de `get-select-for-weights` | 4 |
 
 ## Preguntas de cierre
 

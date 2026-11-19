@@ -1,6 +1,6 @@
 ---
 name: sync-brain
-description: Usar cuando el `.claude/` de un repo de trabajo o los plugins de main-brain traen cambios que no se han contrastado contra el cerebro propio (~/.claude) — tipicamente despues de un `git pull` de `desa` o de un `fetch` de main-brain, cuando el hook lo avisa, o cuando el usuario pide revisar que trajo el equipo ("sincroniza el cerebro", "que hay nuevo en main-brain"). Baja los cambios de main-brain, clasifica lo que llego, recomienda que vale la pena absorber y solo mezcla lo que el usuario apruebe. Para enviar cambios propios a main-brain esta `contribute-main-brain`.
+description: Usar cuando el `.claude/` de un repo de trabajo o los plugins de main-brain traen cambios que no se han contrastado contra el cerebro propio (~/.claude) — tipicamente despues de un `git pull` de `desa` o de un `fetch` de main-brain, cuando el hook lo avisa, al arrancar cualquier desarrollo (lo corre `start-development`), o cuando el usuario pide revisar que trajo el equipo ("sincroniza el cerebro", "que hay nuevo en main-brain"). Siempre incluye main-brain, con su `qa` local puesta al dia antes de comparar. Baja los cambios de main-brain, clasifica lo que llego, recomienda que vale la pena absorber y solo mezcla lo que el usuario apruebe. Para enviar cambios propios a main-brain esta `contribute-main-brain`.
 ---
 
 # sync-brain
@@ -28,13 +28,20 @@ lo dice despues de ver la comparacion.
 
 ### 1. Levantar los hechos
 
+**main-brain entra siempre**, se haya pedido o no: primero se pone al dia su rama local `qa` y
+despues se compara. El repo que se pida (o el actual) se revisa ademas.
+
 ```bash
-node ~/.claude/skills/sync-brain/lib/report.mjs [ruta-del-repo]   # el .claude/ de un repo
+node ~/.claude/skills/start-development/lib/update-branches.mjs --project main-brain
 node ~/.claude/skills/sync-brain/lib/report.mjs main-brain        # baja y revisa main-brain
+node ~/.claude/skills/sync-brain/lib/report.mjs [ruta-del-repo]   # el .claude/ de un repo
 ```
 
-Sin argumento usa el directorio actual. **Cuando el usuario pide sincronizar sin decir que,
-se revisa main-brain y ademas el repo actual si tiene cambios.** Devuelve JSON con:
+`update-branches.mjs` adelanta `qa` (y las demas ramas locales) solo por fast-forward y sin
+cambiar la rama en la que este el clon: un `feature/*` abierto no se toca. Si dice que `qa`
+divergio o tiene commits sin subir, se menciona y se sigue; la comparacion usa `origin/qa` igual.
+
+`report.mjs` sin argumento usa el directorio actual. Devuelve JSON con:
 
 - `watch`: que se vigila (`ref`, `paths`) y si es una rama del remoto (`remote`).
 - `fetched`: en main-brain el informe hace `git fetch` antes de comparar. `true` si bajo bien;
@@ -115,9 +122,7 @@ En main-brain, con el mismo cuidado:
 - **Aporte propio** -> en `brain/main-brain.json`, su `status` pasa de `pending` a `merged`.
 - **Mapa de equivalencias** -> si una skill del equipo empieza a corresponder a una pieza propia,
   se agrega en `equivalents`, para que la proxima revision la relacione sola.
-- **La rama local del clon** queda donde estaba: el informe compara contra la rama del remoto.
-  Si el usuario quiere el clon al dia, se le ofrece `git -C /datos/proyectos/main-brain pull --ff-only`
-  y solo con el clon limpio y en esa rama.
+- **La rama local del clon** no se cambia: `qa` ya quedo al dia en el paso 1 sin hacer checkout.
 
 Despues de copiar, **probar que no rompe nada**: `node --check` sobre cada `.mjs` absorbido.
 

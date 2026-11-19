@@ -93,6 +93,7 @@ Fuentes: el `CLAUDE.md` de cada repo, sus memorias de estándar (`buscar-antes-d
 - Formato de cifras del Dashboard de despachos: `formatOverviewNumber` (miles y hasta un decimal) y `formatOverviewPercent` (`src/utils/dispatchOverviewUtils.ts`).
 - Permiso en el script: `const { can } = useAbility()` (`src/plugins/casl/composables/useAbility.ts`); en la plantilla, `$can(action, subject)`.
 - Fecha actual de la empresa: `CustomCompanyService.getActuallyDateByCompany` (`src/services/settings/companies/CustomCompanyService.ts`); formatos de fecha y número: `src/composables/useFunction.ts`.
+- Cifra con separador de miles y decimales opcionales: `formatQuantity(value, maxDecimals)` (`src/composables/useFunction.ts`); vacío si no es número.
 - Chip de estado: `StatusChip` (`src/components/Standard/chips.vue/StatusChip.vue`); color de estado de una actividad: `src/utils/activityStatusUtils.ts`; estados de una OT: `useWorkOrderStatuses()` (`src/composables/useWorkOrderStatuses.ts`).
 - Constantes de negocio del front (estados de vehículo, despacho…): `src/utils/constants.ts`.
 
