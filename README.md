@@ -105,7 +105,7 @@ tres `gen-*` son **manuales**: no se disparan solas nunca.
 | `environment-start` | Al abrir la sesion | Avisa si arranca fuera de local |
 | `hu-pdf-guard` | Antes de Read y de Bash | **Deniega** leer una HU en PDF/DOCX entera y remite a su `hu.md`; deja pasar Read con `pages` |
 | `code-standards-guard` | Antes de Edit / MultiEdit / Write | **Deniega** la edicion cuyas lineas **agregadas** rompen una regla: las comunes de `brain/standards/common.json` (comentario suelto, docblock de mas de 3 renglones, PHPDoc junto a `@OA`, nombre de mas de 5 palabras) y las del proyecto en `brain/projects/<p>/standards/rules.json`. No mira el cerebro ni el codigo heredado que no se toca. Un falso positivo se resuelve agregando el archivo a `exceptions` de la regla, con aprobacion |
-| `standards-context` | Al abrir la sesion | Si el repo es de un proyecto con inventario (`brain/projects/<p>/standards/reuse.md`), pone en contexto su seccion **No se hace** y la ruta del inventario, para planear reutilizando |
+| `standards-context` | Al abrir la sesion | Si el repo es de un proyecto con inventario (`brain/projects/<p>/standards/reuse.md`), pone en contexto su seccion **No se hace** y la ruta del inventario, para planear reutilizando. Si hay `standards/format.md` (herramientas de formato, que no se corre y como verificar solo la rama), tambien lo senala |
 | `overengineering-notice` | Al terminar una respuesta | Avisa una vez si hay codigo sin commitear en un repo del proyecto que no paso por `review-overengineering`; calla hasta que se registre la revision (`brain/lib/review-state.mjs mark`) o el codigo cambie despues de ella. Ignora los `.d.ts` y lockfiles regenerados |
 
 Casi todos detectan y se apartan. **`i18n-keys-guard`, `bash-write-guard`, `hu-pdf-guard` y

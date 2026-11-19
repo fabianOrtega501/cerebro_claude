@@ -78,7 +78,9 @@ El campo `smells` marca `console.log`, `dd()`, `debugger`, IPs y posibles creden
 líneas **añadidas**. Revisar el diff completo, no solo esa lista: es una red de seguridad, no un
 sustituto de leer lo que se escribió.
 
-Quitar lo que sobre y pasar el formateador del proyecto (`lint` suele traer `--fix`). **No
+Quitar lo que sobre y dar formato **solo a los archivos de la rama**. Antes se lee
+`~/.claude/brain/projects/<p>/standards/format.md`: dice qué formateador hay, qué no se corre y el
+comando que verifica sin corregir. Un script `lint` suele traer `--fix` sobre todo el repo. **No
 reescribir de paso cosas que no son del ticket**: un cierre no es una refactorización.
 
 Después, **correr siempre** la skill `review-overengineering` sobre el diff de la rama: es
@@ -141,11 +143,16 @@ no que la ruta que escribiste exista.
 no existe sin decir nada; el lint no. Dos de las devoluciones del 7433 —un import ausente y un
 `data is not defined`— eran exactamente eso y pasaron el build:
 
+Se usa el comando de la sección **Verificar solo lo de la rama** de `standards/format.md`. Sin ese
+archivo, el genérico, sobre los archivos de la rama:
+
 ```bash
-pnpm exec eslint src --ext .js,.vue --max-warnings 0   # o npm, según el preflight
+git diff --name-only --diff-filter=ACMR origin/<base>...HEAD -- '*.js' '*.ts' '*.vue' \
+  | xargs -r pnpm exec eslint --no-fix   # o npx, según el preflight
 ```
 
-Si el repo no tiene ESLint configurado, se dice y se sigue; no se instala nada en el cierre.
+El repo entero suele arrastrar errores de antes: un fallo se compara contra la versión del archivo
+en la base. Si el repo no tiene ESLint, se dice y se sigue; no se instala nada en el cierre.
 
 ## Fase 2b — Prueba integral
 

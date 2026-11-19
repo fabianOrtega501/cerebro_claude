@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
  * SessionStart hook: when the session opens inside a registered repo whose project has a reuse
- * inventory, puts its "No se hace" section in context and points to the full inventory.
+ * inventory, puts its "No se hace" section in context and points to the inventory and `format.md`.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { projectOf } from "../brain/lib/projects.mjs";
 
 let event = {};
@@ -32,6 +32,8 @@ const forbidden = text.match(/^## No se hace\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.
 if (!forbidden)
 	process.exit(0);
 
+const format = join(dirname(inventory), "format.md");
+
 process.stdout.write(JSON.stringify({
 	hookSpecificOutput: {
 		hookEventName: "SessionStart",
@@ -39,6 +41,7 @@ process.stdout.write(JSON.stringify({
 			`Estándar del proyecto ${project}. Antes de planear, lee el inventario de lo reutilizable: ${inventory}`,
 			"El plan lleva la tabla Se reutiliza / No se implementa / Se escribe nuevo. Esto no se hace:",
 			forbidden,
+			...(existsSync(format) ? [`Formato y lint: antes de correr un formateador o verificar estilo, lee ${format}`] : []),
 		].join("\n"),
 	},
 }));
