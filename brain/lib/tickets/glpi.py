@@ -3,6 +3,7 @@
 La REST API existe pero hoy responde ERROR_NOT_ALLOWED_IP: GLPI ve la IP publica de salida.
 Cuando el admin la habilite (Configuracion > General > API), conviene migrar a ella.
 """
+import html
 import http.cookiejar
 import re
 import ssl
@@ -74,6 +75,36 @@ def _links(html):
 def attachments(op, code):
     """[(docid, nombre)] del caso: primero el hilo principal y, si no hay, los documentos vinculados."""
     return _links(_tab(op, code, "Ticket$main")) or _links(_tab(op, code, "Document_Item$1"))
+
+
+TIMELINE_TYPES = {"ITILFollowup": "Seguimiento", "TicketTask": "Tarea", "ITILSolution": "Solución",
+                  "ITILValidation": "Validación"}
+
+
+def _plain_text(fragment):
+    """HTML fragment as plain text, one paragraph per line."""
+    text = re.sub(r"<br\s*/?>|</p>|</li>|</div>", "\n", fragment, flags=re.I)
+    text = html.unescape(re.sub(r"<[^>]+>", "", text))
+    return "\n".join(line.strip() for line in text.splitlines() if line.strip())
+
+
+def timeline(op, code):
+    """Follow-ups, tasks, solutions and validations of the case, oldest first. Author name only, never the e-mail."""
+    items = []
+    for chunk in re.split(r'<div class="timeline-item mb-3', _tab(op, code, "Ticket$main"))[1:]:
+        tag = chunk.split(">", 1)[0]
+        kind = re.search(r'data-itemtype="(\w+)"', tag)
+        if "collapse" in tag or not kind or kind.group(1) not in TIMELINE_TYPES:
+            continue
+        item_id = re.search(r'data-items-id="(\d+)"', tag)
+        date = re.search(r'title="(\d{4}-\d{2}-\d{2} \d{2}:\d{2})"', chunk)
+        author = re.search(r"href='/front/user\.form\.php\?id=\d+'\s+title=\"([^\"]+)\"", chunk)
+        body = re.search(r'class="rich_text_container"[^>]*>(.*?)(?:<div class="timeline-badges"|<div class="edit-content)',
+                         chunk, re.S)
+        items.append({"id": item_id.group(1) if item_id else "", "type": TIMELINE_TYPES[kind.group(1)],
+                      "date": date.group(1) if date else "", "author": html.unescape(author.group(1)) if author else "",
+                      "text": _plain_text(body.group(1)) if body else ""})
+    return sorted(items, key=lambda item: item["date"])
 
 
 def download(op, code, docid):

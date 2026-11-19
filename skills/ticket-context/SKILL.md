@@ -13,7 +13,7 @@ GLPI (sesion web, solo el login es POST). El resultado queda en:
 
 ```
 ~/.claude/cache/tickets/<clave>/   clave = numero de Mantis, o glpi-<codigo> si no hay Mantis
-  ticket.md    ficha de Mantis: campos, descripcion y notas completas
+  ticket.md    ficha de Mantis (campos, descripcion y notas) y los seguimientos del caso de GLPI
   hu.md        la HU convertida: lo unico que se lee
   hu-*.pdf     los originales, para mirar paginas con capturas
   meta.json    de donde salio, cuando, y que candidatas habia

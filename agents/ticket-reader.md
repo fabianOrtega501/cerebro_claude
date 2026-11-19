@@ -54,8 +54,9 @@ reglas y validaciones:
 archivos, endpoints o pantallas que nombra la HU:
   - POST /api/... — <para que>
   - src/views/... 
-notas de Mantis que cambian el alcance:
-  - 2026-09-20 Ana: "<cita>"
+notas de Mantis y seguimientos de GLPI que cambian el alcance:
+  - 2026-09-20 Ana (Mantis): "<cita>"
+  - 2026-09-22 Luis (GLPI, Seguimiento): "<cita>"
 paginas con imagenes: 2, 3 (capturas o maquetas; no revisadas)
 ambiguedades:
   - <lo que la HU no deja claro, o se contradice con Mantis>

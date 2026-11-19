@@ -59,25 +59,42 @@ def _stem(name):
     return re.sub(r"\.[A-Za-z0-9]+$", "", name).lower()
 
 
-def _ticket_md(issue):
-    """Ficha del ticket de Mantis en Markdown: campos, descripcion y notas completas."""
-    fields = mantis.custom_fields(issue)
-    lines = [f"# Mantis {issue['id']} — {issue['summary']}", "",
-             f"- Estado: {issue['status']['name']}",
-             f"- Proyecto: {issue['project']['name']}",
-             f"- Prioridad: {issue.get('priority', {}).get('name', '-')}",
-             f"- Actualizado: {issue.get('updated_at', '')[:10]}"]
-    lines += [f"- {k}: {v}" for k, v in fields.items() if v]
-    lines += ["", "## Descripcion", "", issue.get("description", "").strip()]
-    if issue.get("additional_information"):
-        lines += ["", "## Informacion adicional", "", issue["additional_information"].strip()]
-    notes = issue.get("notes", [])
-    if notes:
-        lines += ["", "## Notas"]
-        for n in notes:
-            lines += ["", f"### {n.get('created_at', '')[:10]} — {n.get('reporter', {}).get('name', '')}",
-                      "", n.get("text", "").strip()]
+def _ticket_md(issue, glpi_code=None, followups=None):
+    """Ficha del ticket de Mantis en Markdown: campos, descripcion, notas y, con GLPI, sus seguimientos."""
+    lines = []
+    if issue:
+        fields = mantis.custom_fields(issue)
+        lines += [f"# Mantis {issue['id']} — {issue['summary']}", "",
+                  f"- Estado: {issue['status']['name']}",
+                  f"- Proyecto: {issue['project']['name']}",
+                  f"- Prioridad: {issue.get('priority', {}).get('name', '-')}",
+                  f"- Actualizado: {issue.get('updated_at', '')[:10]}"]
+        lines += [f"- {k}: {v}" for k, v in fields.items() if v]
+        lines += ["", "## Descripcion", "", issue.get("description", "").strip()]
+        if issue.get("additional_information"):
+            lines += ["", "## Informacion adicional", "", issue["additional_information"].strip()]
+        notes = issue.get("notes", [])
+        if notes:
+            lines += ["", "## Notas"]
+            for n in notes:
+                lines += ["", f"### {n.get('created_at', '')[:10]} — {n.get('reporter', {}).get('name', '')}",
+                          "", n.get("text", "").strip()]
+    else:
+        lines += [f"# GLPI {glpi_code}"]
+    if glpi_code:
+        lines += ["", f"## Seguimientos del GLPI {glpi_code}"]
+        if not followups:
+            lines += ["", "El caso no tiene seguimientos, tareas, soluciones ni validaciones."]
+        for f in followups or []:
+            lines += ["", f"### {f['date']} — {f['type']} — {f['author']}", "", f["text"]]
     return "\n".join(lines) + "\n"
+
+
+def _followups(op, glpi_code):
+    """Timeline of the GLPI case; empty without a case. Opens a session only if none is given."""
+    if not glpi_code:
+        return []
+    return glpi.timeline(op or glpi.session(), glpi_code)
 
 
 def _doc(source, docid, name, case):
@@ -144,7 +161,8 @@ def fetch(mantis_id, glpi_code, pick):
     except Stop as stop:
         if issue and stop.code in (3, 4):
             _reset_folder(folder)
-            (folder / "ticket.md").write_text(_ticket_md(issue), encoding="utf-8")
+            followups = _followups(None, glpi_code)
+            (folder / "ticket.md").write_text(_ticket_md(issue, glpi_code, followups), encoding="utf-8")
             stop.data["ticket_md"] = str(folder / "ticket.md")
         raise
     chosen = _choose(found, pick)
@@ -176,17 +194,19 @@ def fetch(mantis_id, glpi_code, pick):
     elif pdfs:
         info["images_pdf"] = pdfs[0]
     (folder / "hu.md").write_text(markdown, encoding="utf-8")
-    if issue:
-        (folder / "ticket.md").write_text(_ticket_md(issue), encoding="utf-8")
+    followups = _followups(op, glpi_code)
+    if issue or glpi_code:
+        (folder / "ticket.md").write_text(_ticket_md(issue, glpi_code, followups), encoding="utf-8")
 
     meta = {"key": key, "mantis": mantis_id, "glpi": glpi_code, "glpi_title": case_title,
+            "glpi_followups": [f["id"] for f in followups],
             "mantis_updated_at": issue.get("updated_at") if issue else None,
             "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "hu": files, "candidates_seen": found, "picked": bool(pick), "read_from": files[0]["file"],
             "conversion": info}
     (folder / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
     emit(0, key=key, folder=str(folder), hu_md=str(folder / "hu.md"),
-         ticket_md=str(folder / "ticket.md") if issue else None,
+         ticket_md=str(folder / "ticket.md") if issue or glpi_code else None,
          summary=issue["summary"] if issue else case_title, conversion=info,
          ignored=[d for d in found if d not in chosen])
 
@@ -210,6 +230,11 @@ def check(key):
         cases = {"glpi": meta["glpi"], "mantis": meta["mantis"]}
         label = lambda docs: [f"documento {i} del {s.upper() if s == 'glpi' else s.capitalize()} {cases[s]}" for s, i in sorted(docs)]
         changes.append(f"Cambiaron las HU adjuntas: nuevas {label(now - before)}, retiradas {label(before - now)}")
+    if op and "glpi_followups" in meta:
+        new_followups = [f for f in glpi.timeline(op, meta["glpi"]) if f["id"] not in meta["glpi_followups"]]
+        if new_followups:
+            changes.append(f"El GLPI {meta['glpi']} tiene {len(new_followups)} seguimiento(s) nuevo(s): "
+                           "revisa ticket.md despues de volver a bajarlo")
     if issue and issue.get("updated_at") != meta.get("mantis_updated_at"):
         changes.append(f"El ticket de Mantis se actualizo el {issue.get('updated_at', '')[:10]} "
                        "(nota o campo nuevo): revisa ticket.md despues de volver a bajarlo")
