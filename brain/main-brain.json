@@ -26,6 +26,7 @@
   },
   "contributions": [
     { "branch": "feature/fabian-review-overengineering", "commit": "ae13793", "plugin": "development", "version": "0.2.0", "piece": "skills/review-overengineering", "status": "merged" },
-    { "branch": "feature/fabian-docblock-two-lines", "commit": "6eafa08", "plugin": "development", "version": "0.2.1", "piece": "skills/peer-review/references/team-rules.md", "status": "merged" }
+    { "branch": "feature/fabian-docblock-two-lines", "commit": "6eafa08", "plugin": "development", "version": "0.2.1", "piece": "skills/peer-review/references/team-rules.md", "status": "merged" },
+    { "branch": "feature/fabian-peer-review-assigned-side", "commit": "3d127a8", "plugin": "development", "version": "0.3.0", "piece": "skills/peer-review", "status": "pending" }
   ]
 }
