@@ -54,6 +54,7 @@ Fuentes: el `CLAUDE.md` de cada repo, sus memorias de estándar (`buscar-antes-d
 - Encabezado oficial (código, versión, fechas) de un PDF por empresa: trait `app/Traits/Functions/FormatHeader.php`.
 - Colaborador del usuario en sesión: `Auth::user()?->staff?->id` (relación `User::staff()`, por documento). No hace falta `User::find(Auth::id())`.
 - Parámetro por empresa: `CustomParameterService::getParameterByCompany($companyId, $key)` (`app/Services/Modules/Settings/Parameter/CustomParameterService.php`).
+- Sembrar un parámetro nuevo: al final de `database/initialData/parameters.json` (lo inserta `ParameterSeeder` si la llave no existe). Nunca una migración, aunque la HU la pida.
 - Comprobar un permiso por código: `PermissionCheckerService::userHasPermission` (`app/Services/Common/Auth/PermissionCheckerService.php`).
 
 ### Exportaciones, PDF, archivos y notificaciones

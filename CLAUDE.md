@@ -539,8 +539,10 @@ Lo decidio Fabian el 2026-09-16.
 
 **Que va y que no va:**
 
-- Se documenta **solo la funcion, metodo, clase o constante**. Nada interno: ni el porque de una
+- Se documenta **solo la funcion, metodo o clase**. Nada interno: ni el porque de una
   condicion, ni como funciona un operador, ni el orden de dos instrucciones.
+- **Las constantes y las propiedades no llevan docblock**, ni en PHP ni en TypeScript: su nombre las
+  explica. La revision de pares del ticket 11730 devolvio dos (2026-11-19), porque esta regla las incluia.
 - **Nunca comentarios sueltos dentro del codigo**, en ningun repo de trabajo: ni junto a una linea,
   ni encima de un bloque, ni en plantillas. Solo el docblock de la funcion. El porque de una regla
   va a la documentacion tecnica (`docs/`), no al codigo. Fabian tuvo que borrar a mano los que

@@ -11,7 +11,7 @@ Al citarlas en un informe, el respaldo es «reglas del equipo para la revisión 
 ### Código
 
 1. **Sin comentarios dentro del código.** Solo se admiten los docblocks que documentan funciones,
-   métodos y clases. Tampoco en CSS (ni en el `<style>` de un `.vue` ni en el de una plantilla de PDF) ni
+   métodos y clases; las constantes y las propiedades no llevan docblock. Tampoco en CSS (ni en el `<style>` de un `.vue` ni en el de una plantilla de PDF) ni
    encima de cada interfaz de TypeScript. Si algo necesita explicación, va en el docblock. Que un archivo
    vecino tenga comentarios no es permiso: es deuda heredada. Excepción: los comentarios de Blade
    (`{{-- --}}`) en plantillas, donde son convención.

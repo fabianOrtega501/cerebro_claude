@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: feedback
   originSessionId: 8c34b7cf-528c-4a38-9db5-224293c71ab9
-  modified: 2026-11-05T20:01:20.203Z
+  modified: 2026-11-19T14:26:38.123Z
 ---
 
 Antes de proponer el commit de un desarrollo en AIO, se revisa el diff completo como lo haría la
@@ -37,6 +37,15 @@ revisión de pares, con esta lista. Cada punto salió de una devolución real de
 12. **Antes de cada `git add`, el diff de ese archivo.** Si trae líneas que no son del desarrollo, se
     pregunta. Un commit del 11411 llevó dos cambios de `es.json` hechos a mano en la copia de trabajo
     (un texto y una clave repetida de `desa`) sin que se notaran.
+
+13. **Sin docblock en constantes ni propiedades**, en PHP y en TypeScript (11730).
+14. **Lo que la HU prescribe técnicamente cede ante el estándar del repo**: un parámetro va en
+    `parameters.json`, no en una migración (11730, [[parametros-en-parameters-json]]).
+15. **Toda ventana de tiempo sobre GPS lleva tope**, y se prueba con un despacho abierto de días atrás
+    (11730, [[ventana-gps-con-tope]]).
+16. **Lo copiado de un archivo de referencia se justifica línea por línea**: una propiedad o un import
+    sin quien lo use se quita. El `$messageError` del controlador estándar lo usan sus métodos CRUD; un
+    `Custom*Controller` cuyos errores salen del servicio no lo necesita (11730).
 
 **Why:** el MR del ticket 11411 volvió con 1 bloqueante (anular un PQR de otra empresa), 4
 correcciones y 4 mejoras, aunque las 119 pruebas pasaban. Fabian lo pidió el 2026-10-19: «no
