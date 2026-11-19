@@ -11,6 +11,28 @@ ni romper la rama de nadie.
 **El orden importa y no es negociable.** Lo que más se salta —integrar la base y volver a
 verificar— es justo lo que evita el fallo caro: subir código que compilaba antes del merge y ya no.
 
+## El orden del cierre: se ejecuta sin preguntar
+
+Con el sí de Fabian a la prueba en pantalla y a su set propio (`CLAUDE.md`, «Antes de
+finish-development»), el cierre corre entero y en este orden, **sin pedir confirmación entre pasos**:
+
+1. Revisión de sobreingeniería (Fase 1).
+2. Revisión de pares propia (Fase 1b).
+3. Verificación: build, lint, pruebas y prueba integral (Fases 2 y 2b).
+4. Documentación técnica, `update-tech-docs` (Fase 7a).
+5. Actualización de manuales, `update-manual` (Fase 7a).
+6. Commit, integrar la base, verificar de nuevo y push de todos los repos a la vez (Fases 3 a 6 y 8).
+   **Es el único paso que se detiene**: el commit y el push los aprueba Fabian, siempre.
+7. Control de cambios (Fase 9). Los niveles de riesgo e impacto los decide Claude, sin preguntar.
+8. Set de pruebas (Fase 9), generado en el cierre, no en diferido.
+9. Comentarios para QA (Fase 9).
+
+Lo que sí se detiene, aunque esté en la lista: un hallazgo que «Impide aprobar» o «Debe corregirse»,
+un check que falla, un conflicto del merge o un archivo dudoso en el `git add`. Eso se dice y se espera.
+
+El commit del cerebro no es parte del cierre del ticket: se ofrece **una sola vez, al terminar todo el
+desarrollo** (`CLAUDE.md`, «El cerebro se commitea y se respalda»). Lo pidió Fabian el 2026-11-19.
+
 ## Reparto: qué hace un script y qué haces tú
 
 Los scripts hacen lo mecánico y **no deciden nada**: leen estado y devuelven JSON. Las decisiones
@@ -240,44 +262,20 @@ este paso se pushea roto con la conciencia tranquila, que es peor que pushear ro
 
 Si el merge no trajo nada (`merged: false`, ya al día), se puede saltar.
 
-## Fase 7 — Documentación: manuales, control de cambios y set de pruebas
+## Fase 7a — Documentación técnica y manuales, antes del commit
 
-Cuatro cosas que se ofrecen, **ninguna se ejecuta sin permiso**:
+Van antes del commit para que todo se suba en un solo push. Se ejecutan sin preguntar:
 
-| Si el desarrollo cambió | Ofrecer |
+| Si el desarrollo cambió | Se ejecuta |
 |---|---|
+| Una **regla de negocio, máquina de estados o integración** | `update-tech-docs`, en el mismo commit que el código |
 | **Lo que el usuario ve**: vistas, tablas, modales, textos, flujos | `update-manual` |
-| Una **regla de negocio, máquina de estados o integración** | `update-tech-docs` |
-| Cualquier cosa que vaya a un despliegue | `gen-changes-controls` |
-| Cualquier cosa que haya que probar en el ambiente de desarrollo | `gen-test-set` |
 
 El manual vive en otro repo, en su propia rama nacida de `qa` (mismo nombre que esta, por
 defecto), lleva su propio commit y las capturas hay que revisarlas a ojo. No es automático y no
-hay que venderlo como tal.
+hay que venderlo como tal. Su commit y su push se aprueban junto con los del código.
 
-**El control de cambios se ofrece siempre, aquí.** `gen-changes-controls` está marcada como de uso
-manual y **no se dispara sola**: eso significa que no se genera sin pedirlo, no que no haya que
-ofrecerlo. Este es el punto donde toca, porque es el único momento en que están a la vez el diff, el
-porqué del ticket y lo que se descubrió al probar —los tres apartados que el formato pide—, y
-reconstruirlo una semana después sale peor y más lento.
-
-Ofrecerlo en una línea, con el ticket y el nombre de la rama. Si el usuario dice que no, no
-insistir.
-
-**El set de pruebas se ofrece aquí, pero lo normal es que se genere después.** Las pruebas se
-ejecutan cuando el desarrollo ya está desplegado en el ambiente de desarrollo, y eso puede tardar
-uno o dos días. Preguntar en una línea si se genera ahora con `gen-test-set` o más adelante.
-
-Si la respuesta es "después", **apuntarlo antes de seguir**, una línea en
-`~/.claude/brain/testing/pending.md`:
-
-```
-| fecha | proyecto | ticket | rama | base | sha de la base |
-```
-
-La sha es la parte que importa. Dos días más tarde la rama ya se mezcló y la base se movió, así que
-sin ella el diff del desarrollo no se puede reconstruir y el set se acaba armando de memoria, que es
-justo lo que la skill viene a evitar. Sale del preflight y de `git rev-parse origin/<base>`.
+Si el desarrollo no cambió nada de eso, se dice en una línea y se sigue.
 
 ## Fase 8 — Push
 
@@ -290,6 +288,25 @@ El preflight dice cuál de los dos con `hasUpstream`.
 
 Después del push, recordar lo que queda fuera de esta skill: **abrir el MR** hacia la rama base.
 Esta skill sube la rama, no la mezcla.
+
+## Fase 9 — Control de cambios, set de pruebas y comentarios para QA
+
+Después del push, sin preguntar y en este orden. Antes, `tickets.py check <clave>`: los tres se
+contrastan contra la HU vigente, no contra la de memoria.
+
+1. **Control de cambios** con `gen-changes-controls`. Los niveles de riesgo e impacto los decide
+   Claude con su justificación; no se espera confirmación.
+2. **Set de pruebas** con `gen-test-set`, en el cierre. La lista de casos se entrega redactada, sin
+   el paso previo de aprobarla. Si el desarrollo aún no está en el ambiente de pruebas, se dice
+   arriba del set.
+3. **Comentarios para QA**: un texto para pegar en Mantis con todo lo que el desarrollo hizo distinto
+   o adicional a la HU, y por qué. Se arma recorriendo la HU sección por sección contra el código y
+   el `docs/` del cambio: lo que pedía y se hizo de otra forma (también por la revisión de pares), los
+   casos que la HU no definía y cómo se resolvieron, y lo visible que se agregó. Se numera, en
+   lenguaje de QA, sin lo puramente técnico que no se ve. No se publica: Mantis solo se lee.
+
+Los tres van como texto normal, no en bloque de código. Lo pidió Fabian el 2026-11-19, para que QA
+no devuelva el ticket por un punto que no cumple la HU al pie de la letra.
 
 ## Reglas duras
 

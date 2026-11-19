@@ -26,12 +26,11 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [no-usar-pint-en-aio](no-usar-pint-en-aio.md) — No correr pint en aio-backend: el formato lo pone Intelephense y sus defaults contradicen el CLAUDE.md
 - [no-usar-stash-para-comparar-con-la-base](no-usar-stash-para-comparar-con-la-base.md) — No usar git stash para comparar la rama contra su base; aplica stashes ajenos y deja conflictos en archivos de otros tickets
 - [solo-lo-pedido](solo-lo-pedido.md) — No agregar trabajo, validaciones ni protecciones que no se pidieron; lo que parezca necesario se propone, no se agrega
-- [push-antes-de-documentar](push-antes-de-documentar.md) — Al cerrar, el push de las ramas de código va antes del control de cambios, el set de pruebas y el manual
 - [repetir-revision-tras-corregir](repetir-revision-tras-corregir.md) — Si la revisión de pares propia lleva a corregir algo, se vuelve a correr completa antes de seguir
 - [revision-de-pares-propia](revision-de-pares-propia.md) — Antes del commit, revisar el diff con la lista de 12 fallas que devolvió la revisión de pares del 11411
 - [vscode-autoguardado-pisa-cambios](vscode-autoguardado-pisa-cambios.md) — El autoguardado de VS Code deshace los cambios hechos con git checkout o git apply; confirmar con git diff antes del add
 - [glpi-es-el-codigo-glpi-de-mantis](glpi-es-el-codigo-glpi-de-mantis.md) — El GLPI de un ticket es solo el campo "Codigo GLPI" de Mantis; el id de un adjunto es un docid, no un caso
-- [cierre-con-todas-las-documentaciones](cierre-con-todas-las-documentaciones.md) — Al cerrar un desarrollo se hacen siempre manual, control de cambios y set de pruebas, sin preguntar cuáles
+- [cierre-con-todas-las-documentaciones](cierre-con-todas-las-documentaciones.md) — Orden fijo del cierre sin preguntar entre pasos; solo commit y push se aprueban; al final control de cambios, set y comentarios para QA
 - [adaptar-lo-nuevo-al-manejo-existente](adaptar-lo-nuevo-al-manejo-existente.md) — Si el ticket choca con un manejo global existente, no se cambia ese manejo; se adapta lo nuevo solo para los campos del ticket
 - [auditoria-local-sin-particion](auditoria-local-sin-particion.md) — En la base local las tablas particionadas (auditoría y GPS) se quedan sin partición del mes y la secuencia de gps.events va atrasada
 - [rutas-de-menu-completas](rutas-de-menu-completas.md) — Al indicar dónde está algo en el AIO, dar la ruta completa del menú verificada contra la tabla menus
@@ -41,4 +40,6 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [worker-sail-sigue-vivo](worker-sail-sigue-vivo.md) — Detener sail artisan queue:work no mata el worker del contenedor; matar los viejos por PID y dejar uno solo
 - [congelamiento-de-desa](congelamiento-de-desa.md) — Desde el día 8 del sprint no se sube nada a desa ni se abren MR hacia desa; la reapertura varía y se pregunta
 - [dblink-local-apunta-a-desa](dblink-local-apunta-a-desa.md) — En local, database_connections puede tener filas hacia desa (el ETL lee desa sin avisar); la contraseña se cifra con el database_name de la fila
+- [borrar-ramas-sin-uso](borrar-ramas-sin-uso.md) — Una rama del ticket que queda sin cambios se borra sin pedir autorización
+- [cierre-tras-pruebas-en-pantalla](cierre-tras-pruebas-en-pantalla.md) — Desde el 2026-11-18: terminadas las pruebas en pantalla de Claude, se cierran con finish-development todos los tickets abiertos
 - [cada-rn-con-su-caso](cada-rn-con-su-caso.md) — Cada RN de la HU con su fila en el plan y su caso en el set; una condición heredada que la contradiga se decide antes de editar

@@ -245,6 +245,11 @@ subir, y no repite hasta que el estado cambie. Calla si esa respuesta ya ofrecio
 cerebro. Cuando avise, **decirlo en una linea y ofrecer
 hacerlo**; si el usuario dice que no, no insistir.
 
+**Mientras hay un desarrollo en curso, el aviso se calla.** El commit del cerebro se ofrece una sola
+vez, al terminar completamente el desarrollo (despues de los comentarios para QA del cierre), con
+todo lo que se cambio en el cerebro durante el. No se menciona en cada cambio ni en cada respuesta.
+Lo pidio Fabian el 2026-11-19.
+
 **Commitear y hacer push en `~/.claude` se pide SIEMPRE, sin excepcion.** No importa que el trabajo
 este terminado, verificado, que sea mio, que el hook este avisando o que la sesion lleve diez
 commits aprobados: cada uno se ofrece y se espera el si. Aprobar un commit no autoriza el
@@ -379,6 +384,12 @@ restaurado al final; (2) se entrega un set de pruebas para Fabian, distinto del 
 caso marcado como «lo vi en pantalla», «lo cubre la prueba automatica» o «no lo probe»; (3) se espera
 su confirmacion. Solo con ese si se pasa a `finish-development`. Lo pidio Fabian el 2026-11-04 (ticket
 11549), despues de que la prueba en pantalla destapo un auto-import roto que el typecheck no vio.
+
+**Con ese si, el cierre corre entero sin preguntar entre pasos**, en el orden fijo de
+`finish-development` («El orden del cierre»): sobreingenieria, revision de pares propia,
+verificacion y prueba integral, documentacion tecnica, manuales, commit + integrar la base + push,
+control de cambios (los niveles los decide Claude), set de pruebas y comentarios para QA. **El commit
+y el push siguen pidiendo el si de Fabian, siempre.** Lo fijo el 2026-11-19.
 
 ## La VPN solo hace falta desde fuera, y no afecta las bases locales
 
