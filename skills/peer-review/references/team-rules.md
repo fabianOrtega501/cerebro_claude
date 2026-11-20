@@ -11,7 +11,7 @@ Al citarlas en un informe, el respaldo es «reglas del equipo para la revisión 
 ### Código
 
 1. **Sin comentarios dentro del código.** Solo se admiten los docblocks que documentan funciones,
-   métodos y clases; las constantes y las propiedades no llevan docblock. Tampoco en CSS (ni en el `<style>` de un `.vue` ni en el de una plantilla de PDF) ni
+   métodos y clases; toda clase nueva lleva el suyo, y las constantes y las propiedades no llevan docblock. Tampoco en CSS (ni en el `<style>` de un `.vue` ni en el de una plantilla de PDF) ni
    encima de cada interfaz de TypeScript. Si algo necesita explicación, va en el docblock. Que un archivo
    vecino tenga comentarios no es permiso: es deuda heredada. Excepción: los comentarios de Blade
    (`{{-- --}}`) en plantillas, donde son convención.
@@ -19,7 +19,8 @@ Al citarlas en un informe, el respaldo es «reglas del equipo para la revisión 
    ni `@return`): el qué; el porqué largo no va ahí. Hasta 2 líneas se acepta; más de 2 debe
    corregirse.
 3. **Una función recibe como máximo 3 parámetros.** Lo demás va en un objeto de opciones con valores por
-   defecto. Los parámetros que no se usan se eliminan.
+   defecto. Los parámetros que no se usan se eliminan. Una constante o un método es `public` solo si se usa
+   fuera de su clase; si no, `private`.
 4. **Un componente genérico solo hace lo suyo.** Nada de props, banderas ni eventos de un caso de negocio
    concreto: lo variable se inyecta (por ejemplo, una lista de acciones con su función), para que agregar
    un caso no obligue a modificar el componente.

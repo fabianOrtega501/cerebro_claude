@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: feedback
   originSessionId: 8c34b7cf-528c-4a38-9db5-224293c71ab9
-  modified: 2026-11-20T13:58:26.807Z
+  modified: 2026-11-20T20:38:25.360Z
 ---
 
 Antes de proponer el commit de un desarrollo en AIO, se revisa el diff completo como lo haría la
@@ -58,6 +58,12 @@ revisión de pares, con esta lista. Cada punto salió de una devolución real de
 20. **Lo que el servidor puede calcular no se recibe del cliente**: si el front ya calcula un costo o un
     total, el servicio lo calcula igual para todos los caminos y se prueba llamando la API con otro valor
     (11857). Lo mecánico (`app()` dentro de un método, casts booleanos) ya lo niega `code-standards-guard`.
+21. **Toda clase nueva con su docblock**: servicio, query builder, controlador, request y prueba. Lo
+    revisa `undocumented-functions.mjs`, que se corre y se lee completo (11730).
+22. **Visibilidad mínima**: por cada `public const` o método público nuevo se busca su uso fuera de la
+    clase (`grep "Clase::NOMBRE"`); sin uso externo, va `private` (11730).
+23. **Un cambio de regla se busca en todo el documento técnico**, incluida «Casos borde y deuda
+    técnica»: ningún párrafo puede seguir describiendo el comportamiento viejo (11730).
 
 **Why:** el MR del ticket 11411 volvió con 1 bloqueante (anular un PQR de otra empresa), 4
 correcciones y 4 mejoras, aunque las 119 pruebas pasaban. Fabian lo pidió el 2026-10-19: «no

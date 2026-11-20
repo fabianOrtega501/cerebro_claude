@@ -113,7 +113,7 @@ function missingTags(doc, name, params, isVoid) {
 }
 
 /**
- * Funciones declaradas en un archivo PHP, con si llevan docblock justo encima y que etiquetas le faltan.
+ * Clases, interfaces, traits, enums y funciones de un archivo PHP, con si llevan docblock y que etiquetas le faltan.
  * Se ignoran las anonimas (`function (`) y los `fn()`: no son unidades documentables.
  */
 function functionsIn(source) {
@@ -121,7 +121,10 @@ function functionsIn(source) {
 	const found = [];
 
 	lines.forEach((line, index) => {
-		const match = /^\s*(?:(?:final|abstract)\s+)?(?:public|private|protected)?\s*(?:static\s+)?function\s+([A-Za-z_]\w*)\s*\(/.exec(line);
+		const type = /^\s*(?:(?:final|abstract|readonly)\s+)*(class|interface|trait|enum)\s+([A-Za-z_]\w*)/.exec(line);
+		const match = type
+			? [line, `${type[1]} ${type[2]}`]
+			: /^\s*(?:(?:final|abstract)\s+)?(?:public|private|protected)?\s*(?:static\s+)?function\s+([A-Za-z_]\w*)\s*\(/.exec(line);
 
 		if (!match) return;
 
@@ -136,7 +139,7 @@ function functionsIn(source) {
 			name: match[1],
 			line: index + 1,
 			hasDoc: doc !== null,
-			missing: doc === null ? [] : missingTags(doc, match[1], parameterCount(lines, index), returnsVoid(lines, index)),
+			missing: doc === null || type ? [] : missingTags(doc, match[1], parameterCount(lines, index), returnsVoid(lines, index)),
 		});
 	});
 

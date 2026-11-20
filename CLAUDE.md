@@ -552,6 +552,9 @@ Lo decidio Fabian el 2026-09-16.
 
 - Se documenta **solo la funcion, metodo o clase**. Nada interno: ni el porque de una
   condicion, ni como funciona un operador, ni el orden de dos instrucciones.
+- **Toda clase nueva lleva su docblock de clase** (servicio, query builder, controlador, request,
+  prueba): un renglon con su responsabilidad. Que no se documenten las constantes no exime a la clase.
+  `undocumented-functions.mjs` ya la revisa. La revision de pares del 11730 devolvio tres (2026-11-20).
 - **Las constantes y las propiedades no llevan docblock**, ni en PHP ni en TypeScript: su nombre las
   explica. La revision de pares del ticket 11730 devolvio dos (2026-11-19), porque esta regla las incluia.
 - **Nunca comentarios sueltos dentro del codigo**, en ningun repo de trabajo: ni junto a una linea,

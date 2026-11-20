@@ -163,7 +163,11 @@ mueve, y esa es la señal de que el documento quedó obsoleto.
 - La documentación va **en el mismo MR que el código**. Es lo que pide el estándar y es la única
   forma de que no se quede atrás.
 - Volver a correr **los dos scripts**: `check-docs.mjs` y `undocumented-functions.mjs`. Ninguna
-  función nueva puede quedar sin documentar.
+  clase ni función nueva puede quedar sin documentar.
+- **Al cambiar una regla, releer el documento entero**, no solo la sección que se editó. Se busca en
+  todo el `.md` el comportamiento viejo (sus palabras clave, sus números) y se corrige donde aparezca,
+  sobre todo en «Casos borde y deuda técnica», que suele describir el riesgo que el cambio acaba de
+  cerrar. En el 11730 la tabla de la ventana quedó al día y la deuda siguió diciendo lo contrario.
 - Reportar qué se escribió y qué se dejó fuera por no ser regla de negocio.
 
 ## Agregar un proyecto
