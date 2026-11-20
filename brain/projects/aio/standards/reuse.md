@@ -19,6 +19,10 @@ Fuentes: el `CLAUDE.md` de cada repo, sus memorias de estándar (`buscar-antes-d
   - Validaciones, protecciones, cachés o métodos que no pidió la HU ni el usuario: se proponen, no se agregan.
   - `env()` fuera de `config/`, `public $queue` en un Job, colas escritas a mano, `SoftDeletes`, queries en el controlador, listados sin `company_id`, PHPDoc encima de un método con `@OA`, comentarios sueltos dentro del código.
   - Correr `pint` (el formato lo pone el editor) o `php artisan` desde el host: siempre con Sail.
+  - Pedir un servicio con `app(X::class)` dentro de un método: va al constructor. Si la clase es la `Custom*` de un `<Entidad>Service`, el constructor del estándar solo reenvía el parámetro (11385, 11857).
+  - `$casts` que repite el tipo que ya entrega PostgreSQL (`boolean`, `integer`): la columna va solo en `$fillable` (11857).
+  - `nullable` en el request de una columna `NOT NULL`: llega null, la base lo rechaza y sale un 500. Opcional pero con valor: `['sometimes', $this->bool]` (11857).
+  - Confiar en un valor que el servidor puede calcular (un costo, un total) solo porque el front ya lo calcula: el servicio lo calcula para todos los caminos, también por API (11857).
 - **Frontend**
   - Llamar a la API desde un componente: siempre una clase de `src/services/` con `$api`.
   - `VTextField` / `VTextarea` directos en formularios: `AppTextField` / `AppTextarea` con la etiqueta arriba, `persistent-placeholder` y placeholder `` `${$t('enter')} ${etiqueta}` ``.

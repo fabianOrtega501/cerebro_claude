@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: feedback
   originSessionId: 8c34b7cf-528c-4a38-9db5-224293c71ab9
-  modified: 2026-11-19T14:26:38.123Z
+  modified: 2026-11-20T13:58:26.807Z
 ---
 
 Antes de proponer el commit de un desarrollo en AIO, se revisa el diff completo como lo haría la
@@ -46,6 +46,18 @@ revisión de pares, con esta lista. Cada punto salió de una devolución real de
 16. **Lo copiado de un archivo de referencia se justifica línea por línea**: una propiedad o un import
     sin quien lo use se quita. El `$messageError` del controlador estándar lo usan sus métodos CRUD; un
     `Custom*Controller` cuyos errores salen del servicio no lo necesita (11730).
+17. **Cada regla del request se cruza con su migración.** Un `nullable` sobre una columna `NOT NULL`
+    deja pasar el null hasta la base y responde 500; si el campo es opcional, `['sometimes', $this->bool]`.
+    Se prueba enviando el campo en null (11857).
+18. **Todas las salidas de una función devuelven las mismas llaves**, también las salidas tempranas, y un
+    dato ausente vale lo mismo (`null`) en todo lugar que lo expone: endpoint, atributo del modelo y
+    docblock (11857).
+19. **Un dato nuevo en un payload se sigue hasta los docblocks y los comentarios vecinos**: los `@param`
+    que enumeran sus llaves se actualizan, y un comentario anterior que quedó desactualizado se borra,
+    aunque no lo haya escrito el ticket (11857).
+20. **Lo que el servidor puede calcular no se recibe del cliente**: si el front ya calcula un costo o un
+    total, el servicio lo calcula igual para todos los caminos y se prueba llamando la API con otro valor
+    (11857). Lo mecánico (`app()` dentro de un método, casts booleanos) ya lo niega `code-standards-guard`.
 
 **Why:** el MR del ticket 11411 volvió con 1 bloqueante (anular un PQR de otra empresa), 4
 correcciones y 4 mejoras, aunque las 119 pruebas pasaban. Fabian lo pidió el 2026-10-19: «no

@@ -42,6 +42,22 @@
       "exceptions": []
     },
     {
+      "id": "service-from-container",
+      "pattern": "\\bapp\\(\\s*\\\\?[A-Z][\\w\\\\]*(Service|Repository)::class",
+      "files": "^app/(Services|Http/Controllers)/",
+      "message": "Las dependencias de un servicio o controlador van por el constructor, no con app(X::class) dentro de un metodo. Si es la Custom* de un <Entidad>Service, el constructor del estandar solo reenvia el parametro.",
+      "source": "Revisiones de pares de los tickets 11385 y 11857",
+      "exceptions": []
+    },
+    {
+      "id": "redundant-boolean-cast",
+      "pattern": "=>\\s*'(bool|boolean)'",
+      "files": "^app/Models/",
+      "message": "PostgreSQL ya entrega la columna booleana como true/false: el cast repite el tipo. Basta con dejarla en $fillable.",
+      "source": "Revision de pares del ticket 11857",
+      "exceptions": []
+    },
+    {
       "id": "standard-service-method",
       "kind": "standard-service-method",
       "files": "^app/Services/Modules/",
