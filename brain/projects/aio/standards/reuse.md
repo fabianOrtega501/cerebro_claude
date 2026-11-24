@@ -100,6 +100,7 @@ Fuentes: el `CLAUDE.md` de cada repo, sus memorias de estándar (`buscar-antes-d
 - Cifra con separador de miles y decimales opcionales: `formatQuantity(value, maxDecimals)` (`src/composables/useFunction.ts`); vacío si no es número.
 - Chip de estado: `StatusChip` (`src/components/Standard/chips.vue/StatusChip.vue`); color de estado de una actividad: `src/utils/activityStatusUtils.ts`; estados de una OT: `useWorkOrderStatuses()` (`src/composables/useWorkOrderStatuses.ts`).
 - Constantes de negocio del front (estados de vehículo, despacho…): `src/utils/constants.ts`.
+- Iniciales de un nombre para un avatar: `avatarText(nombre)` de `src/@core/utils/formatters.ts`, autoimportado. No se arma con `split` y `charAt` a mano.
 
 ### Claves i18n que ya existen
 `add` Agregar · `edit` Editar · `view` Ver · `store` Guardar · `close` Cerrar · `cancel` Cancelar · `confirm` Confirmar · `enter` Ingrese · `select` Seleccione · `search` Buscar · `clearFilters` Limpiar filtros · `noInformation` No existe información · `status` Estado · `active` Activo · `observation` Observación · `observations` Observaciones · `description` Descripción · `executedTime` Tiempo Ejecutado · `noObservation` Sin observación · `observationsOf` Observaciones de {name}.

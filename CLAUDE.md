@@ -387,9 +387,13 @@ su confirmacion. Solo con ese si se pasa a `finish-development`. Lo pidio Fabian
 
 **Con ese si, el cierre corre entero sin preguntar entre pasos**, en el orden fijo de
 `finish-development` («El orden del cierre»): sobreingenieria, revision de pares propia,
-verificacion y prueba integral, documentacion tecnica, manuales, commit + integrar la base + push,
-control de cambios (los niveles los decide Claude), set de pruebas y comentarios para QA. **El commit
-y el push siguen pidiendo el si de Fabian, siempre.** Lo fijo el 2026-11-19.
+verificacion y prueba integral, documentacion tecnica, manuales, commit + integrar la base + push.
+**El commit y el push siguen pidiendo el si de Fabian, siempre.** Lo fijo el 2026-11-19.
+
+**El control de cambios, el set de pruebas y los comentarios para QA no van en el cierre.** Se generan y
+entregan cuando Fabian avisa «Ticket en desa» (Fase 9 de `finish-development`), contra lo que de verdad
+quedo en desa. El set propio de antes del cierre, el de «lo vi en pantalla», no cambia. Lo pidio Fabian
+el 2026-11-24.
 
 ## La VPN solo hace falta desde fuera, y no afecta las bases locales
 

@@ -1,6 +1,6 @@
 ---
 name: finish-development
-description: Usar al TERMINAR un desarrollo, cuando el código ya funciona y toca subirlo, en cualquier proyecto. Limpia el código, verifica que compila y que la app arranca, revisa qué archivos se suben, commitea con el formato del equipo, integra la rama base, actualiza los manuales si cambió la interfaz y hace push. Dispara con "terminé el desarrollo", "ya quedó, súbelo", "cierra el ticket", "haz el push". Es la pareja de `start-development`.
+description: Usar al TERMINAR un desarrollo, cuando el código ya funciona y toca subirlo, en cualquier proyecto. Limpia el código, verifica que compila y que la app arranca, revisa qué archivos se suben, commitea con el formato del equipo, integra la rama base, actualiza los manuales si cambió la interfaz y hace push. Dispara con "terminé el desarrollo", "ya quedó, súbelo", "cierra el ticket", "haz el push". También con "Ticket en desa": ahí corre solo su Fase 9 (control de cambios, set de pruebas y comentarios para QA). Es la pareja de `start-development`.
 ---
 
 # Cerrar un desarrollo
@@ -23,9 +23,10 @@ finish-development»), el cierre corre entero y en este orden, **sin pedir confi
 5. Actualización de manuales, `update-manual` (Fase 7a).
 6. Commit, integrar la base, verificar de nuevo y push de todos los repos a la vez (Fases 3 a 6 y 8).
    **Es el único paso que se detiene**: el commit y el push los aprueba Fabian, siempre.
-7. Control de cambios (Fase 9). Los niveles de riesgo e impacto los decide Claude, sin preguntar.
-8. Set de pruebas (Fase 9), generado en el cierre, no en diferido.
-9. Comentarios para QA (Fase 9).
+
+El cierre termina en el push, con una línea: «Control de cambios, set de pruebas y comentarios para QA:
+pendientes hasta que el ticket esté en desa». Esos tres van en la Fase 9, cuando Fabian avise
+«Ticket en desa».
 
 Lo que sí se detiene, aunque esté en la lista: un hallazgo que «Impide aprobar» o «Debe corregirse»,
 un check que falla, un conflicto del merge o un archivo dudoso en el `git add`. Eso se dice y se espera.
@@ -289,16 +290,22 @@ El preflight dice cuál de los dos con `hasUpstream`.
 Después del push, recordar lo que queda fuera de esta skill: **abrir el MR** hacia la rama base.
 Esta skill sube la rama, no la mezcla.
 
-## Fase 9 — Control de cambios, set de pruebas y comentarios para QA
+## Fase 9 — Ticket en desa: control de cambios, set de pruebas y comentarios para QA
 
-Después del push, sin preguntar y en este orden. Antes, `tickets.py check <clave>`: los tres se
-contrastan contra la HU vigente, no contra la de memoria.
+**No corre en el cierre.** Corre cuando Fabian avisa «Ticket en desa» (o lo dice con otras palabras:
+«ya está en desa», «pasó a desa»), aunque sea en otra sesión: se escriben contra lo que de verdad quedó
+en desa, después de las correcciones del MR. Antes de ese aviso no se generan, aunque el cierre haya
+terminado. Lo pidió Fabian el 2026-11-24.
+
+Con el aviso, se generan y se entregan sin preguntar, en este orden. Antes, `tickets.py check <clave>`:
+los tres se contrastan contra la HU vigente, no contra la de memoria. Si existe
+`~/.claude/cache/tickets/<clave>/pendiente-desa.md`, se lee primero: guarda lo que el cierre dejó dicho
+para esta fase.
 
 1. **Control de cambios** con `gen-changes-controls`. Los niveles de riesgo e impacto los decide
    Claude con su justificación; no se espera confirmación.
-2. **Set de pruebas** con `gen-test-set`, en el cierre. La lista de casos se entrega redactada, sin
-   el paso previo de aprobarla. Si el desarrollo aún no está en el ambiente de pruebas, se dice
-   arriba del set.
+2. **Set de pruebas** con `gen-test-set`. La lista de casos se entrega redactada, sin el paso previo
+   de aprobarla.
 3. **Comentarios para QA**: un texto para pegar en Mantis con todo lo que el desarrollo hizo distinto
    o adicional a la HU, y por qué. Se arma recorriendo la HU sección por sección contra el código y
    el `docs/` del cambio: lo que pedía y se hizo de otra forma (también por la revisión de pares), los

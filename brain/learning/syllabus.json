@@ -114,7 +114,7 @@
         "refactor",
         "proceso"
       ],
-      "lastPracticed": "2026-10-19",
+      "lastPracticed": "2026-11-24",
       "cleanStreak": 0,
       "tickets": [
         {
@@ -130,9 +130,18 @@
           "date": "2026-10-19",
           "hint": 1,
           "blocking": 1
+        },
+        {
+          "ticket": "11934",
+          "project": "aio",
+          "date": "2026-11-24",
+          "hint": 3,
+          "blocking": 1
         }
       ],
-      "recurringErrors": []
+      "recurringErrors": [
+        "El punto 3 del servicio (recorrer las unidades de negocio por empresa) necesitó el esqueleto"
+      ]
     },
     "api-endpoints": {
       "label": "Disenar un endpoint: ruta, contrato de respuesta y codigos de estado",
@@ -262,7 +271,7 @@
     },
     "sql-consultas": {
       "label": "SQL a mano: agregaciones, subconsultas y rendimiento",
-      "level": "practicado",
+      "level": "dominado",
       "keywords": [
         "sql",
         "consulta",
@@ -273,13 +282,20 @@
         "lento",
         "indice"
       ],
-      "lastPracticed": "2026-10-13",
-      "cleanStreak": 1,
+      "lastPracticed": "2026-11-24",
+      "cleanStreak": 2,
       "tickets": [
         {
           "ticket": "11180",
           "project": "status",
           "date": "2026-10-13",
+          "hint": 2,
+          "blocking": 0
+        },
+        {
+          "ticket": "11934",
+          "project": "aio",
+          "date": "2026-11-24",
           "hint": 2,
           "blocking": 0
         }

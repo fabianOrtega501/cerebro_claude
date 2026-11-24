@@ -1,7 +1,8 @@
 {
   "env": {
     "STATUS_MANUAL_WEB": "/datos/proyectos/manua-web",
-    "STATUS_DB_CONTAINER": "postgres_postgis_17"
+    "STATUS_DB_CONTAINER": "postgres_postgis_17",
+    "CLAUDE_CODE_TMPDIR": "/datos/proyectos/.claude-tmp"
   },
   "includeCoAuthoredBy": false,
   "permissions": {

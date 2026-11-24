@@ -36,4 +36,10 @@ export const MAPPINGS = {
 		"medicion.png": "AVL/HistoricoGps/medicion.png",
 		"coordenadas.png": "AVL/HistoricoGps/coordenadas.png",
 	},
+
+	/* Nube del vehículo y su ventana «Despachos (24 h)»: capture-dispatch-history.mjs. */
+	"vehicle-dispatch-history": {
+		"vehiculo_nube.png": "AVL/SeguimientoVehicular/vehiculos_popup.png",
+		"despachos_24h.png": "AVL/SeguimientoVehicular/despachos_24h.png",
+	},
 };

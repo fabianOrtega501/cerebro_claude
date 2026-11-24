@@ -67,12 +67,22 @@ buena dice "200 gramos": no depende de la cocina.
 - Transformar el lado equivocado: el periodo ya es fecha y basta con `EXTRACT`; el que necesita
   traduccion es el texto del archivo. **Ticket 11180**: se respondio "se transforma el mes
   calculado".
+- **Consultar por fila en un listado (N+1)**: una consulta por vehiculo de la pagina. Se arma una
+  sola para todos los ids. Ejemplo del patron: `PublicRouteQueryBuilder.php:212-224` (aio-backend),
+  `DISTINCT ON (rg.route_id)` con la version mas reciente.
+- **`DISTINCT ON` con un `ORDER BY` que no empieza por su columna**: PostgreSQL lo rechaza. Y sin
+  desempate (`id DESC`) el elegido cambia entre peticiones.
+- **Unir una tabla hija (tripulacion) antes del `DISTINCT ON`**: repite el padre; va en subconsultas.
+- **`STRING_AGG` sin `ORDER BY` interno**: el orden lo decide la base.
+- **Un "ahora" por empresa** en una sola consulta: JSON en un binding, `?::jsonb ->> d.company_id::text`
+  (`DispatchRouteCoverageQueryBuilder.php:386-389`).
 
 ## 5. Apariciones
 
 | Ticket | Proyecto | Como aparecio | Pista mas alta |
 |---|---|---|---|
 | 11180 | status (status-api) | Las validaciones del mes de la carga de toneladas dependen del idioma del servidor; se reescriben comparando numero de mes y anio | (pendiente) |
+| 11934 | aio | Despacho en operacion mas reciente de cada vehiculo y sus conductores, por lote para la pagina del listado de Seguimiento GPS | (pendiente) |
 
 ## Preguntas de cierre
 
