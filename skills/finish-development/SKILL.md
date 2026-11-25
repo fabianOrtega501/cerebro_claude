@@ -311,6 +311,10 @@ para esta fase.
    el `docs/` del cambio: lo que pedía y se hizo de otra forma (también por la revisión de pares), los
    casos que la HU no definía y cómo se resolvieron, y lo visible que se agregó. Se numera, en
    lenguaje de QA, sin lo puramente técnico que no se ve. No se publica: Mantis solo se lee.
+   **Solo entra lo adicional o distinto a la HU, Mantis o GLPI**, y los casos que la HU no definía con
+   la decisión tomada. No se incluyen notas genéricas (cómo refrescar permisos, que se actualizó el
+   manual, comportamientos que ya existían) ni registros de prueba de un ambiente. Lo pidió Fabian el
+   2026-11-24.
 
 Los tres van como texto normal, no en bloque de código. Lo pidió Fabian el 2026-11-19, para que QA
 no devuelva el ticket por un punto que no cumple la HU al pie de la letra.
