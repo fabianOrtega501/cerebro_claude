@@ -1,0 +1,1 @@
+/datos/proyectos/sgh/.claude/memory/rollback-sin-step.md

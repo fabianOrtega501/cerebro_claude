@@ -1,9 +1,8 @@
 /**
  * Corre los checks que el proyecto declara en `stack.json` y dice cuales fallaron.
  *
- * Traduce el gestor de paquetes al que de verdad esta instalado: el `stack.json` del AIO pide
- * `pnpm typecheck`, pero si en la maquina solo hay npm eso muere con "orden no encontrada" y
- * parece un fallo del codigo. Se traduce en silencio y se deja constancia en `ranAs`.
+ * Traduce el gestor de paquetes al que declara el lockfile del repo (o al instalado, si no hay
+ * lockfile) y, si el repo trae `.nvmrc`, corre con esa version de Node. Queda en `ranAs`.
  *
  * Sale con codigo 1 si algun check fallo, para poder encadenarlo.
  *
@@ -13,6 +12,9 @@
  */
 
 import { execFileSync, execSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
 /** `true` si el ejecutable existe en el PATH. */
 function has(binary) {
@@ -27,16 +29,41 @@ function has(binary) {
 }
 
 /**
- * Reescribe un check al gestor disponible. `pnpm lint` -> `npm run lint` cuando no hay pnpm.
- * Los comandos propios de npm (`install`, `ci`) no llevan `run`.
+ * Package manager for the repo, from its lockfile; without one, pnpm if installed, else npm.
+ * @param {string} repo
+ * @returns {"pnpm"|"yarn"|"npm"}
  */
-function adapt(check) {
-	if (!check.startsWith("pnpm ") || has("pnpm")) return check;
+function managerOf(repo) {
+	if (existsSync(join(repo, "pnpm-lock.yaml"))) return "pnpm";
+	if (existsSync(join(repo, "yarn.lock"))) return "yarn";
+	if (existsSync(join(repo, "package-lock.json"))) return "npm";
 
-	const rest = check.slice(5).trim();
-	const native = ["install", "ci", "exec", "dlx"];
+	return has("pnpm") ? "pnpm" : "npm";
+}
 
-	return native.includes(rest.split(/\s+/)[0]) ? `npm ${rest}` : `npm run ${rest}`;
+/**
+ * Rewrites a `pnpm`/`npm`/`yarn` check to the repo manager, inside `nvm use` when there is `.nvmrc`.
+ * @param {string} check
+ * @param {string} repo
+ * @returns {string}
+ */
+function adapt(check, repo) {
+	const [tool, ...rest] = check.trim().split(/\s+/);
+	let command = check;
+
+	if (["pnpm", "npm", "yarn"].includes(tool)) {
+		const manager = managerOf(repo);
+		const args = rest[0] === "run" ? rest.slice(1) : rest;
+		const native = ["install", "ci", "add"];
+
+		if (manager !== "npm") command = `${manager} ${args.join(" ")}`;
+		else if (["exec", "dlx"].includes(args[0])) command = `npx ${args.slice(1).join(" ")}`;
+		else command = native.includes(args[0]) ? `npm ${args.join(" ")}` : `npm run ${args.join(" ")}`;
+	}
+
+	const nvm = join(process.env.NVM_DIR ?? join(homedir(), ".nvm"), "nvm.sh");
+
+	return existsSync(join(repo, ".nvmrc")) && existsSync(nvm) ? `. "${nvm}"; nvm use >/dev/null 2>&1; ${command}` : command;
 }
 
 const args = process.argv.slice(2);
@@ -44,16 +71,16 @@ const repo = args.includes("--repo") ? args[args.indexOf("--repo") + 1] : proces
 
 const checks = args.reduce((acc, arg, i) => (arg === "--check" ? [...acc, args[i + 1]] : acc), []);
 
-if (args.includes("--with-build")) checks.push("pnpm build");
+if (args.includes("--with-build")) checks.push(`${managerOf(repo)} run build`);
 
 const results = [];
 
 for (const check of checks) {
-	const command = adapt(check);
+	const command = adapt(check, repo);
 	const started = Date.now();
 
 	try {
-		const out = execSync(command, { cwd: repo, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 600000 });
+		const out = execSync(command, { cwd: repo, shell: "/bin/bash", encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 600000 });
 
 		results.push({ check, ranAs: command, ok: true, seconds: Math.round((Date.now() - started) / 1000), tail: out.trim().split("\n").slice(-5).join("\n") });
 	}

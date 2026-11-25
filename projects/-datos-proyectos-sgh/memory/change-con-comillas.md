@@ -1,0 +1,1 @@
+/datos/proyectos/sgh/.claude/memory/change-con-comillas.md

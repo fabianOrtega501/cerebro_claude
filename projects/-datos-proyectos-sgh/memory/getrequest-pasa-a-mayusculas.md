@@ -1,0 +1,1 @@
+/datos/proyectos/sgh/.claude/memory/getrequest-pasa-a-mayusculas.md

@@ -1,0 +1,1 @@
+/datos/proyectos/sgh/.claude/memory/pruebas-contra-la-base-del-env.md
