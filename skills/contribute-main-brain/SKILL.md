@@ -58,9 +58,10 @@ Se escribe la version para el equipo, no se copia la propia tal cual:
 | Del cerebro | En el plugin |
 |---|---|
 | Rutas absolutas, `~/.claude/...` | `${CLAUDE_PLUGIN_ROOT}` dentro del `SKILL.md`; en los scripts, rutas relativas a su archivo |
-| `secrets.env`, `credentialsFor`, `dbConnection` | Variables de entorno del `settings.local.json` de cada quien, documentadas en el `README.md` del plugin. Si falta una, el script dice cual y donde se define |
+| `secrets.env`, `secret()`, `setting()` | El `lib/config.mjs` de `core` copiado tal cual en el plugin; lee `~/.claude/main-brain/secrets.env`. Cada clave nueva va a `plugins/core/templates/secrets.example.env` con el prefijo del proyecto, y `node scripts/check-shared.mjs` debe pasar |
+| `credentialsFor`, `projectOf`, `dbConnection`, guarda de ambientes | Viven en `core` (`lib/projects.mjs`, `lib/environments.mjs` y sus hooks) y no se copian. Si el plugin los necesita, la pieza va dentro de `core` |
 | Imports de `brain/lib/` o de otra skill | Lo necesario se copia dentro del plugin: **cada plugin es una isla** y no puede importar de fuera de su carpeta |
-| Skills y hooks personales (`ticket-context`, `start-development`, `hu-pdf-guard`, guardas de ambiente) | Se nombran como paso opcional ("si el desarrollador lo tiene, lo usa") o se quitan |
+| Skills y hooks personales (`ticket-context`, `start-development`, `hu-pdf-guard`) | Se nombran como paso opcional ("si el desarrollador lo tiene, lo usa") o se quitan |
 | Reglas del CLAUDE.md del cerebro | Solo las que el equipo ya comparte. Una regla personal nueva va como propuesta en el MR, no metida en la skill |
 | Nombres de proyectos o clientes | Solo si el plugin es de ese dominio (`aio`) |
 

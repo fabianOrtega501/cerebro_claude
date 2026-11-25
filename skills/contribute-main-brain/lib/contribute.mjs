@@ -13,8 +13,8 @@ const BASE = "origin/qa";
 
 const LEAKS = [
 	[/\/home\/[^/\s]+|\/datos\/proyectos/, "ruta de esta maquina"],
-	[/~\/\.claude|\.claude\/brain|brain\/lib\/|brain\/projects/, "pieza del cerebro personal"],
-	[/secrets\.env|credentialsFor|dbConnection|assertEnvironment/, "credenciales o ambientes del cerebro"],
+	[/~\/\.claude(?!\/main-brain)|\.claude\/brain|brain\/lib\/|brain\/projects/, "pieza del cerebro personal"],
+	[/\.claude\/secrets\.env|cache\/environment\//, "credenciales o ambientes del cerebro"],
 	[/ticket-context|hu-pdf-guard|practice-ticket|start-development|finish-development/, "skill o hook personal"],
 	[/@datint\.co|fabian\.ortega|fabianOrtega/i, "dato personal"],
 	[/(PASSWORD|TOKEN|SECRET)\s*[=:]\s*['"]?\w{6,}/, "posible credencial"],
