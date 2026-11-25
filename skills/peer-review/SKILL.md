@@ -109,6 +109,10 @@ Devuelve número, título, estado, autor, **rama destino** y la lista **completa
 - Si ya está `merged`, se dice al principio del resumen y del informe.
 - Si `truncatedByGitlab` sale en `true`, se completa con el diff local.
 - La URL del MR es interna: va en el resumen del chat, no en el informe.
+- Con `--discussions` devuelve los comentarios ya publicados en el MR: es la entrada de la segunda
+  revisión (ver «Segunda revisión»).
+- **Antes de decir que no hay rama par** en el otro repo o que no hay MR, se vuelve a hacer `fetch` y se
+  busca otra vez: la rama pudo subirse después de empezar.
 
 ### M4. Traer la rama, con permiso
 
@@ -125,8 +129,18 @@ node ~/.claude/skills/peer-review/lib/prepare.mjs <rama> --base <rama destino> -
   Nunca `stash`, `commit` ni `checkout --` por cuenta propia.
 - Si falla por un archivo con `skip-worktree` (en aio-backend, `.env.testing`), se detiene y se cuenta:
   la memoria del repo dice cómo manejarlo, y lo decide el usuario.
-- Devuelve `originalBranch`, autores, commits propios y archivos con líneas, marcando los generados. Si
-  hay **varios autores**, se pregunta a cuál se le hace la revisión.
+- **Si la rama local del usuario tiene commits que no están en el remoto** (va adelante, o el autor
+  reescribió la rama), el script no cambia de rama y lo dice. Se pregunta qué hacer; no se borra ni se
+  reinicia su rama.
+- Trae y valida la base antes de cambiar de rama; si algo falla después del cambio, vuelve solo a la
+  rama original.
+- Devuelve `originalBranch` (si el repo estaba en un commit suelto, es ese commit), autores, commits
+  propios y archivos con líneas, marcando los generados. Si hay **varios autores**, se pregunta a cuál
+  se le hace la revisión.
+- **Los mensajes de los commits** se revisan contra la convención del `CLAUDE.md` del repo. Si uno no la
+  cumple, **se propone el mensaje correcto** (formato del repo y una descripción corta sacada del diff),
+  para los commits siguientes: **nunca se sugiere squash**, porque cambia los ids y la rama vuelve a
+  chocar al mezclarse en las bases siguientes.
 
 Al terminar, **siempre**: `node ~/.claude/skills/peer-review/lib/prepare.mjs --return <originalBranch> --repo <ruta>`.
 
@@ -172,7 +186,9 @@ Los comentarios se publican en GitLab, así que cada uno dice dónde se pega:
 
 - La línea es la del archivo en la rama revisada (`git show origin/<rama>:<archivo> | grep -n`); si el MR
   ya se mezcló, la del commit del merge.
-- **GitLab solo deja comentar las líneas que están en el diff del MR.** Si la línea no cambió en el MR,
+- **GitLab solo deja comentar las líneas que están en el diff del MR.** Se comprueba con
+  `node ~/.claude/skills/sonar-check/lib/changed-lines.mjs --base origin/<base> <archivos>`; de un bloque,
+  se cita su primera línea. Si la línea no cambió en el MR,
   el comentario pasa a tipo **Archivo** y la línea se menciona en el texto. Si el archivo ni siquiera está
   en el MR (una documentación que faltó actualizar, un archivo que no se tocó), pasa a **General** y el
   texto nombra el archivo.
@@ -248,6 +264,25 @@ sin los títulos de sección.
 <General primero, luego por archivo en el orden del MR; ver arriba>
 ~~~
 
+#### Segunda revisión
+
+Cuando el compañero sube ajustes sobre una rama ya revisada:
+
+- **Mandan los comentarios publicados en el MR**, no solo los del informe: `gitlab-mr.mjs <rama>
+  --discussions` (sin `GITLAB_TOKEN`, se pregunta cuáles se publicaron). Cada uno se valida contra los
+  commits nuevos.
+- Se revisa **el diff desde el commit ya revisado**, no la rama entera otra vez, y no se suman exigencias
+  nuevas sobre código que ya se aprobó.
+- Un punto del informe que el usuario **no publicó** y sigue igual no se le cobra al compañero: va como
+  «el revisor del MR lo decide».
+- Lo nuevo que aparezca en el ajuste va en **«Detalles que quedan»** y no impide aprobar, salvo que rompa
+  algo.
+- Se vuelven a correr lint, pruebas, los scripts y «Antes de mezclar»: el commit nuevo puede crear
+  conflictos que antes no había.
+- Va en una sección nueva del mismo informe, con la fecha y una tabla de cómo quedó cada comentario
+  (corregido, sigue igual, el revisor lo decide). El que sigue igual repite su comentario con la línea
+  nueva, porque pudo moverse.
+
 Al cerrar: vuelta a la rama original de cada repo, y `git status` para confirmar que quedó como estaba.
 Si apareció una regla que el usuario confirma y que debería aplicar a todos, se le propone para el
 `CLAUDE.md` del repo o, si sirve a varios proyectos, para `team-rules.md` de main-brain con
@@ -272,7 +307,9 @@ Lo corre `finish-development` en su Fase 1b, **siempre**, después de `review-ov
 4. **Se revisa** con la sección común y, además, con **las reglas del usuario**, porque el código es suyo:
    `~/.claude/CLAUDE.md` (docblocks, comentarios, claves i18n al final, nombres de 5 palabras, solo
    lecturas al probar) y la lista de la memoria del proyecto (en AIO, `revision-de-pares-propia`), punto
-   por punto, diciendo qué se verificó y cómo.
+   por punto, diciendo qué se verificó y cómo. Si una regla del usuario choca con una del equipo, manda
+   la del usuario: toda clase lleva su docblock, también las pruebas, aunque la regla 40 de
+   `team-rules.md` diga lo contrario. Lo decidió Fabian el 2026-11-25.
 5. **Entrega en el chat**, sin informe: la tabla de conteos por nivel y cada hallazgo con su Ubicación, qué
    pasa, la regla y la corrección propuesta. **Lo que «Impide aprobar» o «Debe corregirse» se corrige, o
    el usuario lo acepta de forma explícita, antes de proponer el commit.** `finish-development` no sigue
@@ -305,10 +342,18 @@ En este orden. Cada comentario cita **de dónde sale la regla**; sin respaldo, e
 1. **El repo**: su `CLAUDE.md`, su `.claude/memory/`, la documentación que cite y uno o dos módulos
    vecinos análogos. Manda la convención que ya existe en el código.
 2. **Las reglas del equipo**: [references/team-rules.md](references/team-rules.md), las que aplican al
-   aplicativo. Si el `CLAUDE.md` del repo dice otra cosa, manda el `CLAUDE.md`.
+   aplicativo. Si el `CLAUDE.md` del repo dice otra cosa, manda el `CLAUDE.md`. **Con script, en cada
+   revisión** (lo que encuentren en líneas de la rama es «Debe corregirse»):
+   - máximo 3 parámetros:
+     `node ~/.claude/skills/peer-review/lib/max-params.mjs --base origin/<base> <archivos>`. Sale con `1`
+     si hay hallazgos; un mismo problema en varias funciones es **un** hallazgo.
+   - en aio-backend, los FormRequest de la rama con `local-check-form-requests`.
+   - El nombre de un ayudante o una función se verifica en el archivo antes de citarlo: cambia entre ramas.
 3. **Solo en el modo propio**, las reglas del usuario (paso 4 del modo propio).
-4. **Calidad**: SonarQube u otra herramienta si está a mano, separando lo del cambio de lo heredado; si
-   no, se omite y se dice.
+4. **Calidad**: `sonar-check` sobre los archivos de la rama, con la base como base, **en modo de solo
+   reporte**: las alertas de las líneas de la rama son hallazgos; las heredadas, solo si el cambio las
+   empeoró (`git blame -L` para saberlo). Si el editor no está conectado o no tiene SonarQube for IDE, se
+   omite y se dice; nunca se dan los archivos por limpios.
 5. **Lint contra la base, sin copiar archivos al repo** (los `checks` del `stack.json`):
    - ESLint lee la versión de la base por la entrada estándar:
      `git show origin/<base>:<archivo> | pnpm exec eslint --stdin --stdin-filename <archivo>`.
@@ -328,6 +373,18 @@ En este orden. Cada comentario cita **de dónde sale la regla**; sin respaldo, e
    el criterio de `review-overengineering` al diff de la rama. Cada hallazgo es **Mejora sugerida**; si
    además incumple una regla escrita (el `CLAUDE.md`, las reglas del equipo), es **Debe corregirse** y se
    cita la fuente. Un símbolo que el cambio dejó huérfano es **Debe corregirse**.
+10. **Lo que suele devolver QA**, mirado con los ojos de quien prueba:
+    - fechas y horas que se muestran o se exportan en la hora del país de la empresa, no en UTC;
+    - exportaciones legibles: columnas con nombre claro, valores con su texto (no ids ni `true`) y fechas
+      con formato;
+    - datos que el cambio necesita en producción (parámetros, maestros, permisos, menús): en un seeder o
+      una migración, o escritos como precondición en el MR;
+    - correos y notificaciones de las pruebas que no salgan a destinatarios reales.
+11. **Antes de mezclar**: que la rama no choque con su base ni con las ramas hermanas que tocan los mismos
+    archivos y aún no están en la base:
+    `git merge-tree --write-tree --name-only origin/<base> origin/<rama>` (sale con `1` y lista los
+    archivos si hay conflicto). Lo que choque va en una sección **«Antes de mezclar»**, con los archivos y
+    la rama; no impide aprobar, pero se resuelve antes del merge.
 
 ### Clasificar
 

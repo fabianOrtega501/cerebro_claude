@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Consulta en GitLab (solo lectura) el merge request de una rama y lista todos los archivos que toca.
- * Uso: node gitlab-mr.mjs <rama> [--repo <ruta>]   ·   sale con 3 si no hay GITLAB_TOKEN: la revisión sigue con el diff local.
+ * Uso: node gitlab-mr.mjs <rama> [--repo <ruta>] [--discussions]   ·   sale con 3 si no hay GITLAB_TOKEN: la revisión sigue con el diff local.
  */
 
 import { execFileSync } from "node:child_process";
@@ -88,12 +88,28 @@ function fileState(diff) {
 	return "modificado";
 }
 
+/** Comentarios publicados en el MR, sin las notas `system`, con archivo y línea cuando son de código. */
+async function discussions(base, token, path) {
+	const threads = await get(base, token, `${path}/discussions`);
+
+	return threads.flatMap((thread) => thread.notes.filter((note) => !note.system).map((note) => ({
+		thread: thread.id,
+		author: note.author?.name,
+		date: note.created_at,
+		file: note.position?.new_path,
+		line: note.position?.new_line ?? note.position?.old_line,
+		resolved: note.resolvable ? Boolean(note.resolved) : undefined,
+		text: note.body,
+	})));
+}
+
 const args = process.argv.slice(2);
 const branch = args[0];
 const repoPath = args.includes("--repo") ? args[args.indexOf("--repo") + 1] : null;
+const withDiscussions = args.includes("--discussions");
 
 try {
-	if (!branch || branch.startsWith("--")) throw new Error("Uso: node gitlab-mr.mjs <rama> [--repo <ruta>]");
+	if (!branch || branch.startsWith("--")) throw new Error("Uso: node gitlab-mr.mjs <rama> [--repo <ruta>] [--discussions]");
 	const token = setting("GITLAB_TOKEN");
 	if (!token) {
 		process.stderr.write([
@@ -113,6 +129,7 @@ try {
 	const mr = requests[0];
 	const { diffs, truncated } = await mergeRequestDiffs(base, token, `/projects/${project}/merge_requests/${mr.iid}`);
 	const files = diffs.map((d) => ({ path: d.new_path, previous: d.renamed_file ? d.old_path : undefined, state: fileState(d) }));
+	const comments = withDiscussions ? await discussions(base, token, `/projects/${project}/merge_requests/${mr.iid}`) : undefined;
 
 	process.stdout.write(`${JSON.stringify({
 		iid: mr.iid,
@@ -125,6 +142,7 @@ try {
 		totalFiles: files.length,
 		truncatedByGitlab: truncated,
 		files,
+		discussions: comments,
 	}, null, 2)}\n`);
 }
 catch (error) {

@@ -75,6 +75,7 @@ escribe codigo ni documentacion; avisa y se aparta.
 | `gen-test-set` | Set de pruebas manual, sacado del diff de la rama | — |
 | `review-overengineering` | Revisa el diff buscando lo que sobra: reimplementaciones, dependencias y abstracciones sin uso. Solo senala | — |
 | `peer-review` | Revision de pares: manual con el numero de ticket (Mantis o GLPI), sobre las ramas del companero, con informe para el; y modo propio, que `finish-development` corre siempre antes del commit de cierre. En GitLab solo lee | `brain/peer-reviews/` (fuera de git) |
+| `sonar-check` | Alertas de SonarQube for IDE de los archivos de la rama, desde el editor conectado: corrige las de las lineas de la rama y reporta las heredadas. `peer-review` la corre en solo reporte. Absorbida de `development:sonar-check` | — |
 | `prueba-integral` | Deriva del diff todo lo que el cambio puede haber afectado y lo prueba flujo por flujo. Entrega una tabla de cobertura con una fila por archivo, y dice lo que no se probo. La corre `finish-development` en su Fase 2b | — |
 | `gen-sprint-summary` | La diapositiva del sprint: texto y PNG, desde las ramas de los ultimos dias | — |
 | `exploration-memory` | El mapa tecnico de un modulo, para no releer el mismo codigo cada ticket | `<proy>/exploration/` |
@@ -99,6 +100,7 @@ tres `gen-*` son **manuales**: no se disparan solas nunca.
 | `i18n-keys-guard` | Antes y despues de editar un locale | **Deniega** la clave intercalada y la que repite un texto que ya existe; avisa de JSON roto y de paridad |
 | `practice-unrecorded-notice` | Al terminar una respuesta | Avisa si un ticket de practica se cerro sin registrar sus temas en el temario |
 | `bash-write-guard` | Antes de cada comando Bash | **Deniega** `sed -i`, `>`, `tee`, `cp`/`mv` y scripts en linea que escriben codigo de un repo registrado. Se apaga con `CLAUDE_ALLOW_BASH_WRITES=1` en `settings.local.json` |
+| `co-author-guard` | Antes de cada comando Bash | **Deniega** el `git commit` cuyo mensaje trae `Co-Authored-By` y el `git push` de commits propios que lo traen. Absorbido de main-brain `development` |
 | `bash-change-audit` | Antes y despues de cada comando Bash | Detecta lo que el comando cambio en los repos y lo pasa por las guardas de Edit; avisa si lo rechazan |
 | `environment-guard` | Antes de Bash, WebFetch, Edit/Write, Skill y MCP | Mira a que host o base apunta y **permite, pregunta o niega** segun el ambiente activo; `git push` siempre pregunta |
 | `environment-activation` | Cada mensaje tuyo | Cambia el ambiente solo si tu lo pides (`/ambiente qa lectura` o una frase); recuerda el activo cuando cambia o si no es local |

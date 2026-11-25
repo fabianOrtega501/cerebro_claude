@@ -136,6 +136,11 @@
             "type": "command",
             "command": "node \"$HOME/.claude/hooks/bash-change-audit.mjs\" --before",
             "timeout": 20
+          },
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/co-author-guard.mjs\"",
+            "timeout": 15
           }
         ]
       },

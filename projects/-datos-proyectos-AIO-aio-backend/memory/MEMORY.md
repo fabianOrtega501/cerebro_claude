@@ -44,3 +44,4 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [cierre-tras-pruebas-en-pantalla](cierre-tras-pruebas-en-pantalla.md) — Desde el 2026-11-18: terminadas las pruebas en pantalla de Claude, se cierran con finish-development todos los tickets abiertos
 - [cada-rn-con-su-caso](cada-rn-con-su-caso.md) — Cada RN de la HU con su fila en el plan y su caso en el set; una condición heredada que la contradiga se decide antes de editar
 - [practica-por-partes](practica-por-partes.md) — Modo práctica por partes funcionales de a una; docs/ la escribe Claude, Swagger y docblocks guiados
+- [rama-del-ticket-antes-del-cierre](rama-del-ticket-antes-del-cierre.md) — Antes del cierre, confirmar que cada repo sigue en la rama del ticket; otra sesión puede haber hecho checkout en el mismo clon
