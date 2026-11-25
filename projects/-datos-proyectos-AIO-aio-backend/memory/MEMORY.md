@@ -45,4 +45,6 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [cierre-tras-pruebas-en-pantalla](cierre-tras-pruebas-en-pantalla.md) — Desde el 2026-11-18: terminadas las pruebas en pantalla de Claude, se cierran con finish-development todos los tickets abiertos
 - [cada-rn-con-su-caso](cada-rn-con-su-caso.md) — Cada RN de la HU con su fila en el plan y su caso en el set; una condición heredada que la contradiga se decide antes de editar
 - [practica-por-partes](practica-por-partes.md) — Modo práctica por partes funcionales de a una; docs/ la escribe Claude, Swagger y docblocks guiados
+- [parametros-en-parameters-json](parametros-en-parameters-json.md) — Un parámetro nuevo del AIO va en database/initialData/parameters.json, no en una migración, aunque la HU la pida
+- [ventana-gps-con-tope](ventana-gps-con-tope.md) — Toda ventana de tiempo que se cruza con tramas GPS lleva tope, también la de un despacho que sigue abierto
 - [rama-del-ticket-antes-del-cierre](rama-del-ticket-antes-del-cierre.md) — Antes del cierre, confirmar que cada repo sigue en la rama del ticket; otra sesión puede haber hecho checkout en el mismo clon

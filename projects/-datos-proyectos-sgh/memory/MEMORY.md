@@ -1,1 +1,6 @@
 - [Ticket 11542: cerrado](ticket-11542-estado.md) — commits de sgh y manual subidos; faltan los MR (sgh → desa, manual → qa) y sus notas
+- [change-con-comillas](change-con-comillas.md) — ->change() de una columna exige el nombre de la tabla entre comillas dobles dentro del texto, por las tablas en MAYÚSCULAS
+- [getrequest-pasa-a-mayusculas](getrequest-pasa-a-mayusculas.md) — Todo lo que se guarda por getRequest() queda en MAYÚSCULAS salvo los campos de $noUppercase
+- [pruebas-contra-la-base-del-env](pruebas-contra-la-base-del-env.md) — Las pruebas corren contra la base del .env dentro de una transacción; nunca apuntarlo a un ambiente compartido
+- [rollback-sin-step](rollback-sin-step.md) — En Laravel 5.2 migrate:rollback no tiene --step; cada ejecución deshace un lote completo
+- [seeder-desde-migracion](seeder-desde-migracion.md) — Un seeder nuevo llamado desde una migración no se encuentra sin composer dump-autoload
