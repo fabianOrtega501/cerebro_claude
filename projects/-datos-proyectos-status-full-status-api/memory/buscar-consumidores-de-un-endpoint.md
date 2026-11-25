@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: feedback
   originSessionId: 9a89ba80-4bff-4132-ac32-32c94eb282b2
-  modified: 2026-09-22T01:13:07.528Z
+  modified: 2026-11-25T16:46:36.211Z
 ---
 
 Antes de cambiar el contrato de un endpoint de `status-api` hay que encontrar **todos** sus
@@ -42,11 +42,13 @@ grep -riE "VUE_APP_API|MIX_PATH_API" <repo>/.env
 |---|---|
 | `status-frontend` | `/datos/proyectos/status-full/status-frontend` |
 | **`sipa`** | `/datos/proyectos/sipa` |
-| monolito `status` | `/datos/proyectos/status` (revisar `resources/js`) |
+
+El monolito no se busca: no consume status-api y ya no se desarrolla
+([[monolito-status-sin-desarrollo]]).
 
 ```bash
-for r in /datos/proyectos/status-full/status-frontend /datos/proyectos/sipa /datos/proyectos/status; do
-  echo "== $r"; grep -rn "Roles/select" "$r/src" "$r/resources/js" 2>/dev/null | head
+for r in /datos/proyectos/status-full/status-frontend /datos/proyectos/sipa; do
+  echo "== $r"; grep -rn "Roles/select" "$r/src" 2>/dev/null | head
 done
 ```
 
@@ -78,7 +80,7 @@ mirar la linea, no solo contar archivos.
 
 ## Como aplicarlo
 
-1. Buscar por fragmento en los tres repos y **contar archivos unicos** antes de estimar.
+1. Buscar por fragmento en los dos repos y **contar archivos unicos** antes de estimar.
 2. Revisar si la vista arma la ruta con una variable —`"/"+this.ruta+"/store"`—: eso es un
    componente que sirve a varios maestros.
 3. Anotar **que clave lee cada consumidor** (`ArrayRoles`, `datos`, `ListaEmpresas`): esa es la

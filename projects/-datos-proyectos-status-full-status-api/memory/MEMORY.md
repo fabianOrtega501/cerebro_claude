@@ -2,7 +2,8 @@
 - [Swagger y estructura AIO en todo controlador tocado](swagger-en-controlador-tocado.md) — si lo tocamos, queda documentado y con la estructura de FormulariosTramitesController.
 - [Los servicios del front espejan al back](servicios-front-espejan-al-back.md) — misma estructura de carpetas que app/Services, trasladando de a poco.
 - [Selectores sin opciones en español](selectores-sin-opciones-en-espanol.md) — el mensaje ya sale traducido desde main.js, no hay que tocar cada vista.
-- [Buscar consumidores de un endpoint](buscar-consumidores-de-un-endpoint.md) — en los tres repos (status-frontend, sipa y el monolito) y por fragmento de ruta.
+- [Buscar consumidores de un endpoint](buscar-consumidores-de-un-endpoint.md) — en status-frontend y sipa, y por fragmento de ruta.
+- [Monolito status sin desarrollo](monolito-status-sin-desarrollo.md) — desde el 2026-11-25 no se crean ramas ni se toca; solo referencia.
 - [Mensaje de commit: qué y dónde](mensaje-de-commit-que-y-donde.md) — qué se hizo y en qué módulo, sin mencionar AIO.
 - [Convenciones temporales del ticket 7433](convenciones-temporales-ticket-7433.md) — status al cerrar cada grupo y retoque visual de toda vista tocada; borrar al cerrar el ticket.
 - [SIPA y status-api](sipa-roto-por-la-migracion.md) — SIPA desa ya trae el contrato de status-api (7433); el despliegue espera a producción con status-api. Inventario de ajustes.

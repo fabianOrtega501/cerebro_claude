@@ -381,6 +381,14 @@ todo el resto del informe.
 **Lo que no se probo se dice en la tabla.** Esconderlo es lo que convierte una prueba en una
 devolucion.
 
+**Antes de dar un paso de prueba, comprobar en el codigo que ese camino existe.** Por cada punto
+de entrada al codigo cambiado: que vista lo atiende en cada caso (formato, tipo, estado), que
+condicion muestra el boton o la accion, y si el orden de las llamadas asincronas la deja
+encendida. Se entrega como una tabla «camino → vista → condicion → caso con que se prueba». Un
+paso que no se verifico asi no se le pasa a nadie: en el 12016, «Calcular Campos en la captura
+normal de FR35TEC» costo dos intentos, porque esa vista esconde el boton en los formatos con PDF.
+Lo pidio Fabian el 2026-11-25.
+
 ## Antes de finish-development: pantalla, set propio y confirmacion
 
 Terminado el desarrollo, y antes de correr `finish-development`, siempre: (1) se prueba en pantalla

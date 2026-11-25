@@ -1,30 +1,28 @@
 # Status — inventario de lo reutilizable
 
-Qué pieza ya resuelve cada necesidad común en `status` (monolito Laravel 7 / PHP 7.4 con front
-Vuesax en `resources/js`) y en `status-api` (Laravel 11 / PHP 8.4), y qué no se hace. Se lee
-**antes de armar el plan**. Las rutas son relativas al repo; si el texto no dice cuál, la pieza
-existe en los dos. Doctor avisa si una ruta deja de existir.
+Qué pieza ya resuelve cada necesidad común en `status-api` (Laravel 13 / PHP 8.4) y en
+`status-frontend` (Vue 2.7 con Vuesax), y qué no se hace. Se lee **antes de armar el plan**. Las
+rutas son relativas al repo que nombra cada sección. Doctor avisa si una ruta deja de existir.
 
-Fuentes: el `CLAUDE.md` de cada repo, `status-api/docs/`, las memorias de los dos proyectos en el
+El monolito `status` ya no se desarrolla (desde el 2026-11-25): no se toma como referencia de
+código nuevo.
+
+Fuentes: el `CLAUDE.md` de cada repo, `status-api/docs/`, las memorias de los proyectos en el
 cerebro y las secciones de `~/.claude/CLAUDE.md` que tocan Status.
 
 ## No se hace
 
-- **Comentarios sueltos dentro del código, tampoco aquí.** El `status/CLAUDE.md` §9 los permite,
-  pero manda la regla del cerebro (decisión de Fabian del 2026-10-07); `code-standards-guard` los niega.
-- **status (monolito)**
-  - Imitar el controlador legado (lógica en el controlador, `DB::` crudo, `response()->json()` a mano) ni extender la generación intermedia `BaseController` / `BaseService`: solo se mantiene.
-  - Registrar rutas en `routes/api.php`, usar API Resources, policies o Gates de negocio.
-  - `SoftDeletes`: el borrado lógico es la columna `estado`.
-  - PHP 7.4: sin enums, `match`, promoción en el constructor ni `?->`.
-  - `migrate --pretend` (ejecuta de verdad), Artisan o Composer en el host, `npm run hot` o `npm run dev` en modo vigilancia.
-  - Dependencias de build sin coordinar los servidores, `require('dotenv')` en `webpack.mix.js`, `mix()` sobre assets copiados con `.copy()`.
-  - Duplicar el `shell_exec` de colas: el worker va en `docker/laravel-worker.conf`.
+- **Comentarios sueltos dentro del código.** Manda la regla del cerebro (decisión de Fabian del
+  2026-10-07); `code-standards-guard` los niega.
+- **status-frontend**
   - Lógica de negocio o llamadas HTTP en el store; buscar vue-i18n, vue-acl, mixins o carpetas `utils/`, `http/`, `acl/`.
   - Prefijo `fn_`, `::v-deep` / `>>>`, `console.log`, `var`; siempre `===`.
   - Comparar el IMEC con `> 0`: es `>= 0`.
-  - Al separar repos, copiar de AIO la URL `/storage` fuera de Sanctum, la URL horneada en el bundle, el `split('/api')`, el AES con la llave en el bundle o el 400 en vez de 403.
+  - Leer dos veces el cuerpo de un servicio (`data.data`): los servicios ya devuelven `respuesta.data`.
+  - Copiar de AIO la URL `/storage` fuera de Sanctum, la URL horneada en el bundle, el `split('/api')`, el AES con la llave en el bundle o el 400 en vez de 403.
 - **status-api**
+  - `SoftDeletes`: el borrado lógico es la columna `estado`. API Resources, policies o Gates de negocio.
+  - `migrate --pretend` (ejecuta de verdad), Artisan o Composer en el host.
   - Responder con `response()->json()`, `establecerArregloRetorno` o un arreglo crudo: siempre `ApiResponse`. Un error nunca con HTTP 200.
   - `Request` genérico: un Form Request por método. El controlador no consulta la base.
   - Mensajes repetidos como literales: van como constante de clase.
@@ -38,14 +36,14 @@ cerebro y las secciones de `~/.claude/CLAUDE.md` que tocan Status.
   - Mencionar AIO u otros proyectos en un commit.
 - **Los dos**: referencias a tickets, Mantis, GLPI o HU en código o docs; credenciales o rutas absolutas en archivos versionados; probar con escrituras.
 
-## Backend
+## Backend (status-api)
 
 ### Respuestas, errores y controladores
 - Respuesta JSON estándar `{status, message, data, meta}`: `ApiResponse` (`app/Http/Responses/ApiResponse.php`).
 - Traducir una excepción o un código de Postgres y registrarla: `Controller::verificarExcepciones()` (`app/Http/Controllers/Controller.php`).
 - Excepción de negocio: `CustomException` (`app/Exceptions/CustomException.php`); ejemplo de subclase en status-api: `app/Exceptions/Status/GestorTransaccional/CargueDeArchivoException.php`.
 - Registrar un error en base y log: `ErrorService::logError()` (`app/Services/Common/Base/ErrorService.php`) o el trait `ManejoErrores::capturarError()` (`app/Traits/Common/ManejoErrores.php`).
-- Controlador de referencia que se imita: en status-api, `app/Http/Controllers/Status/GestionTramites/FormularioTramite/FormulariosTramitesController.php`; en el monolito, `app/Http/Controllers/GestionTramites/GestionTramitesController.php`.
+- Controlador de referencia que se imita: `app/Http/Controllers/Status/GestionTramites/FormularioTramite/FormulariosTramitesController.php`.
 
 ### Validación
 - Base de los Form Requests: `CommonFormRequest` (`app/Http/Requests/Common/CommonFormRequest.php`), con `mergeRules`, `validateString`, `validarDecimal`, `validarArchivo`. Ojo: su `failedValidation` responde HTTP 200 con `{code: 500}`; en lo nuevo se sobrescribe con `ApiResponse::warning()`.
@@ -69,16 +67,17 @@ cerebro y las secciones de `~/.claude/CLAUDE.md` que tocan Status.
 - Correo: `CorreoService::enviarCorreo()` (`app/Services/Common/Base/CorreoService.php`).
 
 ### Seeders, objetos SQL y pruebas
-- Menú y permisos: en el monolito `MenuDinamicSeeder` (`database/seeds/MenuDinamicSeeder.php`) con su JSON; en status-api `database/seeders/MenusSeeder.php` y `ModulosSeeder.php`, que leen un JSON por módulo en `database/initialData/menus/` (por ejemplo `aprovechamiento.json`) y `modulos.json` (una pantalla nueva es una entrada en el JSON de su módulo).
+- Menú y permisos: `database/seeders/MenusSeeder.php` y `ModulosSeeder.php`, que leen un JSON por módulo en `database/initialData/menus/` (por ejemplo `aprovechamiento.json`) y `modulos.json` (una pantalla nueva es una entrada en el JSON de su módulo).
 - Objetos SQL: `DbObjectsSeeder`.
 - Pruebas de status-api: `usuarioActivo()` y `superUsuario()` (`tests/TestCase.php`), datos de trámite (`tests/Support/GestionTramites/CreaTramitesDePrueba.php`).
 
-## Front del monolito (`resources/js/src`)
-- Cliente HTTP con el interceptor de 401: `this.$http` (`resources/js/src/axios.js`).
-- Capa de servicios de código nuevo (singleton que relanza `error.response?.data`): como `resources/js/src/services/Dashboard/ResumenVariablesService.js`.
-- Sesión, empresas y permisos IMEC: `DatosSesion.vue` (`resources/js/src/views/GestorInformacion/Estandar/DatosSesion.vue`); botonera estándar: `Botones.vue` (`resources/js/src/views/GestorInformacion/Estandar/Botones.vue`).
-- Selector de empresa: `Empresas.vue` y sus variantes (`resources/js/src/views/GestorInformacion/Estandar/Empresas.vue`); de periodo: `Frecuencia.vue` (`resources/js/src/views/GestorInformacion/Estandar/Frecuencia.vue`).
-- Moneda: `InputMoneda.vue` (`resources/js/src/views/GestorInformacion/Estandar/InputMoneda.vue`); exportar: `ExportarArchivo.vue` (`resources/js/src/views/GestorInformacion/Estandar/ExportarArchivo.vue`); importar Excel: `resources/js/src/components/excel/ImportExcel.vue`.
-- Tablas dinámicas: `resources/js/src/views/GestorInformacion/Estandar/tablaDinamica.vue`.
+## Front (status-frontend, `src/`)
+- Cliente HTTP con el interceptor de 401: `apiClient`, importado de `@/axios` (`src/axios.js`).
+- Capa de servicios, que espeja `app/Services` del back y devuelve `respuesta.data`: como `src/services/Status/GestorMaestros/MtListaMaestro/MtListaMaestrosService.js`.
+- Avisar el error de una pantalla: `avisarErrorDeLaPantalla` (`src/composables/useFunction.js`).
+- Sesión, empresas y permisos IMEC: `DatosSesion.vue` (`src/views/GestorInformacion/Estandar/DatosSesion.vue`); botonera estándar: `Botones.vue` (`src/views/GestorInformacion/Estandar/Botones.vue`).
+- Selector de empresa: `Empresas.vue` y sus variantes (`src/views/GestorInformacion/Estandar/Empresas.vue`); de periodo, que emite `AAAAMMDD` en todas las frecuencias: `Frecuencia.vue` (`src/views/GestorInformacion/Estandar/Frecuencia.vue`).
+- Moneda: `InputMoneda.vue` (`src/views/GestorInformacion/Estandar/InputMoneda.vue`); exportar: `ExportarArchivo.vue` (`src/views/GestorInformacion/Estandar/ExportarArchivo.vue`); importar Excel: `src/components/excel/ImportExcel.vue`.
+- Tablas dinámicas: `src/views/GestorInformacion/Estandar/tablaDinamica.vue`.
 - Notificaciones, confirmación y espera: `$vs.notify`, `$vs.dialog`, `$vs.loading` de Vuesax; tablas `vs-table`, popups `vs-popup`.
-- Formulario con el estándar `campo` / `campo__label` / `campo__error`: referencia en `resources/js/src/views/GestorInformacion/Transacciones/GestionTramites/EditorTramite.vue`.
+- Formulario con el estándar `campo` / `campo__label` / `campo__error`: referencia en `src/views/GestorInformacion/Transacciones/GestionTramites/EditorTramite.vue`.

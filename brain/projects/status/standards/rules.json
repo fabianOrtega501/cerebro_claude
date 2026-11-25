@@ -1,15 +1,6 @@
 {
-  "description": "Reglas de status (monolito) y status-api que code-standards-guard aplica sobre las lineas que agrega cada edicion. `repos` limita una regla a uno de los dos repos.",
+  "description": "Reglas de status-api y status-frontend que code-standards-guard aplica sobre las lineas que agrega cada edicion. `repos` limita una regla a uno de los dos repos. Las reglas de front vienen del CLAUDE.md del monolito, que ya no se desarrolla.",
   "rules": [
-    {
-      "id": "php74-syntax",
-      "repos": ["status"],
-      "pattern": "\\?->|(?<![\\w>$:])match\\s*\\(|^\\s*enum\\s+[A-Z]|__construct\\s*\\([^)]*\\b(private|public|protected)\\s",
-      "files": "^(app|database|routes|config)/.*\\.php$",
-      "message": "El monolito corre PHP 7.4: sin ?->, match, enum ni promocion de propiedades en el constructor.",
-      "source": "status/CLAUDE.md, seccion 2",
-      "exceptions": []
-    },
     {
       "id": "soft-deletes",
       "pattern": "\\bSoftDeletes\\b|->softDeletes\\(",
@@ -20,19 +11,19 @@
     },
     {
       "id": "vue-deep",
-      "repos": ["status"],
+      "repos": ["status-frontend"],
       "pattern": "::v-deep|\\s>>>\\s",
-      "files": "^resources/js/src/.*\\.vue$",
+      "files": "^src/.*\\.vue$",
       "message": "Usar :deep(selector), no ::v-deep ni >>>.",
       "source": "status/CLAUDE.md, seccion 9",
       "exceptions": []
     },
     {
       "id": "store-without-http",
-      "repos": ["status"],
+      "repos": ["status-frontend"],
       "pattern": "\\b(axios|\\$http)\\.(get|post|put|delete|request)\\(",
-      "files": "^resources/js/src/store/",
-      "message": "El store no hace llamadas HTTP: van en services/<Modulo>/<Nombre>Service.js.",
+      "files": "^src/store/",
+      "message": "El store no hace llamadas HTTP: van en services/<Producto>/<Modulo>/<Nombre>Service.js.",
       "source": "status/CLAUDE.md, seccion 7",
       "exceptions": []
     },
@@ -82,7 +73,7 @@
     {
       "id": "no-ticket-references",
       "pattern": "\\b(Mantis|GLPI)\\b|\\bticket\\s*#?\\s*\\d{3,}",
-      "files": "^(docs/|app/|routes/|database/migrations/|resources/js/src/)",
+      "files": "^(docs/|app/|routes/|database/migrations/|src/)",
       "message": "Sin referencias a tickets, Mantis, GLPI ni HU en el codigo ni en la documentacion tecnica.",
       "source": "~/.claude/CLAUDE.md, seccion Documentar funciones",
       "exceptions": []
@@ -107,27 +98,27 @@
     },
     {
       "id": "fn-prefix",
-      "repos": ["status"],
+      "repos": ["status-frontend"],
       "pattern": "^\\s*(async\\s+)?fn_\\w+\\s*\\([^)]*\\)\\s*\\{\\s*$",
-      "files": "^resources/js/src/.*\\.(vue|js)$",
+      "files": "^src/.*\\.(vue|js)$",
       "message": "Sin el prefijo fn_ en codigo nuevo: fnNombre en camelCase.",
       "source": "status/CLAUDE.md, seccion 9",
       "exceptions": []
     },
     {
       "id": "console-log",
-      "repos": ["status"],
+      "repos": ["status-frontend"],
       "pattern": "^(?!\\s*//).*\\bconsole\\.log\\(",
-      "files": "^resources/js/src/.*\\.(vue|js)$",
+      "files": "^src/.*\\.(vue|js)$",
       "message": "Sin console.log.",
       "source": "status/CLAUDE.md, seccion 9",
       "exceptions": []
     },
     {
       "id": "var-declaration",
-      "repos": ["status"],
+      "repos": ["status-frontend"],
       "pattern": "(?:^|[;{(])\\s*var\\s+[A-Za-z_$]",
-      "files": "^resources/js/src/.*\\.(vue|js)$",
+      "files": "^src/.*\\.(vue|js)$",
       "message": "Usar const o let, no var.",
       "source": "status/CLAUDE.md, seccion 9",
       "exceptions": []
