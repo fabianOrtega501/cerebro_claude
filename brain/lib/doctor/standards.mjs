@@ -8,7 +8,7 @@ const AREA = "standards";
 const PATH = /`((?:app|src|routes|database|resources|config|docs|tests|docker)\/[^`\s]+\.[a-z]{2,4})`/g;
 
 /** Rule kinds implemented in hooks/code-standards-guard.mjs; a rule without kind needs a pattern. */
-const KINDS = ["inline-comment", "docblock-length", "phpdoc-with-oa", "function-name-words", "standard-service-method"];
+const KINDS = ["inline-comment", "docblock-length", "phpdoc-with-oa", "function-name-words", "function-params", "standard-service-method"];
 
 /** File cited by a rule `source` ("aio-backend/x.md, seccion ..."), or `null` if it is not a path. */
 function sourceFile(source, root, repos) {

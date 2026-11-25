@@ -35,6 +35,15 @@
       "message": "Nombre de funcion, metodo o prueba de mas de 5 palabras (el prefijo test no cuenta). El detalle va en el docblock.",
       "source": "~/.claude/CLAUDE.md, preferencias de trabajo (nombres de maximo 5 palabras)",
       "exceptions": []
+    },
+    {
+      "id": "function-params",
+      "kind": "function-params",
+      "files": "\\.(php|ts|js|mjs|vue)$",
+      "max": 3,
+      "message": "Funcion con mas de 3 parametros (no cuentan los constructores). Se agrupan en un arreglo o DTO, o se reutiliza lo que ya resuelve una parte.",
+      "source": "team-rules.md de peer-review, punto 3, y ~/.claude/CLAUDE.md, preferencias de trabajo",
+      "exceptions": []
     }
   ]
 }

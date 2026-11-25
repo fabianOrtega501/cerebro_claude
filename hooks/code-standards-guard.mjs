@@ -6,7 +6,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, join, relative } from "node:path";
-import { readProjects, repoContaining } from "../brain/lib/projects.mjs";
+import { mainRepoOf, readProjects, repoContaining } from "../brain/lib/projects.mjs";
 
 const BRAIN = join(homedir(), ".claude");
 const ALLOWED_DIRECTIVES = /eslint-|@ts-|phpcs:|prettier-ignore|@vite-ignore|stylelint-|istanbul ignore/;
@@ -94,6 +94,56 @@ function words(name) {
 	return parts[0]?.toLowerCase() === "test" ? parts.slice(1) : parts;
 }
 
+/** Number of top-level parameters in a parameter list; nested (), [], {} and <> are skipped. */
+function countParams(list) {
+	let depth = 0;
+	let count = list.trim() ? 1 : 0;
+
+	for (let i = 0; i < list.length; i++) {
+		const char = list[i];
+
+		if ("([{<".includes(char))
+			depth++;
+		else if (")]}".includes(char) || (char === ">" && list[i - 1] !== "="))
+			depth = Math.max(0, depth - 1);
+		else if (char === "," && depth === 0 && list.slice(i + 1).trim())
+			count++;
+	}
+
+	return count;
+}
+
+/** Functions of `after` whose declaration line was added, with their name and parameter list. */
+function declaredFunctions(after, added) {
+	const addedText = new Set(added.map(a => a.text));
+	const found = [];
+	let offset = 0;
+
+	for (const line of after.split("\n")) {
+		const match = line.match(/function\s+&?\s*([A-Za-z_]\w*)\s*\(/)
+			?? line.match(/^\s*(?:export\s+)?const\s+([A-Za-z_]\w*)\s*=\s*(?:async\s*)?\(/);
+
+		if (match && addedText.has(line)) {
+			const start = offset + match.index + match[0].length;
+			let depth = 1;
+			let end = start;
+
+			for (; end < after.length && depth > 0; end++) {
+				if (after[end] === "(")
+					depth++;
+				else if (after[end] === ")")
+					depth--;
+			}
+
+			found.push({ text: line, name: match[1], params: after.slice(start, end - 1) });
+		}
+
+		offset += line.length + 1;
+	}
+
+	return found;
+}
+
 /** Findings of the rules that need context, not a single regex. */
 const KINDS = {
 	"inline-comment": (rule, { added, path }) => added.filter(({ text }) => {
@@ -134,6 +184,9 @@ const KINDS = {
 
 		return !!name && !name.startsWith("__") && words(name).length > rule.max;
 	}),
+
+	"function-params": (rule, { added, after }) => declaredFunctions(after, added)
+		.filter(({ name, params }) => !name.startsWith("__") && countParams(params) > rule.max),
 
 	"standard-service-method": (rule, { added, path }) => {
 		const match = path.match(/^app\/Services\/Modules\/[^/]+\/([^/]+)\/([^/]+)Service\.php$/);
@@ -182,15 +235,16 @@ const common = readJson(join(BRAIN, "brain", "standards", "common.json"));
 if (common?.skipPaths && new RegExp(common.skipPaths).test(path))
 	process.exit(0);
 
-const project = Object.entries(readProjects()).find(([, config]) => config.repos?.includes(repo))?.[0];
+const mainRepo = mainRepoOf(repo);
+const project = Object.entries(readProjects()).find(([, config]) => config.repos?.includes(mainRepo))?.[0];
 const own = project ? readJson(join(BRAIN, "brain", "projects", project, "standards", "rules.json")) : null;
 const rules = [...(common?.rules ?? []), ...(own?.rules ?? [])]
-	.filter(rule => !rule.repos || rule.repos.includes(basename(repo)))
+	.filter(rule => !rule.repos || rule.repos.includes(basename(mainRepo)))
 	.filter(rule => new RegExp(rule.files ?? ".").test(path) && !(rule.exceptions ?? []).includes(path));
 
 const { before, after } = texts(tool, input);
 const added = addedLines(before, after);
-const ctx = { added, path, before, blocks: newDocblocks(before, after, added) };
+const ctx = { added, path, before, after, blocks: newDocblocks(before, after, added) };
 const violations = rules.flatMap(rule => check(rule, ctx).slice(0, 3).map(hit => ({ rule, hit })));
 
 if (!violations.length)

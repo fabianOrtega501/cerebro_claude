@@ -96,6 +96,46 @@
       "message": "Sin console.log: los errores se muestran con handleResponseErrors y notify.",
       "source": "aio-app/CLAUDE.md, seccion Que evitar",
       "exceptions": []
+    },
+    {
+      "id": "db-raw-in-select",
+      "pattern": "^\\s*DB::raw\\(",
+      "files": "^app/",
+      "message": "Columnas calculadas con selectRaw(), no con DB::raw dentro de select([...]), como en DispatchOverviewQueryBuilder.",
+      "source": "Revision de pares del ticket 11934 (Steveen, MR 3004)",
+      "exceptions": []
+    },
+    {
+      "id": "dispatch-status-literal",
+      "pattern": "dispatch_status['\"]?\\s*(={1,3}\\s*\\d|,\\s*\\[\\s*\\d)",
+      "files": "^(app|src)/",
+      "message": "Estado del despacho con numero suelto. En el back, DispatchOverviewQueryBuilder::STATUS_OPERATING / STATUS_CLOSED; en el front, DISPATCH_STATUS_META.",
+      "source": "Revision de pares del ticket 11934 (Steveen, MR 3004 y 2403)",
+      "exceptions": []
+    },
+    {
+      "id": "controller-without-return-type",
+      "pattern": "^\\s*public\\s+function\\s+(?!__construct)\\w+\\(.*\\)\\s*$",
+      "files": "^app/Http/Controllers/",
+      "message": "Metodo de controlador sin tipo de retorno: declarar ': JsonResponse' (use Illuminate\\Http\\JsonResponse).",
+      "source": "Revision de pares del ticket 11934 (Steveen, MR 3004)",
+      "exceptions": []
+    },
+    {
+      "id": "import-of-auto-imported",
+      "pattern": "^import\\s+\\{(?![^}]*\\b(render|type)\\b)[^}]*\\}\\s+from\\s+'(vue|vue-i18n|pinia|@vueuse/core|@/composables/[^'/]+|@/utils/[^'/]+)'",
+      "files": "^src/",
+      "message": "Eso ya se auto-importa (vue, vue-i18n, pinia, @vueuse/core, src/composables/ y src/utils/): sobra el import. render de vue y los tipos (import type) si se importan.",
+      "source": "Revision de pares del ticket 11934 (Steveen, MR 2403); vite.config.ts, AutoImport",
+      "exceptions": []
+    },
+    {
+      "id": "typescript-any",
+      "pattern": "(:\\s*any\\b|<any(\\[\\])?>|\\bas\\s+any\\b)",
+      "files": "^src/.*\\.(ts|vue)$",
+      "message": "any en codigo nuevo: usar la interfaz que ya existe en src/interfaces/ (IVehicle, IDispatch...) o crear la que falte.",
+      "source": "Revision de pares del ticket 11934 (Steveen, MR 2403)",
+      "exceptions": []
     }
   ]
 }

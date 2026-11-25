@@ -117,6 +117,11 @@ trabajando en el cerebro**: main-brain no lo reemplaza. Modelo mixto, lo decidio
   si; `test_agreement_without_advantage_items_cannot_be_approved` no. En las pruebas el prefijo
   `test_` no cuenta. Si no cabe en cinco palabras, el detalle va en el docblock. Lo pidio Fabian el
   2026-09-30.
+- **Funciones: maximo 3 parametros**, tambien las privadas y los ayudantes de las pruebas; no cuentan
+  los constructores. Si hace falta mas, se reutiliza lo que ya resuelve una parte (un servicio que ya
+  devuelve los ids, por ejemplo) o se agrupa en un arreglo o DTO. Es el punto 3 de las reglas del
+  equipo (`team-rules.md` de `peer-review`); lo hace cumplir `code-standards-guard` con la regla
+  `function-params`. Lo pidio Fabian el 2026-11-24, tras el comentario de Andres en el MR del 11934.
 - **Credenciales: en ningun archivo versionado, nunca.** Van a `~/.claude/secrets.env`, que la
   lista blanca del `.gitignore` deja fuera del repo. Los scripts las leen de ahi.
 - **Rutas absolutas: aqui si, en un repo de trabajo jamas.** El cerebro es local y personal, y hay

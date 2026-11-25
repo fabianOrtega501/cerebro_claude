@@ -28,6 +28,7 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [solo-lo-pedido](solo-lo-pedido.md) — No agregar trabajo, validaciones ni protecciones que no se pidieron; lo que parezca necesario se propone, no se agrega
 - [repetir-revision-tras-corregir](repetir-revision-tras-corregir.md) — Si la revisión de pares propia lleva a corregir algo, se vuelve a correr completa antes de seguir
 - [revision-de-pares-propia](revision-de-pares-propia.md) — Antes del commit, revisar el diff con la lista de fallas que han devuelto las revisiones de pares (11411, 11730, 11857)
+- [comentarios-mr-alimentan-reglas](comentarios-mr-alimentan-reglas.md) — Tras resolver comentarios de un MR, cada uno se vuelve regla (guarda, reuse.md y revisión propia) sin que se pida
 - [vscode-autoguardado-pisa-cambios](vscode-autoguardado-pisa-cambios.md) — El autoguardado de VS Code deshace los cambios hechos con git checkout o git apply; confirmar con git diff antes del add
 - [glpi-es-el-codigo-glpi-de-mantis](glpi-es-el-codigo-glpi-de-mantis.md) — El GLPI de un ticket es solo el campo "Codigo GLPI" de Mantis; el id de un adjunto es un docid, no un caso
 - [cierre-con-todas-las-documentaciones](cierre-con-todas-las-documentaciones.md) — Orden fijo del cierre sin preguntar entre pasos, hasta el push (lo único aprobado); control de cambios, set y comentarios para QA solo con «Ticket en desa»

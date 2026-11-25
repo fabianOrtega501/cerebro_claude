@@ -10,7 +10,7 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { homedir } from "node:os";
 
 const REGISTRY = join(homedir(), ".claude", "brain", "projects.json");
@@ -75,15 +75,58 @@ export function allRepos() {
 
 /**
  * Repo registrado que contiene una ruta; si hay anidados, gana el mas profundo.
+ * Una ruta dentro de un worktree de un repo registrado devuelve la raiz del worktree.
  *
  * @param {string} path - Ruta absoluta
  * @param {string[]} [repos] - Lista de repos; por defecto `allRepos()`
  * @returns {string|null} La raiz del repo, o `null` si la ruta no cae en ninguno
  */
 export function repoContaining(path, repos = allRepos()) {
-	return repos
+	const registered = repos
 		.filter(repo => path === repo || path.startsWith(repo + "/"))
-		.sort((a, b) => b.length - a.length)[0] ?? null;
+		.sort((a, b) => b.length - a.length)[0];
+
+	if (registered)
+		return registered;
+
+	const worktree = worktreeOf(path);
+
+	return worktree && repos.includes(worktree.main) ? worktree.root : null;
+}
+
+/**
+ * Repo principal de una raiz: la misma raiz, o el repo del que es worktree.
+ *
+ * @param {string} root - Raiz devuelta por `repoContaining`
+ * @returns {string} Ruta del repo principal
+ */
+export function mainRepoOf(root) {
+	return worktreeOf(root)?.main ?? root;
+}
+
+/**
+ * Raiz del worktree que contiene una ruta y su repo principal, leidos de git.
+ *
+ * @param {string} path - Ruta absoluta; si no existe, se usa la carpeta existente mas cercana
+ * @returns {{root: string, main: string}|null} `null` si la ruta no esta en un repo git
+ */
+function worktreeOf(path) {
+	let dir = path;
+
+	while (dir !== dirname(dir) && !existsSync(dir))
+		dir = dirname(dir);
+
+	try {
+		const [root, common] = execFileSync("git", ["-C", dir, "rev-parse", "--show-toplevel", "--path-format=absolute", "--git-common-dir"], {
+			encoding: "utf8",
+			stdio: ["ignore", "pipe", "ignore"],
+		}).trim().split("\n");
+
+		return { root, main: basename(common) === ".git" ? dirname(common) : root };
+	}
+	catch {
+		return null;
+	}
 }
 
 /** Ruta del registro, para poder decirle al usuario dónde agregar un proyecto que falte. */

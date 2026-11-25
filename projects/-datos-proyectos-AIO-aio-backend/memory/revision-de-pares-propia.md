@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: feedback
   originSessionId: 8c34b7cf-528c-4a38-9db5-224293c71ab9
-  modified: 2026-11-20T20:38:25.360Z
+  modified: 2026-11-25T14:40:31.963Z
 ---
 
 Antes de proponer el commit de un desarrollo en AIO, se revisa el diff completo como lo haría la
@@ -64,6 +64,14 @@ revisión de pares, con esta lista. Cada punto salió de una devolución real de
     clase (`grep "Clase::NOMBRE"`); sin uso externo, va `private` (11730).
 23. **Un cambio de regla se busca en todo el documento técnico**, incluida «Casos borde y deuda
     técnica»: ningún párrafo puede seguir describiendo el comportamiento viejo (11730).
+24. **Máximo 3 parámetros por función, y ninguna consulta que ya exista en un servicio vecino.** Lo
+    primero lo niega `code-standards-guard` (`function-params`); lo segundo se busca: los centros del
+    usuario salen de `DispatchOverviewService::getUserCenterIds`, no de otro `whereExists` (11934,
+    comentario de Andrés en el MR).
+25. **Nada armado a mano que el repo ya resuelve, ni valores sin nombre** (11934, Steveen en los MR 3004 y
+    2403): estados por constante, `selectRaw()` y `: JsonResponse` en el back; `VSkeletonLoader`, sin
+    imports de lo auto-importado y sin `any` en el front. Lo mecánico lo niega `code-standards-guard`
+    (reglas de `brain/projects/aio/standards/rules.json`); el skeleton propio se busca a ojo.
 
 **Why:** el MR del ticket 11411 volvió con 1 bloqueante (anular un PQR de otra empresa), 4
 correcciones y 4 mejoras, aunque las 119 pruebas pasaban. Fabian lo pidió el 2026-10-19: «no

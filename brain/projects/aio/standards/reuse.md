@@ -23,7 +23,12 @@ Fuentes: el `CLAUDE.md` de cada repo, sus memorias de estándar (`buscar-antes-d
   - `$casts` que repite el tipo que ya entrega PostgreSQL (`boolean`, `integer`): la columna va solo en `$fillable` (11857).
   - `nullable` en el request de una columna `NOT NULL`: llega null, la base lo rechaza y sale un 500. Opcional pero con valor: `['sometimes', $this->bool]` (11857).
   - Confiar en un valor que el servidor puede calcular (un costo, un total) solo porque el front ya lo calcula: el servicio lo calcula para todos los caminos, también por API (11857).
+  - Funciones de más de 3 parámetros (los constructores no cuentan): se reutiliza lo que ya resuelve una parte o se agrupa en un arreglo o DTO. Lo niega `code-standards-guard` (11934).
+  - Armar otro `whereExists` o `join` sobre `user_operational_centers` para acotar por los centros del usuario: se piden a `DispatchOverviewService::getUserCenterIds($companyId)` y se filtra con `whereIn` (11934).
+  - Estados como número suelto (`dispatch_status = 2`, `[1, 2]`): la constante con nombre que ya exista (`DispatchOverviewQueryBuilder::STATUS_OPERATING` / `STATUS_CLOSED`); `DB::raw` dentro de `select([...])`: columnas calculadas con `selectRaw()`; método de controlador sin `: JsonResponse`. Los tres los niega `code-standards-guard` (11934).
 - **Frontend**
+  - Skeleton, loader o estado de carga hechos desde cero (barras con `@keyframes` propios): `VSkeletonLoader` (`type="list-item-avatar-two-line"`, como en `views/home/modulos.vue`) o `components/Standard/Loader` (11934). En Vuetify 3.3 está en labs: se importa con `import { VSkeletonLoader } from 'vuetify/lib/labs/components.mjs'`; sin eso el build pasa y en pantalla no aparece.
+  - `import` de lo que se auto-importa (`vue` salvo `render`, `vue-i18n`, `pinia`, `@vueuse/core`, `src/composables/`, `src/utils/`), `any` en código nuevo (se usa la interfaz de `src/interfaces/`, y si le falta un campo real se agrega opcional) y estados como número suelto (`DISPATCH_STATUS_META`). Los niega `code-standards-guard` (11934).
   - Llamar a la API desde un componente: siempre una clase de `src/services/` con `$api`.
   - `VTextField` / `VTextarea` directos en formularios: `AppTextField` / `AppTextarea` con la etiqueta arriba, `persistent-placeholder` y placeholder `` `${$t('enter')} ${etiqueta}` ``.
   - Una clave i18n nueva cuando ya existe una equivalente; las nuevas, al final de `es.json` y `en.json`.
@@ -57,6 +62,7 @@ Fuentes: el `CLAUDE.md` de cada repo, sus memorias de estándar (`buscar-antes-d
 - Publicar las fechas de un modelo en la hora de su empresa: trait `app/Traits/Functions/FormatDateByCompany.php`. Lo que compare instantes se lee con `getRawOriginal`.
 - Encabezado oficial (código, versión, fechas) de un PDF por empresa: trait `app/Traits/Functions/FormatHeader.php`.
 - Colaborador del usuario en sesión: `Auth::user()?->staff?->id` (relación `User::staff()`, por documento). No hace falta `User::find(Auth::id())`.
+- Centros operativos activos del usuario en sesión dentro de una empresa (asignación y centro activos): `DispatchOverviewService::getUserCenterIds($companyId)` (`app/Services/Modules/Operation/Dispatch/DispatchOverviewService.php`). Ya lo usan el Dashboard de despachos, el cumplimiento por puntos de control y los despachos de 24 horas de Seguimiento GPS.
 - Parámetro por empresa: `CustomParameterService::getParameterByCompany($companyId, $key)` (`app/Services/Modules/Settings/Parameter/CustomParameterService.php`).
 - Sembrar un parámetro nuevo: al final de `database/initialData/parameters.json` (lo inserta `ParameterSeeder` si la llave no existe). Nunca una migración, aunque la HU la pida.
 - Comprobar un permiso por código: `PermissionCheckerService::userHasPermission` (`app/Services/Common/Auth/PermissionCheckerService.php`).
