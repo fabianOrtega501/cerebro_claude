@@ -31,7 +31,7 @@ trabaje, o hechos que solo valen en esta maquina o en este clon.
 - [comentarios-mr-alimentan-reglas](comentarios-mr-alimentan-reglas.md) — Tras resolver comentarios de un MR, cada uno se vuelve regla (guarda, reuse.md y revisión propia) sin que se pida
 - [vscode-autoguardado-pisa-cambios](vscode-autoguardado-pisa-cambios.md) — El autoguardado de VS Code deshace los cambios hechos con git checkout o git apply; confirmar con git diff antes del add
 - [glpi-es-el-codigo-glpi-de-mantis](glpi-es-el-codigo-glpi-de-mantis.md) — El GLPI de un ticket es solo el campo "Codigo GLPI" de Mantis; el id de un adjunto es un docid, no un caso
-- [cierre-con-todas-las-documentaciones](cierre-con-todas-las-documentaciones.md) — Orden fijo del cierre sin preguntar entre pasos, hasta el push (lo único aprobado); control de cambios, set y comentarios para QA solo con «Ticket en desa»
+- [cierre-con-todas-las-documentaciones](cierre-con-todas-las-documentaciones.md) — Orden fijo del cierre sin preguntar entre pasos, hasta el push (lo único aprobado) y el control de cambios; set y comentarios para QA solo con «Ticket en desa»
 - [adaptar-lo-nuevo-al-manejo-existente](adaptar-lo-nuevo-al-manejo-existente.md) — Si el ticket choca con un manejo global existente, no se cambia ese manejo; se adapta lo nuevo solo para los campos del ticket
 - [auditoria-local-sin-particion](auditoria-local-sin-particion.md) — En la base local las tablas particionadas (auditoría y GPS) se quedan sin partición del mes y la secuencia de gps.events va atrasada
 - [rutas-de-menu-completas](rutas-de-menu-completas.md) — Al indicar dónde está algo en el AIO, dar la ruta completa del menú verificada contra la tabla menus

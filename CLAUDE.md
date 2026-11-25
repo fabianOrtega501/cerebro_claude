@@ -395,10 +395,11 @@ su confirmacion. Solo con ese si se pasa a `finish-development`. Lo pidio Fabian
 verificacion y prueba integral, documentacion tecnica, manuales, commit + integrar la base + push.
 **El commit y el push siguen pidiendo el si de Fabian, siempre.** Lo fijo el 2026-11-19.
 
-**El control de cambios, el set de pruebas y los comentarios para QA no van en el cierre.** Se generan y
-entregan cuando Fabian avisa «Ticket en desa» (Fase 9 de `finish-development`), contra lo que de verdad
-quedo en desa. El set propio de antes del cierre, el de «lo vi en pantalla», no cambia. Lo pidio Fabian
-el 2026-11-24.
+**El control de cambios va al final del cierre, despues del push**: sin el no se puede pasar el ticket a
+desa. **El set de pruebas y los comentarios para QA no van en el cierre**: se generan y entregan cuando
+Fabian avisa «Ticket en desa» (Fase 9 de `finish-development`), contra lo que de verdad quedo en desa. El
+set propio de antes del cierre, el de «lo vi en pantalla», no cambia. Lo pidio Fabian el 2026-11-24 y
+movio el control de cambios al cierre el 2026-11-25.
 
 ## La VPN solo hace falta desde fuera, y no afecta las bases locales
 
