@@ -23,3 +23,22 @@ Lo específico de la app móvil para la skill `update-manual`. El procedimiento 
   invisible y no importa nada: hay que hacer clic de ratón real sobre el elemento visible.
 - **El AMI solo descarga las programaciones aprobadas de hoy** (en la hora de la empresa), con su
   inspección aprobada. Datos de prueba de otro día no aparecen.
+
+## Capturas desde un celular real (adb + CDP)
+
+Lo que solo existe en nativo —permisos, ubicación apagada, notificaciones— se captura del celular
+conectado: `adb forward tcp:9333 localabstract:webview_devtools_remote_<pid>` y CDP sobre el webview.
+Lo aprendido en el 11687 (2026-11-26):
+
+- **`Page.captureScreenshot` se cuelga con la pantalla apagada o bloqueada.** Despertar con
+  `input keyevent KEYCODE_WAKEUP` y deslizar para desbloquear; `adb screencap` sirve para ver los
+  diálogos del sistema, que el webview no ve.
+- **Ubicación apagada**: `cmd location set-location-enabled false|true`.
+- **Permiso en «preguntar»**: `pm revoke` (cierra la app). Tras dos negativas Android marca
+  `USER_FIXED`, que `pm grant` no borra: se limpia concediéndolo desde Ajustes > Permisos.
+- **Capacitor recuerda la negativa aparte**, en `shared_prefs/PluginPermStates.xml`, y sigue
+  respondiendo `denied`. Con la APK de depuración se borra con `run-as <paquete> rm …` y la app detenida.
+- **El nombre de la compilación sale en pantalla** (`AMI-LOCAL`): se reemplaza en el DOM antes de
+  capturar, porque en producción dice AMI.
+- **Cerrar sesión con `router.push('/logout')` deja montadas las páginas anteriores** y sus alertas se
+  ven encima del ingreso. El menú real usa `href="/logout"`, que recarga: recargar antes de capturar.
