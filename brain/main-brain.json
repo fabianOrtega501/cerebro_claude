@@ -10,6 +10,9 @@
     "development:gen-changes-controls": [
       "skills/gen-changes-controls"
     ],
+    "development:impact-test": [
+      "skills/prueba-integral"
+    ],
     "development:update-tech-docs": [
       "skills/update-tech-docs",
       "hooks/docs-on-push.mjs",
@@ -72,6 +75,6 @@
     { "branch": "feature/fabian-project-config", "commit": "5433774", "plugin": "core", "version": "0.2.0", "piece": "brain/lib/secrets.mjs, brain/lib/environments.mjs, hooks/environment-*.mjs, skills/ambiente", "status": "merged" },
     { "branch": "feature/fabian-project-config", "commit": "5433774", "plugin": "development", "version": "0.6.0", "piece": "skills/ticket-context, agents/ticket-reader.md, brain/lib/tickets", "status": "merged", "note": "Merge de qa en 940c877: la misma rama sube aio y manuals a 0.4.0 por la copia de lib/config.mjs" },
     { "branch": "feature/fabian-gen-test-set", "commit": "53ad548", "plugin": "development", "version": "0.9.0", "piece": "skills/gen-test-set, skills/gen-sprint-summary, skills/gen-changes-controls/lib/collect-changes.mjs", "status": "merged" },
-    { "branch": "feature/fabian-gen-changes-controls", "commit": "90dd3d0", "plugin": "development", "version": "0.10.0", "piece": "skills/gen-changes-controls, skills/update-tech-docs, hooks/docs-on-push.mjs", "status": "pending" }
+    { "branch": "feature/fabian-gen-changes-controls", "commit": "d0a9ed6", "plugin": "development", "version": "0.10.0", "piece": "skills/gen-changes-controls, skills/update-tech-docs, hooks/docs-on-push.mjs, skills/prueba-integral", "status": "pending" }
   ]
 }
