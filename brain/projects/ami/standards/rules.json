@@ -72,6 +72,22 @@
       "message": "SCHEMA_STAMP vive en Preferences: el logout hace localStorage.clear().",
       "source": "app-movil/CLAUDE.md, seccion 4",
       "exceptions": []
+    },
+    {
+      "id": "typescript-any",
+      "pattern": "(:\\s*any\\b|<any(\\[\\])?>|\\bas\\s+any\\b|\\(\\w+:\\s*any\\))",
+      "files": "^src/.*\\.(ts|vue)$",
+      "message": "any en codigo nuevo: usar el tipo o la interfaz que ya exista (src/interfaces/, o el exportado por el mismo servicio) o crear la que falte.",
+      "source": "app-movil/CLAUDE.md, seccion de estilo; revision de pares del ticket 11687 (Victor, MR 706)",
+      "exceptions": []
+    },
+    {
+      "id": "shared-no-module-imports",
+      "pattern": "from\\s+['\"]@/(services/app|views/pages)/modules/(?!common/|settings/)",
+      "files": "^src/(components/|composables/standard/|services/app/hardware/)",
+      "message": "Lo compartido no depende de un modulo de negocio: si varios modulos usan la pieza, va en la carpeta comun (services/app/hardware, services/app/modules/common, composables/standard) y el modulo la importa de alli.",
+      "source": "team-rules.md, punto 5; revision de pares del ticket 11687 (Victor, MR 706)",
+      "exceptions": []
     }
   ]
 }

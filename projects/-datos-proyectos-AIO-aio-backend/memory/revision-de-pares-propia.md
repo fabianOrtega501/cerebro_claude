@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: feedback
   originSessionId: 8c34b7cf-528c-4a38-9db5-224293c71ab9
-  modified: 2026-11-25T14:40:31.963Z
+  modified: 2026-11-27T14:38:39.276Z
 ---
 
 Antes de proponer el commit de un desarrollo en AIO, se revisa el diff completo como lo haría la
@@ -72,6 +72,15 @@ revisión de pares, con esta lista. Cada punto salió de una devolución real de
     2403): estados por constante, `selectRaw()` y `: JsonResponse` en el back; `VSkeletonLoader`, sin
     imports de lo auto-importado y sin `any` en el front. Lo mecánico lo niega `code-standards-guard`
     (reglas de `brain/projects/aio/standards/rules.json`); el skeleton propio se busca a ojo.
+26. **Ningún docblock con solo `@returns` o `@param`**: lleva antes la línea que dice qué hace la
+    función, también en el front y en la app móvil (11687, Andrés en el MR 706 de app-movil). En AMI lo
+    revisa `undocumented-functions.mjs --project ami`, también las funciones internas de un composable.
+27. **En AMI, un fallo que el usuario no ve se registra con `storeLocalError`** (`LogErrorService.ts`), no
+    con `console.error` ni con `.catch(() => undefined)`: en el celular la consola no se ve y soporte se
+    queda sin rastro. Se exceptúan los envíos sin red que el propio flujo reintenta. Además, lo que usa
+    más de un módulo va en la carpeta común, y al copiar una firma vecina se le quita el `any` (11687,
+    Victor en el MR 706; lo mecánico lo niega `code-standards-guard` con `typescript-any` y
+    `shared-no-module-imports`).
 
 **Why:** el MR del ticket 11411 volvió con 1 bloqueante (anular un PQR de otra empresa), 4
 correcciones y 4 mejoras, aunque las 119 pruebas pasaban. Fabian lo pidió el 2026-10-19: «no

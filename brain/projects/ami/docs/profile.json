@@ -1,0 +1,12 @@
+{
+  "//": "Perfil de AMI (app-movil) para la skill update-tech-docs. Solo sirve a undocumented-functions.mjs: el repo no tiene docs/ de reglas de negocio, asi que check-docs.mjs no aplica.",
+
+  "label": "AMI (app-movil)",
+  "repo": "/datos/proyectos/app-movil",
+
+  "//docGlobs": "Solo src/: las funciones de ayuda de las pruebas son anonimas o de una linea y no se documentan.",
+  "docGlobs": ["src"],
+  "docExtensions": [".ts", ".vue"],
+
+  "techDocs": false
+}

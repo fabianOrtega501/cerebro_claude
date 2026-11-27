@@ -34,11 +34,14 @@ node ~/.claude/skills/update-tech-docs/lib/undocumented-functions.mjs --project 
 El primero compara la rama actual contra el punto donde se separó de su base y dice **qué módulos
 tienen lógica cambiada y no tienen documentación tocada**. Sale 1 si hay pendientes.
 
-El segundo lista **las funciones sin docblock, o con el docblock incompleto (sin `@return` en una que devuelve algo, o con
-menos `@param` que argumentos), de los archivos PHP que toca la rama**, separando las `nuevas`
-(declaradas en líneas añadidas) de las que ya existían. Revisa `app/`, `database/migrations/`,
-`database/seeders/` y `tests/`, o lo que diga `docGlobs` en el perfil; los métodos con `@OA` no
-exigen etiquetas. Sale 1 si hay funciones nuevas sin documentar o incompletas.
+El segundo lista **las funciones sin docblock, o con el docblock incompleto (sin la línea que dice qué
+hace, sin `@return` en una que devuelve algo, o con menos `@param` que argumentos), de los archivos
+que toca la rama**, separando las `nuevas` (declaradas en líneas añadidas) de las que ya existían.
+Por omisión revisa PHP en `app/`, `database/migrations/`, `database/seeders/` y `tests/`; el perfil
+lo cambia con `docGlobs` y `docExtensions`. Con `.ts` y `.vue` (AMI) revisa también las funciones
+internas de un composable o de un `<script setup>` y los métodos de los objetos. Los métodos con
+`@OA` no exigen etiquetas. Sale 1 si hay funciones nuevas sin documentar o incompletas. Un perfil con
+`"techDocs": false` (AMI, sin `docs/`) solo sirve a este script: `check-docs.mjs` sale sin revisar.
 
 Opciones: `--base <rama>` si el nombre de la rama no codifica su origen, `--branch <rama>` para
 revisar otra sin cambiarse a ella, `--json` para procesar.

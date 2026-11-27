@@ -62,6 +62,11 @@ if (!profile) {
 	process.exit(2);
 }
 
+if (profile.techDocs === false) {
+	console.log(`${profile.label}: el repo no lleva documentacion tecnica de reglas de negocio; solo aplica undocumented-functions.mjs.`);
+	process.exit(0);
+}
+
 const repo = profile.repo;
 
 if (!existsSync(repo)) {
